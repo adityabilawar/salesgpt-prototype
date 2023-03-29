@@ -36,8 +36,8 @@ export default (req: NextApiRequest, res: NextApiResponse) => {
 		}
 		const workbook = xlsx.readFile(files.file.filepath);
 		const data = xlsx.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
-		const responseData = await getResponses(data, 'Om Patel');
-		console.log(responseData);
+		if(typeof req.query.name !== 'string') return res.status(404).send('invalid name');
+		const responseData = await getResponses(data, req.query.name);
 		return res.status(200).json(responseData);
 	});
 }

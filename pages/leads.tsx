@@ -16,9 +16,8 @@ const LeadsPage = () => {
 
 		const formData = new FormData();
 		formData.append('file', file);
-		const name = localStorage.getItem('fullName');
-		if(name) formData.append('name', name);
-		axios.post('/api/file', formData)
+		const name = localStorage.getItem('fullName') ? localStorage.getItem('fullName') : '';
+		axios.post(`/api/file?name=${name}`, formData)
 			.then(res => setData(res.data))
 			.catch(err => {
 				console.log(err);
