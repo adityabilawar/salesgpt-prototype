@@ -18,7 +18,7 @@ const LeadsPage = () => {
 		formData.append('file', file);
 		const name = localStorage.getItem('fullName');
 		if(name) formData.append('name', name);
-		axios.post('/api/upload', formData)
+		axios.post('/api/file', formData)
 			.then(res => setData(res.data))
 			.catch(err => {
 				console.log(err);
@@ -36,7 +36,7 @@ const LeadsPage = () => {
 					</div>
 					{(data !== null)
 						? 
-							<div className="leads-list flex flex-col justify-center gap-5 items-center">
+							<div className="leads-list flex flex-col justify-center gap-5 items-center overflow-y-scroll">
 								{data.map((res: any, ind: any) => (
 									<div className="lead-listing flex w-full h-12 border-t-2 border-solid border-[#1D203E] items-center gap-10" key={ind}>
 										<div className="lead-listing-name text-xl text-blue-100 ml-5 mt-1" key={`name-${ind}`}>
