@@ -1,0 +1,16 @@
+.loginContainer {
+  border: 5px solid;
+  border-image-slice: 1;
+  border-image-source: linear-gradient(to bottom right, #01B7C5, #C417E0);
+}
+
+.loginBTN {
+  background: linear-gradient(to bottom right, #01B7C5, #C417E0);
+}
+
+.loginInput {
+  transition: border 300ms ease-in;
+  -webkit-transition : border 300ms ease-in; 
+  -moz-transition : border 300ms ease-in;
+  -o-transition : border 300ms ease-in;
+}
