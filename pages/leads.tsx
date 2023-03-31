@@ -52,7 +52,7 @@ const LeadsPage = () => {
 								<table className="leads-list table-auto border-collapse border-t-2 border-solid border-[#1D203E] w-full self-center overflow-y-scroll">
 									<tbody>
 										{data.map((res: any, ind: any) => (
-											<tr className="lead-listing cursor-pointer hover:bg-[#393D5D] select-none">
+											<tr className="lead-listing cursor-pointer hover:bg-[#393D5D] select-none" key={ind}>
 												<td className="lead-listing-name text-xl text-blue-100 align-middle p-2 pl-5" key={`name-${ind}`}>
 													{res.name}
 												</td>
@@ -88,7 +88,7 @@ const LeadsPage = () => {
 										
 										<div className="text-blue-100 text-sm">
 											<p className="text-blue-200 text-2xl">{res.type} for {res.name}</p>
-											{res.res.split('\n').map((str: any) => <p>{str}</p>)}
+											{res.res.split('\n').map((str: any) => <p key={str}>{str}</p>)}
 										</div>
 									</div>
 								))}
