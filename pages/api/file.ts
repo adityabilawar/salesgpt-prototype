@@ -27,19 +27,23 @@ export default (req: NextApiRequest, res: NextApiResponse) => {
 	if(req.method !== 'POST') return res.status(404).send("only POST allowed");
 
 	// const { name } = req.body;
-	const form = new formidable.IncomingForm();
-	form.parse(req, async(err, fields, files) => {
-		if(Array.isArray(files.file)) return res.status(404).send("array files");
-		if(err) {
-			console.error(err);
-			return res.status(404).send('error while parsing file');
-		}
-		const workbook = xlsx.readFile(files.file.filepath);
-		const data = xlsx.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
-		if(typeof req.query.name !== 'string') return res.status(404).send('invalid name');
-		const responseData = await getResponses(data, req.query.name);
-		return res.status(200).json(responseData);
-	});
+	try {
+		const form = new formidable.IncomingForm();
+		form.parse(req, async(err, fields, files) => {
+			if(Array.isArray(files.file)) return res.status(404).send("array files");
+			if(err) {
+				console.error(err);
+				return res.status(404).send('error while parsing file');
+			}
+			const workbook = xlsx.readFile(files.file.filepath);
+			const data = xlsx.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
+			if(typeof req.query.name !== 'string') return res.status(404).send('invalid name');
+			const responseData = await getResponses(data, req.query.name);
+			return res.status(200).json(responseData);
+		});
+	} catch(e) {
+		console.error(e);
+	}
 }
 
 const LETTER_TYPES = ['Linkedin invite', 'Intro Email', 'Coffee Chat'];
