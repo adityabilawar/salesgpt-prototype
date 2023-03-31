@@ -35,18 +35,35 @@ const LeadsPage = () => {
 					</div>
 					{(data !== null)
 						? 
-							<div className="leads-list flex flex-col justify-center gap-5 items-center overflow-y-scroll">
-								{data.map((res: any, ind: any) => (
-									<div className="lead-listing flex w-full h-12 border-t-2 border-solid border-[#1D203E] items-center gap-10" key={ind}>
-										<div className="lead-listing-name text-xl text-blue-100 ml-5 mt-1" key={`name-${ind}`}>
-											{res.name}
-										</div>
-										<div className="lead-listing-info flex flex-col mt-4" key={`info-${ind}`}>
-											<div className="lead-listing-position text-lg text-blue-100" key={`pos-${ind}`}>{res.position}</div>
-											<div className="lead-listing-company text-lg text-blue-100" key={`company-${ind}`}>{res.company}</div>
-										</div>
-									</div>
-								))}
+							// <div className="leads-list flex flex-col justify-center gap-5 items-center overflow-y-scroll">
+							// 	{data.map((res: any, ind: any) => (
+							// 		<div className="lead-listing flex w-full h-12 border-t-2 border-solid border-[#1D203E] items-center gap-10 justify-between" key={ind}>
+							// 			<div className="lead-listing-name text-xl text-blue-100 mt-1 ml-5" key={`name-${ind}`}>
+							// 				{res.name}
+							// 			</div>
+							// 			<div className="lead-listing-info flex flex-col mt-4 mr-5" key={`info-${ind}`}>
+							// 				<div className="lead-listing-position text-lg text-blue-100" key={`pos-${ind}`}>{res.position}</div>
+							// 				<div className="lead-listing-company text-lg text-blue-100" key={`company-${ind}`}>{res.company}</div>
+							// 			</div>
+							// 		</div>
+							// 	))}
+							// </div>
+							<div className="overflow-y-scroll w-full">
+								<table className="leads-list table-auto border-collapse border-t-2 border-solid border-[#1D203E] w-full self-center overflow-y-scroll">
+									<tbody>
+										{data.map((res: any, ind: any) => (
+											<tr className="lead-listing cursor-pointer hover:bg-[#393D5D] select-none">
+												<td className="lead-listing-name text-xl text-blue-100 align-middle p-2 pl-5" key={`name-${ind}`}>
+													{res.name}
+												</td>
+												<td className="lead-listing-info flex flex-col align-middle p-2" key={`info-${ind}`}>
+													<div className="lead-listing-position text-lg text-blue-100" key={`pos-${ind}`}>{res.position}</div>
+													<div className="lead-listing-company text-lg text-blue-100" key={`company-${ind}`}>{res.company}</div>
+												</td>
+											</tr>
+										))}
+									</tbody>
+								</table>
 							</div>
 						:	
 							<div className="leads-list flex flex-col items-center cursor-pointer select-none self-center">

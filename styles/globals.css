@@ -34,3 +34,7 @@ input:focus {
 .leads-option::-webkit-scrollbar {
   display: none;
 }
+
+.lead-listing {
+  border-bottom: 2px solid #1D203E;
+}
