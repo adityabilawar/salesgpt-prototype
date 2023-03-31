@@ -43,7 +43,13 @@ export default (req: NextApiRequest, res: NextApiResponse) => {
 			if(typeof req.query.name !== 'string') return res.status(404).send('invalid name');
 			// const responseData = await getResponses(data, req.query.name);
 			// return res.status(200).json(responseData);
-			return res.status(200).send('helo');
+			return res.status(200).json([{
+				name: 'test',
+				position: 'test',
+				company: 'ea',
+				res: 'a',
+				type: 'mesag'
+			}]);
 		});
 	} catch(e) {
 		console.error(e);
