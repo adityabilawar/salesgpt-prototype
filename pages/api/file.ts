@@ -30,18 +30,20 @@ export default (req: NextApiRequest, res: NextApiResponse) => {
 	try {
 		const form = new formidable.IncomingForm({ uploadDir: '/tmp' });
 		form.parse(req, async(err, fields, files) => {
+			console.log(err, fields, files);
 			if(Array.isArray(files.file)) return res.status(404).send("array files");
 			if(err) {
 				console.error(err);
 				return res.status(404).send('error while parsing file');
 			}
-			console.log(files.file.filepath);
+			// console.log(files.file.filepath);
 			const workbook = xlsx.readFile(files.file.filepath);
 			const data = xlsx.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
 			// fs.unlinkSync(files.file.filepath);
 			if(typeof req.query.name !== 'string') return res.status(404).send('invalid name');
-			const responseData = await getResponses(data, req.query.name);
-			return res.status(200).json(responseData);
+			// const responseData = await getResponses(data, req.query.name);
+			// return res.status(200).json(responseData);
+			return res.status(200).send('helo');
 		});
 	} catch(e) {
 		console.error(e);
