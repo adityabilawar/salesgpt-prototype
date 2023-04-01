@@ -1,9 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import styles from '@/styles/Login.module.css';
 import graphic from '@/public/graphic.png';
+import { useRouter } from "next/router";
 
 const LoginPage = () => {
 
+	const router = useRouter();
 	const [name, setName] = useState('');
 	const [pass, setPass] = useState('');
   
@@ -11,7 +13,12 @@ const LoginPage = () => {
 	  console.log(name, pass);
 	  localStorage.setItem('auth', 'true');
 	  localStorage.setItem('fullName', name);
+	  router.push('/leads');
 	}
+
+	useEffect(() => {
+		if(localStorage.getItem('auth') === 'true') router.push('/leads');
+	});
   
 	return (
 	  <>

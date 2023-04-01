@@ -1,8 +1,9 @@
 import axios from 'axios';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import importImg from '@/public/import.png';
 import Image from 'next/image'
 import graphic from '@/public/graphic.png';
+import { useRouter } from 'next/router';
 
 const LeadsPage = () => {
 	const fileInput = useRef<any>(null);
@@ -16,8 +17,9 @@ const LeadsPage = () => {
 
 		const formData = new FormData();
 		formData.append('file', file);
-		const name = localStorage.getItem('fullName') ? localStorage.getItem('fullName') : '';
-		axios.post(`/api/file?name=${name}`, formData)
+		const name = localStorage.getItem('fullName') ? localStorage.getItem('fullName') as string : '';
+		formData.append('name', name);
+		axios.post(`/api/file`, formData)
 			.then(res => setData(res.data))
 			.catch(err => {
 				console.log(err);
@@ -25,6 +27,11 @@ const LeadsPage = () => {
 			});
 		setStatus('Loading...');
 	}
+
+	const router = useRouter();
+	useEffect(() => {
+		if(localStorage.getItem('auth') !== 'true') router.push('/login');
+	});
 
 	return (
 		<>
