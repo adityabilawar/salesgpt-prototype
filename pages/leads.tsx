@@ -19,7 +19,7 @@ const LeadsPage = () => {
 		formData.append('file', file);
 		const name = localStorage.getItem('fullName') ? localStorage.getItem('fullName') as string : '';
 		formData.append('name', name);
-		axios.post(`/api/file`, formData)
+		axios.post('/api/file', formData)
 			.then(res => setData(res.data))
 			.catch(err => {
 				console.log(err);
@@ -95,7 +95,7 @@ const LeadsPage = () => {
 										
 										<div className="text-blue-100 text-sm">
 											<p className="text-blue-200 text-2xl">{res.type} for {res.name}</p>
-											{res.res.split('\n').map((str: any) => <p key={str}>{str}</p>)}
+											{res.res.split('\n').map((str: any, i: any) => <p key={i}>{str}</p>)}
 										</div>
 									</div>
 								))}
