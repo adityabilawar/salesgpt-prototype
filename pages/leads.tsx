@@ -1,14 +1,14 @@
 import axios from 'axios';
 import { useEffect, useRef, useState } from 'react';
 import importImg from '@/public/import.png';
-import Image from 'next/image'
+import Image from 'next/image';
 import graphic from '@/public/graphic.png';
 import { useRouter } from 'next/router';
 import { ResponseData } from '@/@types/Response';
 
 const LeadsPage = () => {
 	const fileInput = useRef<any>(null);
-	const [data, setData] = useState<ResponseData[] | null>(null);
+	const [leadData, setLeadData] = useState<ResponseData[] | null>(null);
 	const [status, setStatus] = useState('No leads');
 
 	const fileUpload = (target: any) => {
@@ -21,7 +21,7 @@ const LeadsPage = () => {
 		const name = localStorage.getItem('fullName') ? localStorage.getItem('fullName') as string : '';
 		formData.append('name', name);
 		axios.post('/api/file', formData)
-			.then(res => setData(res.data))
+			.then(res => setLeadData(res.data))
 			.catch(err => {
 				console.log(err);
 				setStatus('Error while Uploading');
@@ -37,11 +37,11 @@ const LeadsPage = () => {
 	return (
 		<>
 			<div className="leads-main flex w-full h-full">
-				<div className={`leads-sidebar w-1/5 h-full min-h-full bg-[#2C2F48] flex flex-col justify-start ${(data === null) ? "gap-80" : "gap-5"}`}>
+				<div className={`leads-sidebar w-1/5 h-full min-h-full bg-[#2C2F48] flex flex-col justify-start ${(leadData === null) ? "gap-80" : "gap-5"}`}>
 					<div className="leads-title text-4xl font-semibold text-blue-200 mt-10 self-center">
 						Leads
 					</div>
-					{(data !== null)
+					{(leadData !== null)
 						? 
 							// <div className="leads-list flex flex-col justify-center gap-5 items-center overflow-y-scroll">
 							// 	{data.map((res: any, ind: any) => (
@@ -59,7 +59,7 @@ const LeadsPage = () => {
 							<div className="overflow-y-scroll w-full">
 								<table className="leads-list table-auto border-collapse border-t-2 border-solid border-[#1D203E] w-full self-center overflow-y-scroll">
 									<tbody>
-										{data.map((res: any, ind: any) => (
+										{leadData.map((res: any, ind: any) => (
 											<tr className="lead-listing cursor-pointer hover:bg-[#393D5D] select-none" key={ind}>
 												<td className="lead-listing-name text-xl text-blue-100 align-middle p-2 pl-5" key={`name-${ind}`}>
 													{res.name}
@@ -89,9 +89,9 @@ const LeadsPage = () => {
 							Create your personalized message
 						</div>
 					</div>
-					{(data !== null) ? 
+					{(leadData !== null) ? 
 							<div className="leads-options flex flex-wrap gap-10 mt-10 ml-20">
-								{data.map((res: any, ind: any) => (
+								{leadData.map((res: any, ind: any) => (
 									<div className="leads-option w-96 max-w-96 h-72 max-h-72 bg-[#2C2F48] flex justify-center p-5 rounded-xl flex-col" key={`option-${ind}`}>
 										
 										<div className="text-blue-200 text-2xl">{res.type} for {res.name}</div>
