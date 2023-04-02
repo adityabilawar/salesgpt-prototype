@@ -4,14 +4,14 @@ import importImg from '@/public/import.png';
 import Image from 'next/image';
 import graphic from '@/public/graphic.png';
 import { useRouter } from 'next/router';
-import { ResponseData } from '@/@types/Response';
+import { MessageType, ResponseData } from '@/@types/Response';
 import LeadMenu from '@/components/LeadMenu';
 
 const LeadsPage = () => {
 	const [leadData, setLeadData] = useState<ResponseData[] | null>(null);
 	const [status, setStatus] = useState('No leads');
 
-	const fileUpload = (target: EventTarget & HTMLInputElement) => {
+	const fileUpload = (target: EventTarget & HTMLInputElement, messageType: MessageType) => {
 		if(target.files === null) return;
 		const file = target.files[0];
 		console.log(file.type)
@@ -21,6 +21,7 @@ const LeadsPage = () => {
 		formData.append('file', file);
 		const name = localStorage.getItem('fullName') ? localStorage.getItem('fullName') as string : '';
 		formData.append('name', name);
+		formData.append('type', messageType);
 		axios.post('/api/file', formData)
 			.then(res => setLeadData(res.data))
 			.catch(err => {
