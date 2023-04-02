@@ -82,19 +82,19 @@ const LeadsPage = () => {
 					}
 					
 				</div>
-				<div className="leads-sec w-4/5 h-full flex flex-col">
-					<div style={{backgroundImage: `url(${graphic.src})`}} className="leads-banner w-3/5 h-64 mt-5 rounded-2xl bg-center bg-no-repeat self-center border-2 border-solid border-[#586FD1] flex items-center justify-center">
+				<div className="leads-sec w-4/5 h-full flex flex-col overflow-y-scroll">
+					<div style={{backgroundImage: `url(${graphic.src})`}} className="leads-banner w-3/5 h-48 shrink-0 mt-5 rounded-2xl bg-center bg-no-repeat self-center border-2 border-solid border-[#586FD1] flex items-center justify-center">
 						<div className="banner-title text-2xl text-blue-200">
 							Create your personalized message
 						</div>
 					</div>
 					{(data !== null) ? 
-							<div className="leads-options flex flex-wrap gap-10 mt-10 ml-20 overflow-y-scroll">
+							<div className="leads-options flex flex-wrap gap-10 mt-10 ml-20">
 								{data.map((res: any, ind: any) => (
-									<div className="leads-option w-72 max-w-72 h-56 max-h-56 bg-[#2C2F48] overflow-y-scroll flex justify-center p-5 rounded-xl" key={`option-${ind}`}>
+									<div className="leads-option w-96 max-w-96 h-72 max-h-72 bg-[#2C2F48] flex justify-center p-5 rounded-xl flex-col" key={`option-${ind}`}>
 										
-										<div className="text-blue-100 text-sm">
-											<p className="text-blue-200 text-2xl">{res.type} for {res.name}</p>
+										<div className="text-blue-200 text-2xl">{res.type} for {res.name}</div>
+										<div className="text-blue-100 text-sm overflow-y-scroll">
 											{res.res.split('\n').map((str: any, i: any) => <p key={i}>{str}</p>)}
 										</div>
 									</div>
