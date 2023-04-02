@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import importImg from '@/public/import.png';
 import Image from 'next/image';
 import graphic from '@/public/graphic.png';
@@ -8,7 +8,6 @@ import { ResponseData } from '@/@types/Response';
 import LeadMenu from '@/components/LeadMenu';
 
 const LeadsPage = () => {
-	const fileInput = useRef<any>(null);
 	const [leadData, setLeadData] = useState<ResponseData[] | null>(null);
 	const [status, setStatus] = useState('No leads');
 
