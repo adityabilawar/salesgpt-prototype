@@ -22,14 +22,21 @@ const LeadMenu = (props: { fileUpload: (t: EventTarget & HTMLInputElement) => vo
 						))}
 					</div>
 				:
-					<div 
-						className="leads-import w-96 h-72 border-[1px] border-solid border-[#6E5ED4] bg-[#2C2F48] self-center mt-24 rounded-3xl flex flex-col justify-center items-center gap-5 cursor-pointer"
-						onClick={() => (fileInput.current) ? fileInput.current.click() : console.log('invalid ref')}
-					>
-						<Image src={importImg} className="w-32 h-32" alt="import icon" />
-						<div className="import-title text-2xl text-blue-100 font-medium">Import a .XLSX file (Excel)</div>
-						<input type="file" className="hidden" ref={fileInput} onChange={(e) => props.fileUpload(e.target)} />
-					</div>
+					<>
+						{(messageType !== null) ? 
+								<div 
+									className="leads-import w-96 h-72 border-[1px] border-solid border-[#6E5ED4] bg-[#2C2F48] self-center mt-24 rounded-3xl flex flex-col justify-center items-center gap-5 cursor-pointer"
+									onClick={() => (fileInput.current) ? fileInput.current.click() : console.log('invalid ref')}
+								>
+									<Image src={importImg} className="w-32 h-32" alt="import icon" />
+									<div className="import-title text-2xl text-blue-100 font-medium">Import a .XLSX file (Excel)</div>
+									<input type="file" className="hidden" ref={fileInput} onChange={(e) => props.fileUpload(e.target)} />
+								</div>
+							:
+								<>
+								</>
+						}
+					</>
 			}
 		</>
 	)
