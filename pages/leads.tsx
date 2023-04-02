@@ -11,7 +11,8 @@ const LeadsPage = () => {
 	const [leadData, setLeadData] = useState<ResponseData[] | null>(null);
 	const [status, setStatus] = useState('No leads');
 
-	const fileUpload = (target: any) => {
+	const fileUpload = (target: EventTarget & HTMLInputElement) => {
+		if(target.files === null) return;
 		const file = target.files[0];
 		console.log(file.type)
 		if(file.type !== 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') window.location.reload();
