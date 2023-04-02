@@ -1,6 +1,7 @@
+import { ResponseData } from "@/@types/Response"
 
 
-const LeadMenu = (fileUpload: (t: any) => void) => {
+const LeadMenu = (fileUpload: (t: any) => void, leadData: ResponseData[]) => {
 	return (
 		<>
 		</>

@@ -4,10 +4,11 @@ import importImg from '@/public/import.png';
 import Image from 'next/image'
 import graphic from '@/public/graphic.png';
 import { useRouter } from 'next/router';
+import { ResponseData } from '@/@types/Response';
 
 const LeadsPage = () => {
 	const fileInput = useRef<any>(null);
-	const [data, setData] = useState<any>(null);
+	const [data, setData] = useState<ResponseData[] | null>(null);
 	const [status, setStatus] = useState('No leads');
 
 	const fileUpload = (target: any) => {
