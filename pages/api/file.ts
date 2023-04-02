@@ -3,7 +3,7 @@ import formidable from "formidable";
 import fs from 'fs';
 import xlsx from 'xlsx';
 import { Configuration, OpenAIApi } from 'openai';
-import { ResponseData } from '@/@types/Response';
+import { MessageType, ResponseData } from '@/@types/Response';
 
 const configuration = new Configuration({
     apiKey: process.env.OPEN_AI_KEY,
@@ -42,7 +42,7 @@ export default (req: NextApiRequest, res: NextApiResponse) => {
 	}
 }
 
-const LETTER_TYPES = ['Linkedin invite', 'Intro Email', 'Coffee Chat'];
+const LETTER_TYPES: MessageType[] = ['Linkedin invite', 'Intro Email', 'Coffee Chat'];
 
 const getResponses = async(data: any[], name: string) => {
 	const resultData: ResponseData[] = [];

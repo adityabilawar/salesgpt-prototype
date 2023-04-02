@@ -1,10 +1,11 @@
-import { ResponseData } from "@/@types/Response";
+import { MessageType, ResponseData } from "@/@types/Response";
 import importImg from '@/public/import.png';
 import Image from 'next/image';
-import { useRef } from "react";
+import { useRef, useState } from "react";
 
 const LeadMenu = (props: { fileUpload: (t: EventTarget & HTMLInputElement) => void, leadData: (ResponseData[] | null) }) => {
 	const fileInput = useRef<HTMLInputElement>(null);
+	const [messageType, setMessageType] = useState<MessageType | null>(null)
 
 	return (
 		<>
