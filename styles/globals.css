@@ -38,3 +38,17 @@ input:focus {
 .lead-listing {
   border-bottom: 2px solid #1D203E;
 }
+
+.borderTransition {
+  transition: border 300ms ease-in;
+  -webkit-transition : border 300ms ease-in; 
+  -moz-transition : border 300ms ease-in;
+  -o-transition : border 300ms ease-in;
+}
+
+.bgTransition {
+  transition: background-color 300ms ease-in;
+  -webkit-transition : background-color 300ms ease-in; 
+  -moz-transition : background-color 300ms ease-in;
+  -o-transition : background-color 300ms ease-in;
+}

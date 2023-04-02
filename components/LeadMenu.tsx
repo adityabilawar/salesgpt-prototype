@@ -33,8 +33,14 @@ const LeadMenu = (props: { fileUpload: (t: EventTarget & HTMLInputElement) => vo
 									<input type="file" className="hidden" ref={fileInput} onChange={(e) => props.fileUpload(e.target)} />
 								</div>
 							:
-								<>
-								</>
+								<div className="flex flex-wrap gap-5 self-center mt-32">
+									<div className="w-72 h-60 border-[2px] border-solid border-[#6E5ED4] bg-[#2C2F48] rounded-3xl self-center cursor-pointer flex flex-col justify-end borderTransition bgTransition hover:border-[#586FD1] hover:bg-[#303450]">
+										<div className="mb-3 ml-3 w-64">
+											<div className="text-2xl text-blue-100 font-medium">Linkedin Invite</div>
+											<div className="text-base text-blue-200">Craft a custom linkedin invite for each lead</div>
+										</div>
+									</div>
+								</div>
 						}
 					</>
 			}

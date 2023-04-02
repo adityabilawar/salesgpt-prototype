@@ -36,14 +36,14 @@ const LoginPage = () => {
 				  placeholder="Full Name"
 				  onChange={e => setName(e.target.value)}
 				  value={name}
-				  className={`${styles.loginInput} p-2 pr-24 text-xl text-[#f1f5f9] border-b-2 border-solid border-[#e0f2fe] focus:border-[#818cf8]`}
+				  className='borderTransition p-2 pr-24 text-xl text-[#f1f5f9] border-b-2 border-solid border-[#e0f2fe] focus:border-[#818cf8]'
 				/>
 				<input 
 				  type="password"
 				  placeholder="Password"
 				  onChange={e => setPass(e.target.value)}
 				  value={pass}
-				  className={`${styles.loginInput} p-2 pr-24 text-xl text-[#f1f5f9] border-b-2 border-solid border-[#e0f2fe] focus:border-[#818cf8]`}
+				  className='borderTransition p-2 pr-24 text-xl text-[#f1f5f9] border-b-2 border-solid border-[#e0f2fe] focus:border-[#818cf8]'
 				/>
 			  </div>
 			  <div className={`${styles.loginBTN} p-5 text-2xl text-indigo-200 rounded-3xl font-semibold cursor-pointer select-none`} onClick={submitLogin}>
