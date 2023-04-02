@@ -5,6 +5,7 @@ import Image from 'next/image';
 import graphic from '@/public/graphic.png';
 import { useRouter } from 'next/router';
 import { ResponseData } from '@/@types/Response';
+import LeadMenu from '@/components/LeadMenu';
 
 const LeadsPage = () => {
 	const fileInput = useRef<any>(null);
@@ -44,19 +45,6 @@ const LeadsPage = () => {
 					</div>
 					{(leadData !== null)
 						? 
-							// <div className="leads-list flex flex-col justify-center gap-5 items-center overflow-y-scroll">
-							// 	{data.map((res: any, ind: any) => (
-							// 		<div className="lead-listing flex w-full h-12 border-t-2 border-solid border-[#1D203E] items-center gap-10 justify-between" key={ind}>
-							// 			<div className="lead-listing-name text-xl text-blue-100 mt-1 ml-5" key={`name-${ind}`}>
-							// 				{res.name}
-							// 			</div>
-							// 			<div className="lead-listing-info flex flex-col mt-4 mr-5" key={`info-${ind}`}>
-							// 				<div className="lead-listing-position text-lg text-blue-100" key={`pos-${ind}`}>{res.position}</div>
-							// 				<div className="lead-listing-company text-lg text-blue-100" key={`company-${ind}`}>{res.company}</div>
-							// 			</div>
-							// 		</div>
-							// 	))}
-							// </div>
 							<div className="overflow-y-scroll w-full">
 								<table className="leads-list table-auto border-collapse border-t-2 border-solid border-[#1D203E] w-full self-center overflow-y-scroll">
 									<tbody>
@@ -90,28 +78,7 @@ const LeadsPage = () => {
 							Create your personalized message
 						</div>
 					</div>
-					{(leadData !== null) ? 
-							<div className="leads-options flex flex-wrap gap-10 mt-10 ml-20">
-								{leadData.map((res: any, ind: any) => (
-									<div className="leads-option w-96 max-w-96 h-72 max-h-72 bg-[#2C2F48] flex justify-center p-5 rounded-xl flex-col" key={`option-${ind}`}>
-										
-										<div className="text-blue-200 text-2xl">{res.type} for {res.name}</div>
-										<div className="text-blue-100 text-sm overflow-y-scroll">
-											{res.res.split('\n').map((str: any, i: any) => <p key={i}>{str}</p>)}
-										</div>
-									</div>
-								))}
-							</div>
-						:
-							<div 
-								className="leads-import w-96 h-72 border-[1px] border-solid border-[#6E5ED4] bg-[#2C2F48] self-center mt-24 rounded-3xl flex flex-col justify-center items-center gap-5 cursor-pointer"
-								onClick={() => fileInput.current.click()}
-							>
-								<Image src={importImg} className="w-32 h-32" alt="import icon" />
-								<div className="import-title text-2xl text-blue-100 font-medium">Import a .XLSX file (Excel)</div>
-							</div>
-					}
-					<input type="file" className="hidden" ref={fileInput} onChange={(e) => fileUpload(e.target)} />
+					<LeadMenu fileUpload={fileUpload} leadData={leadData} />
 				</div>
 			</div>
 		</>
