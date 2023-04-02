@@ -3,19 +3,12 @@ import formidable from "formidable";
 import fs from 'fs';
 import xlsx from 'xlsx';
 import { Configuration, OpenAIApi } from 'openai';
+import { ResponseData } from '@/@types/Response';
 
 const configuration = new Configuration({
     apiKey: process.env.OPEN_AI_KEY,
   });
 const openai = new OpenAIApi(configuration);
-
-interface ResponseData {
-	name: string
-	position: string
-	company: string
-	res: string | undefined
-	type: string
-}
 
 export const config = {
 	api: {
