@@ -3,9 +3,14 @@ import importImg from '@/public/import.png';
 import Image from 'next/image';
 import { useRef, useState } from "react";
 
-const LeadMenu = (props: { fileUpload: (t: EventTarget & HTMLInputElement, messageType: MessageType) => void, leadData: (ResponseData[] | null) }) => {
+const LeadMenu = (props: { processLeads: (f: File, messageType: MessageType) => void, leadData: (ResponseData[] | null) }) => {
 	const fileInput = useRef<HTMLInputElement>(null);
-	const [messageType, setMessageType] = useState<MessageType | null>(null)
+	const [file, setFile] = useState<File | null>(null);
+
+	const fileUpload = (target: EventTarget & HTMLInputElement) => {
+		if(target.files === null) return;
+		setFile(target.files[0]);
+	}
 
 	return (
 		<>
@@ -23,25 +28,25 @@ const LeadMenu = (props: { fileUpload: (t: EventTarget & HTMLInputElement, messa
 					</div>
 				:
 					<>
-						{(messageType !== null) ? 
+						{(file === null) ? 
 								<div 
 									className="leads-import w-96 h-72 border-[1px] border-solid border-[#6E5ED4] bg-[#2C2F48] self-center mt-24 rounded-3xl flex flex-col justify-center items-center gap-5 cursor-pointer"
 									onClick={() => (fileInput.current) ? fileInput.current.click() : console.log('invalid ref')}
 								>
 									<Image src={importImg} className="w-32 h-32" alt="import icon" />
 									<div className="import-title text-2xl text-blue-100 font-medium">Import a .XLSX file (Excel)</div>
-									<input type="file" className="hidden" ref={fileInput} onChange={(e) => props.fileUpload(e.target, messageType)} />
+									<input type="file" className="hidden" ref={fileInput} onChange={(e) => fileUpload(e.target)} />
 								</div>
 							:
 								<div className="flex flex-col gap-16 self-center mt-24">
 									<div className="flex gap-32 self-center">
-										<div className="w-80 h-64 border-[2px] border-solid border-[#6E5ED4] bg-[#2C2F48] rounded-3xl cursor-pointer flex flex-col justify-end borderTransition bgTransition hover:border-[#586FD1] hover:bg-[#303450]" onClick={() => setMessageType('Linkedin invite')}>
+										<div className="w-80 h-64 border-[2px] border-solid border-[#6E5ED4] bg-[#2C2F48] rounded-3xl cursor-pointer flex flex-col justify-end borderTransition bgTransition hover:border-[#586FD1] hover:bg-[#303450]" onClick={() => props.processLeads(file, 'Linkedin invite')}>
 											<div className="mb-5 ml-5 w-5/6">
 												<div className="text-2xl text-blue-100 font-medium">Linkedin Invite</div>
 												<div className="text-base text-blue-200">Craft a custom linkedin invite for each lead</div>
 											</div>
 										</div>
-										<div className="w-80 h-64 border-[2px] border-solid border-[#6E5ED4] bg-[#2C2F48] rounded-3xl cursor-pointer flex flex-col justify-end borderTransition bgTransition hover:border-[#586FD1] hover:bg-[#303450]" onClick={() => setMessageType('Intro Email')}>
+										<div className="w-80 h-64 border-[2px] border-solid border-[#6E5ED4] bg-[#2C2F48] rounded-3xl cursor-pointer flex flex-col justify-end borderTransition bgTransition hover:border-[#586FD1] hover:bg-[#303450]" onClick={() => props.processLeads(file, 'Intro Email')}>
 											<div className="mb-5 ml-5 w-5/6">
 												<div className="text-2xl text-blue-100 font-medium">Introduction Email</div>
 												<div className="text-base text-blue-200">Write a custom introduction email for each lead</div>
@@ -49,7 +54,7 @@ const LeadMenu = (props: { fileUpload: (t: EventTarget & HTMLInputElement, messa
 										</div>
 									</div>
 									<div className="flex gap-32 self-center">
-										<div className="w-80 h-64 border-[2px] border-solid border-[#6E5ED4] bg-[#2C2F48] rounded-3xl self-center cursor-pointer flex flex-col justify-end borderTransition bgTransition hover:border-[#586FD1] hover:bg-[#303450]" onClick={() => setMessageType('Coffee Chat')}>
+										<div className="w-80 h-64 border-[2px] border-solid border-[#6E5ED4] bg-[#2C2F48] rounded-3xl self-center cursor-pointer flex flex-col justify-end borderTransition bgTransition hover:border-[#586FD1] hover:bg-[#303450]" onClick={() => props.processLeads(file, 'Coffee Chat')}>
 											<div className="mb-5 ml-5">
 												<div className="text-2xl text-blue-100 font-medium">Coffee Chat Questions</div>
 												<div className="text-base text-blue-200 w-5/6">Write personalized coffee chat questions for each lead</div>
