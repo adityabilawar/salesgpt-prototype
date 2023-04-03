@@ -56,25 +56,6 @@ const getResponses = async(data: any[], name: string, type: MessageType) => {
 			'Coffee Chat': `Write me 5 coffee chat questions on behalf of ${name} to ask to ${userName} that has the ${userPosition} position at the company ${userCompany}.`
 		};
 
-		// for(let j = 0; j < LETTER_PROMPTS.length; j++) {
-		// 	const response = await openai.createCompletion({
-		// 		model: "text-davinci-003",
-		// 		prompt: LETTER_PROMPTS[j],
-		// 		max_tokens: 3000,
-		// 		temperature: 0,
-		// 		top_p: 1.0,
-		// 		frequency_penalty: 0.0,
-		// 		presence_penalty: 0.0,
-		// 	});
-
-		// 	resultData.push({
-		// 		name: userName,
-		// 		position: userPosition,
-		// 		company: userCompany,
-		// 		res: response.data.choices[0].text,
-		// 		type: LETTER_TYPES[j]
-		// 	});
-		// }
 		const response = await openai.createCompletion({
 			model: "text-davinci-003",
 			prompt: LETTER_PROMPTS[type],
