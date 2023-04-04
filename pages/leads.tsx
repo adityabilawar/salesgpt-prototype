@@ -21,7 +21,10 @@ const LeadsPage = () => {
 		formData.append('name', name);
 		formData.append('type', messageType);
 		axios.post('/api/file', formData)
-			.then(res => setLeadData(res.data))
+			.then(res => {
+				setLeadData(res.data);
+				setStatus('Complete');
+			})
 			.catch(err => {
 				console.log(err);
 				setStatus('Error while Uploading');
@@ -76,7 +79,7 @@ const LeadsPage = () => {
 							Create your personalized message
 						</div>
 					</div>
-					<LeadMenu processLeads={processLeads} leadData={leadData} />
+					<LeadMenu processLeads={processLeads} leadData={leadData} status={status} />
 				</div>
 			</div>
 		</>
