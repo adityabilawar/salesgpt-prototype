@@ -6,6 +6,7 @@ import graphic from '@/public/graphic.png';
 import { useRouter } from 'next/router';
 import { MessageType, ResponseData } from '@/@types/Response';
 import LeadMenu from '@/components/LeadMenu';
+import EditModal from '@/components/EditModal';
 
 const LeadsPage = () => {
 	const [leadData, setLeadData] = useState<ResponseData[] | null>(null);
@@ -40,6 +41,7 @@ const LeadsPage = () => {
 	return (
 		<>
 			<div className="leads-main flex w-full h-full">
+				<EditModal display />
 				<div className={`leads-sidebar w-1/5 h-full min-h-full bg-[#2C2F48] flex flex-col justify-start ${(leadData === null) ? "gap-80" : "gap-5"}`}>
 					<div className="leads-title text-4xl font-semibold text-blue-200 mt-10 self-center">
 						Leads
