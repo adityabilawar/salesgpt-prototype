@@ -47,14 +47,14 @@ const LeadsPage = () => {
 	return (
 		<>
 			<div className="leads-main flex w-full h-full">
-				<EditModal display={modalDisplay.display} type={modalDisplay.type} message={modalDisplay?.message} />
+				<EditModal display={modalDisplay.display} type={modalDisplay.type} message={modalDisplay.message} />
 				<div className={`leads-sidebar w-1/5 h-full min-h-full bg-[#2C2F48] flex flex-col justify-start ${(leadData === null) ? "gap-80" : "gap-5"}`}>
 					<div className="leads-title text-4xl font-semibold text-blue-200 mt-10 self-center">
 						Leads
 					</div>
 					{(leadData !== null)
 						? 
-							<div className="overflow-y-scroll w-full">
+							<div className="overflow-y-auto w-full">
 								<table className="leads-list table-auto border-collapse border-t-2 border-solid border-[#1D203E] w-full self-center overflow-y-scroll">
 									<tbody>
 										{leadData.map((res: any, ind: any) => (
@@ -81,7 +81,7 @@ const LeadsPage = () => {
 					}
 					
 				</div>
-				<div className="leads-sec w-4/5 h-full flex flex-col overflow-y-scroll">
+				<div className="leads-sec w-4/5 h-full flex flex-col overflow-y-auto">
 					<div style={{backgroundImage: `url(${graphic.src})`}} className="leads-banner w-3/5 h-48 shrink-0 mt-5 rounded-2xl bg-center bg-no-repeat self-center border-2 border-solid border-[#586FD1] flex items-center justify-center">
 						<div className="banner-title text-2xl text-blue-200">
 							Create your personalized message
