@@ -1,6 +1,6 @@
 
 
-const EditModal = (props: { display: boolean }) => {
+const EditModal = (props: { display: boolean, type: string, message: string }) => {
 	if(!props.display) {
 		return <></>
 	}
@@ -14,11 +14,12 @@ const EditModal = (props: { display: boolean }) => {
 						<div className="bg-slate-800 px-4 pb-4 pt-5 sm:p-6 sm:pb-4 w-full h-full">
 							<div className="sm:flex sm:items-start w-full h-full">
 								<div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left w-full h-full">
-									<h3 className="text-xl font-semibold leading-6 text-slate-200" id="modal-title">Edit Linkedin Prompt</h3>
+									<h3 className="text-xl font-semibold leading-6 text-slate-200" id="modal-title">Edit {props.type} Prompt</h3>
 									<div className="mt-2 w-full h-full">
 										{/* <p className="text-base text-slate-400">Are you sure you want to deactivate your account? All of your data will be permanently removed. This action cannot be undone.</p> */}
 										<textarea 
 											placeholder="New prompt"
+											value={props.message}
 											className='text-xl p-2 w-11/12 h-64 min-h-64 max-h-64 text-[#f1f5f9] bg-slate-600 rounded-lg focus:outline-none'
 										/>
 									</div>

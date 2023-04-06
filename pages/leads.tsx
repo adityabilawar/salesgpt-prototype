@@ -12,6 +12,12 @@ const LeadsPage = () => {
 	const [leadData, setLeadData] = useState<ResponseData[] | null>(null);
 	const [status, setStatus] = useState('No leads');
 
+	const [modalDisplay, setModalDisplay] = useState({
+		display: false,
+		type: '',
+		message: ''
+	});
+
 	const processLeads = (file: File, messageType: MessageType) => {
 		console.log(file.type)
 		if(file.type !== 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') window.location.reload();
@@ -41,7 +47,7 @@ const LeadsPage = () => {
 	return (
 		<>
 			<div className="leads-main flex w-full h-full">
-				<EditModal display />
+				<EditModal display={modalDisplay.display} type={modalDisplay.type} message={modalDisplay?.message} />
 				<div className={`leads-sidebar w-1/5 h-full min-h-full bg-[#2C2F48] flex flex-col justify-start ${(leadData === null) ? "gap-80" : "gap-5"}`}>
 					<div className="leads-title text-4xl font-semibold text-blue-200 mt-10 self-center">
 						Leads
