@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { useEffect, useRef, useState } from "react";
 import EditModal from '@/components/EditModal';
 
-const LeadMenu = (props: { processLeads: (f: File, messageType: MessageType, p: any) => void, leadData: (ResponseData[] | null), status: string }) => {
+const LeadMenu = (props: { processLeads: (f: File, messageType: MessageType[], p: any) => void, leadData: (ResponseData[] | null), status: string }) => {
 	const fileInput = useRef<HTMLInputElement>(null);
 	const [file, setFile] = useState<File | null>(null);
 	const [prompts, setPrompts] = useState<any>(null);
@@ -124,7 +124,7 @@ const LeadMenu = (props: { processLeads: (f: File, messageType: MessageType, p: 
 												</div>
 											</div>
 										</div>
-										<div className={`self-center BTN p-3 text-2xl text-indigo-200 rounded-3xl font-semibold cursor-pointer select-none w-50 text-center mt-5 mb-5`}>
+										<div className='self-center BTN p-3 text-2xl text-indigo-200 rounded-3xl font-semibold cursor-pointer select-none w-50 text-center mt-5 mb-5' onClick={() => props.processLeads(file, selected, prompts)}>
 											SUBMIT
 										</div>
 										</>

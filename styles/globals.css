@@ -60,5 +60,13 @@ input:focus {
 .selected {
   background-color: #303450;
   border-color: #586FD1;
+  user-select: none;
+}
+
+.selected div {
+  transition: color 200ms ease-in-out;
+  -webkit-transition : color 200ms ease-in-out; 
+  -moz-transition : color 200ms ease-in-out;
+  -o-transition : color 200ms ease-in-out;
   color: rgb(129 140 248);
 }
