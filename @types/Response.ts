@@ -1,4 +1,4 @@
-export type MessageType = 'Linkedin invite' | 'Intro Email' | 'Coffee Chat' | 'Custom';
+export type MessageType = 'Linkedin invite' | 'Intro Email' | 'Coffee Chat' | 'Custom Prompt';
 
 export interface ResponseData {
 	name: string
