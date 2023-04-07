@@ -11,7 +11,7 @@ const LeadsPage = () => {
 	const [leadData, setLeadData] = useState<ResponseData[] | null>(null);
 	const [status, setStatus] = useState('No leads');
 
-	const processLeads = (file: File, messageType: MessageType, prompts: any) => {
+	const processLeads = (file: File, messageType: MessageType[], prompts: any) => {
 		console.log(file.type)
 		if(file.type !== 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') window.location.reload();
 
@@ -19,7 +19,7 @@ const LeadsPage = () => {
 		formData.append('file', file);
 		const name = localStorage.getItem('fullName') ? localStorage.getItem('fullName') as string : '';
 		formData.append('name', name);
-		formData.append('type', messageType);
+		formData.append('type', JSON.stringify(messageType));
 		formData.append('prompts', JSON.stringify(prompts));
 		axios.post('/api/file', formData)
 			.then(res => {
