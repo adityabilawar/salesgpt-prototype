@@ -58,7 +58,7 @@ const LeadMenu = (props: { processLeads: (f: File, messageType: MessageType) => 
 									:
 										<div className="flex flex-col gap-16 self-center mt-24">
 											<div className="flex gap-32 self-center">
-												<div className="w-80 h-64 border-[2px] border-solid border-[#6E5ED4] bg-[#2C2F48] rounded-3xl cursor-pointer borderTransition bgTransition flex flex-col hover:border-[#586FD1] hover:bg-[#303450]" onClick={() => props.processLeads(file, 'Linkedin invite')}>
+												<div className="w-80 h-64 border-[2px] border-solid border-[#6E5ED4] bg-[#2C2F48] rounded-3xl cursor-pointer borderTransition bgTransition flex flex-col hover:border-[#586FD1] hover:bg-[#303450]" onClick={(e) => { e.stopPropagation(); props.processLeads(file, 'Linkedin invite') }}>
 													<Image src={penImg} alt="pencil" className="w-8 h-8 fixed self-end mr-5 mt-5" onClick={() => setModalDisplay({display: true, type: 'Linkedin', message: 'Linkedin prompt'})} />
 													<div className="flex flex-col justify-end w-full h-full">
 														<div className="mb-5 ml-5 w-5/6">
@@ -67,7 +67,7 @@ const LeadMenu = (props: { processLeads: (f: File, messageType: MessageType) => 
 														</div>
 													</div>
 												</div>
-												<div className="w-80 h-64 border-[2px] border-solid border-[#6E5ED4] bg-[#2C2F48] rounded-3xl cursor-pointer borderTransition bgTransition flex flex-col hover:border-[#586FD1] hover:bg-[#303450]" onClick={() => props.processLeads(file, 'Intro Email')}>
+												<div className="w-80 h-64 border-[2px] border-solid border-[#6E5ED4] bg-[#2C2F48] rounded-3xl cursor-pointer borderTransition bgTransition flex flex-col hover:border-[#586FD1] hover:bg-[#303450]" onClick={(e) => { e.stopPropagation(); props.processLeads(file, 'Intro Email') }}>
 													<Image src={penImg} alt="pencil" className="w-8 h-8 fixed self-end mr-5 mt-5" onClick={() => setModalDisplay({display: true, type: 'Email', message: 'Email prompt'})} />
 													<div className="flex flex-col justify-end w-full h-full">
 														<div className="mb-5 ml-5 w-5/6">
@@ -78,7 +78,7 @@ const LeadMenu = (props: { processLeads: (f: File, messageType: MessageType) => 
 												</div>
 											</div>	
 											<div className="flex gap-32 self-center">
-												<div className="w-80 h-64 border-[2px] border-solid border-[#6E5ED4] bg-[#2C2F48] rounded-3xl cursor-pointer borderTransition bgTransition flex flex-col hover:border-[#586FD1] hover:bg-[#303450]" onClick={() => props.processLeads(file, 'Coffee Chat')}>
+												<div className="w-80 h-64 border-[2px] border-solid border-[#6E5ED4] bg-[#2C2F48] rounded-3xl cursor-pointer borderTransition bgTransition flex flex-col hover:border-[#586FD1] hover:bg-[#303450]" onClick={() => (!modalDisplay.display) ? props.processLeads(file, 'Coffee Chat') : {}}>
 													<Image src={penImg} alt="pencil" className="w-8 h-8 fixed self-end mr-5 mt-5" onClick={() => setModalDisplay({display: true, type: 'Coffee Chat', message: 'Coffee Chat prompt'})} />
 													<div className="flex flex-col justify-end w-full h-full">
 														<div className="mb-5 ml-5 w-5/6">
