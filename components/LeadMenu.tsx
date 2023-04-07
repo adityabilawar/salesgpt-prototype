@@ -27,7 +27,8 @@ const LeadMenu = (props: { processLeads: (f: File, messageType: MessageType, p: 
 			const initPrompts = {
 				'Linkedin invite': 'Hi! Can you write me a 300 character linkedin invite message on behalf of MY_NAME to the USER_POSITION of the company USER_COMPANY whos name is USER_NAME explaining that you want to help provide value to their business.',
 				'Intro Email': 'Write me a personlized introduction email to USER_NAME, who has the USER_POSITION position at the company USER_COMPANY on behalf of MY_NAME explaining that I want to help provide value to their business & request a phone call',
-				'Coffee Chat': 'Write me 5 coffee chat questions on behalf of MY_NAME to ask to USER_NAME that has the USER_POSITION position at the company USER_COMPANY.'
+				'Coffee Chat': 'Write me 5 coffee chat questions on behalf of MY_NAME to ask to USER_NAME that has the USER_POSITION position at the company USER_COMPANY.',
+				'Custom Prompt': 'Say "You have not made a custom prompt in the editor yet!"'
 			}
 			localStorage.setItem('prompts', JSON.stringify(initPrompts));
 			setPrompts(initPrompts);
@@ -110,10 +111,13 @@ const LeadMenu = (props: { processLeads: (f: File, messageType: MessageType, p: 
 														</div>
 													</div>
 												</div>
-												<div className="w-80 h-64 border-[2px] border-solid border-[#6E5ED4] bg-[#2C2F48] rounded-3xl self-center cursor-pointer flex flex-col justify-end borderTransition bgTransition hover:border-[#586FD1] hover:bg-[#303450]">
-													<div className="mb-5 ml-5 w-5/6">
-														<div className="text-2xl text-blue-100 font-medium">Custom Prompt</div>
-														<div className="text-base text-blue-200">Create your own custom prompt</div>
+												<div className="w-80 h-64 border-[2px] border-solid border-[#6E5ED4] bg-[#2C2F48] rounded-3xl cursor-pointer borderTransition bgTransition flex flex-col hover:border-[#586FD1] hover:bg-[#303450]" onClick={(e) => { e.stopPropagation(); props.processLeads(file, 'Custom Prompt', prompts) }}>
+													<Image src={penImg} alt="pencil" className="w-8 h-8 fixed self-end mr-5 mt-5" onClick={(e) => { e.stopPropagation(); setModalDisplay({display: true, type: 'Custom Prompt', message: prompts['Custom Prompt']}) }} />
+													<div className="flex flex-col justify-end w-full h-full">
+														<div className="mb-5 ml-5 w-5/6">
+															<div className="text-2xl text-blue-100 font-medium">Custom Prompt</div>
+															<div className="text-base text-blue-200">Create your own custom prompt</div>
+														</div>
 													</div>
 												</div>
 											</div>
