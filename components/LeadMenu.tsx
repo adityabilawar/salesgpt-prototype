@@ -80,10 +80,11 @@ const LeadMenu = (props: { processLeads: (f: File, messageType: MessageType, p: 
 											<input type="file" className="hidden" ref={fileInput} onChange={(e) => fileUpload(e.target)} />
 										</div>
 									:
+										<>
 										<div className="flex flex-col gap-16 self-center mt-24">
 											<div className="flex gap-32 self-center">
 												<div className="w-80 h-64 border-[2px] border-solid border-[#6E5ED4] bg-[#2C2F48] rounded-3xl cursor-pointer borderTransition bgTransition flex flex-col hover:border-[#586FD1] hover:bg-[#303450]" onClick={(e) => { e.stopPropagation(); props.processLeads(file, 'Linkedin invite', prompts) }}>
-													<Image src={penImg} alt="pencil" className="w-8 h-8 fixed self-end mr-5 mt-5" onClick={(e) => { e.stopPropagation(); setModalDisplay({display: true, type: 'Linkedin invite', message: prompts['Linkedin invite']}) }} />
+													<Image src={penImg} alt="pencil" className="w-8 h-8 relative self-end mr-5 mt-5" onClick={(e) => { e.stopPropagation(); setModalDisplay({display: true, type: 'Linkedin invite', message: prompts['Linkedin invite']}) }} />
 													<div className="flex flex-col justify-end w-full h-full">
 														<div className="mb-5 ml-5 w-5/6">
 															<div className="text-2xl text-blue-100 font-medium">Linkedin Invite</div>
@@ -92,7 +93,7 @@ const LeadMenu = (props: { processLeads: (f: File, messageType: MessageType, p: 
 													</div>
 												</div>
 												<div className="w-80 h-64 border-[2px] border-solid border-[#6E5ED4] bg-[#2C2F48] rounded-3xl cursor-pointer borderTransition bgTransition flex flex-col hover:border-[#586FD1] hover:bg-[#303450]" onClick={(e) => { e.stopPropagation(); props.processLeads(file, 'Intro Email', prompts) }}>
-													<Image src={penImg} alt="pencil" className="w-8 h-8 fixed self-end mr-5 mt-5" onClick={(e) => { e.stopPropagation(); setModalDisplay({display: true, type: 'Intro Email', message: prompts['Intro Email']}) }} />
+													<Image src={penImg} alt="pencil" className="w-8 h-8 relative self-end mr-5 mt-5" onClick={(e) => { e.stopPropagation(); setModalDisplay({display: true, type: 'Intro Email', message: prompts['Intro Email']}) }} />
 													<div className="flex flex-col justify-end w-full h-full">
 														<div className="mb-5 ml-5 w-5/6">
 															<div className="text-2xl text-blue-100 font-medium">Introduction Email</div>
@@ -103,7 +104,7 @@ const LeadMenu = (props: { processLeads: (f: File, messageType: MessageType, p: 
 											</div>	
 											<div className="flex gap-32 self-center">
 												<div className="w-80 h-64 border-[2px] border-solid border-[#6E5ED4] bg-[#2C2F48] rounded-3xl cursor-pointer borderTransition bgTransition flex flex-col hover:border-[#586FD1] hover:bg-[#303450]" onClick={(e) => { e.stopPropagation(); props.processLeads(file, 'Coffee Chat', prompts) }}>
-													<Image src={penImg} alt="pencil" className="w-8 h-8 fixed self-end mr-5 mt-5" onClick={(e) => { e.stopPropagation(); setModalDisplay({display: true, type: 'Coffee Chat', message: prompts['Coffee Chat']}) }} />
+													<Image src={penImg} alt="pencil" className="w-8 h-8 relative self-end mr-5 mt-5" onClick={(e) => { e.stopPropagation(); setModalDisplay({display: true, type: 'Coffee Chat', message: prompts['Coffee Chat']}) }} />
 													<div className="flex flex-col justify-end w-full h-full">
 														<div className="mb-5 ml-5 w-5/6">
 															<div className="text-2xl text-blue-100 font-medium">Coffee Chat Questions</div>
@@ -112,7 +113,7 @@ const LeadMenu = (props: { processLeads: (f: File, messageType: MessageType, p: 
 													</div>
 												</div>
 												<div className="w-80 h-64 border-[2px] border-solid border-[#6E5ED4] bg-[#2C2F48] rounded-3xl cursor-pointer borderTransition bgTransition flex flex-col hover:border-[#586FD1] hover:bg-[#303450]" onClick={(e) => { e.stopPropagation(); props.processLeads(file, 'Custom Prompt', prompts) }}>
-													<Image src={penImg} alt="pencil" className="w-8 h-8 fixed self-end mr-5 mt-5" onClick={(e) => { e.stopPropagation(); setModalDisplay({display: true, type: 'Custom Prompt', message: prompts['Custom Prompt']}) }} />
+													<Image src={penImg} alt="pencil" className="w-8 h-8 relative self-end mr-5 mt-5" onClick={(e) => { e.stopPropagation(); setModalDisplay({display: true, type: 'Custom Prompt', message: prompts['Custom Prompt']}) }} />
 													<div className="flex flex-col justify-end w-full h-full">
 														<div className="mb-5 ml-5 w-5/6">
 															<div className="text-2xl text-blue-100 font-medium">Custom Prompt</div>
@@ -122,6 +123,10 @@ const LeadMenu = (props: { processLeads: (f: File, messageType: MessageType, p: 
 												</div>
 											</div>
 										</div>
+										<div className={`self-center BTN p-3 text-2xl text-indigo-200 rounded-3xl font-semibold cursor-pointer select-none w-50 text-center mt-5 mb-5`}>
+											SUBMIT
+										</div>
+										</>
 								}
 							</>
 						}

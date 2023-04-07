@@ -52,3 +52,7 @@ input:focus {
   -moz-transition : background-color 300ms ease-in;
   -o-transition : background-color 300ms ease-in;
 }
+
+.BTN {
+  background: linear-gradient(to bottom right, #01B7C5, #C417E0);
+}
