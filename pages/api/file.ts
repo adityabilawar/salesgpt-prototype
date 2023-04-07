@@ -31,13 +31,14 @@ export default (req: NextApiRequest, res: NextApiResponse) => {
 			const prompts = (typeof fields.prompts === 'string') ? JSON.parse(fields.prompts) : {
 				'Linkedin invite': 'Hi! Can you write me a 300 character linkedin invite message on behalf of MY_NAME to the USER_POSITION of the company USER_COMPANY whos name is USER_NAME explaining that you want to help provide value to their business.',
 				'Intro Email': 'Write me a personlized introduction email to USER_NAME, who has the USER_POSITION position at the company USER_COMPANY on behalf of MY_NAME explaining that I want to help provide value to their business & request a phone call',
-				'Coffee Chat': 'Write me 5 coffee chat questions on behalf of MY_NAME to ask to USER_NAME that has the USER_POSITION position at the company USER_COMPANY.'
+				'Coffee Chat': 'Write me 5 coffee chat questions on behalf of MY_NAME to ask to USER_NAME that has the USER_POSITION position at the company USER_COMPANY.',
+				'Custom Prompt': 'Say "You have not made a custom prompt in the editor yet!"'
 			};
 			const messageType: MessageType = (typeof fields.type === 'string') ? fields.type as MessageType : 'Linkedin invite';
 			const workbook = xlsx.readFile(files.file.filepath);
 			const data = xlsx.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
 			fs.unlinkSync(files.file.filepath);
-			const responseData = await getResponses(data, name, messageType, prompts);
+			const responseData: any = await getResponses(data, name, messageType, prompts);
 			// const responseData = Array(10).fill(
 			// 	{
 			// 		name: 'Elon Musk',
