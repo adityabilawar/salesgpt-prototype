@@ -20,7 +20,7 @@ const LeadsPage = () => {
 		const name = localStorage.getItem('fullName') ? localStorage.getItem('fullName') as string : '';
 		formData.append('name', name);
 		formData.append('type', messageType);
-		formData.append('prompts', prompts);
+		formData.append('prompts', JSON.stringify(prompts));
 		axios.post('/api/file', formData)
 			.then(res => {
 				setLeadData(res.data);
