@@ -34,20 +34,20 @@ export default (req: NextApiRequest, res: NextApiResponse) => {
 				'Coffee Chat': 'Write me 5 coffee chat questions on behalf of MY_NAME to ask to USER_NAME that has the USER_POSITION position at the company USER_COMPANY.',
 				'Custom Prompt': 'Say "You have not made a custom prompt in the editor yet!"'
 			};
-			const messageTypes: MessageType[] = (typeof fields.type === 'object') ? fields.type as MessageType[] : ['Linkedin invite'];
+			const messageTypes: MessageType[] = (typeof fields.type === 'string') ? JSON.parse(fields.type) as MessageType[] : ['Linkedin invite'];
 			const workbook = xlsx.readFile(files.file.filepath);
 			const data = xlsx.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
 			fs.unlinkSync(files.file.filepath);
-			// const responseData: any = await getResponses(data, name, messageTypes, prompts);
-			const responseData = Array(10).fill(
-				{
-					name: 'Elon Musk',
-					position: 'CEO',
-					company: 'Tesla',
-					res: 'My message here',
-					type: messageTypes
-				}
-			);
+			const responseData: any = await getResponses(data, name, messageTypes, prompts);
+			// const responseData = Array(10).fill(
+			// 	{
+			// 		name: 'Elon Musk',
+			// 		position: 'CEO',
+			// 		company: 'Tesla',
+			// 		res: 'My message here',
+			// 		type: messageTypes
+			// 	}
+			// );
 			return res.status(200).json(responseData);
 		});
 	} catch(e) {
