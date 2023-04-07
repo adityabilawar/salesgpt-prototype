@@ -37,7 +37,8 @@ export default (req: NextApiRequest, res: NextApiResponse) => {
 			const workbook = xlsx.readFile(files.file.filepath);
 			const data = xlsx.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
 			fs.unlinkSync(files.file.filepath);
-			// const responseData = await getResponses(data, name, messageType);
+			console.log(prompts, messageType);
+			// const responseData = await getResponses(data, name, messageType, prompts);
 			const responseData = Array(10).fill(
 				{
 					name: 'Elon Musk',
@@ -54,8 +55,6 @@ export default (req: NextApiRequest, res: NextApiResponse) => {
 	}
 }
 
-// const LETTER_TYPES: MessageType[] = ['Linkedin invite', 'Intro Email', 'Coffee Chat'];
-
 const getResponses = async(data: any[], name: string, type: MessageType, prompts: any) => {
 	const resultData: ResponseData[] = [];
 	
@@ -63,12 +62,6 @@ const getResponses = async(data: any[], name: string, type: MessageType, prompts
 		const userName = data[i].Name;
 		const userPosition = data[i].Position;
 		const userCompany = data[i].Company;
-
-		// const LETTER_PROMPTS: any = {
-		// 	'Linkedin invite': `Hi! Can you write me a 300 character linkedin invite message on behalf of ${name} to the ${userPosition} of the company ${userCompany} whos name is ${userName} explaining that you want to help provide value to their business.`,
-		// 	'Intro Email': `Write me a personlized introduction email to ${userName}, who has the ${userPosition} position at the company ${userCompany} on behalf of ${name} explaining that I want to help provide value to their business & request a phone call`,
-		// 	'Coffee Chat': `Write me 5 coffee chat questions on behalf of ${name} to ask to ${userName} that has the ${userPosition} position at the company ${userCompany}.`
-		// };
 
 		const currPrompt = prompts[type]
 			.replace('MY_NAME', name)
