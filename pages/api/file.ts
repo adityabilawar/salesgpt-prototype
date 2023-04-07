@@ -34,20 +34,20 @@ export default (req: NextApiRequest, res: NextApiResponse) => {
 				'Coffee Chat': 'Write me 5 coffee chat questions on behalf of MY_NAME to ask to USER_NAME that has the USER_POSITION position at the company USER_COMPANY.',
 				'Custom Prompt': 'Say "You have not made a custom prompt in the editor yet!"'
 			};
-			const messageType: MessageType = (typeof fields.type === 'string') ? fields.type as MessageType : 'Linkedin invite';
+			const messageTypes: MessageType[] = (typeof fields.type === 'object') ? fields.type as MessageType[] : ['Linkedin invite'];
 			const workbook = xlsx.readFile(files.file.filepath);
 			const data = xlsx.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
 			fs.unlinkSync(files.file.filepath);
-			const responseData: any = await getResponses(data, name, messageType, prompts);
-			// const responseData = Array(10).fill(
-			// 	{
-			// 		name: 'Elon Musk',
-			// 		position: 'CEO',
-			// 		company: 'Tesla',
-			// 		res: 'My message here',
-			// 		type: messageType
-			// 	}
-			// );
+			// const responseData: any = await getResponses(data, name, messageTypes, prompts);
+			const responseData = Array(10).fill(
+				{
+					name: 'Elon Musk',
+					position: 'CEO',
+					company: 'Tesla',
+					res: 'My message here',
+					type: messageTypes
+				}
+			);
 			return res.status(200).json(responseData);
 		});
 	} catch(e) {
@@ -55,37 +55,39 @@ export default (req: NextApiRequest, res: NextApiResponse) => {
 	}
 }
 
-const getResponses = async(data: any[], name: string, type: MessageType, prompts: any) => {
+const getResponses = async(data: any[], name: string, type: MessageType[], prompts: any) => {
 	const resultData: ResponseData[] = [];
 	
 	for(let i = 0; i < data.length; i++) {
-		const userName = data[i].Name;
-		const userPosition = data[i].Position;
-		const userCompany = data[i].Company;
-
-		const currPrompt = prompts[type]
-			.replace('MY_NAME', name)
-			.replace('USER_POSITION', userPosition)
-			.replace('USER_COMPANY', userCompany)
-			.replace('USER_NAME', userName);
-
-		const response = await openai.createCompletion({
-			model: "text-davinci-003",
-			prompt: currPrompt,
-			max_tokens: 3000,
-			temperature: 0,
-			top_p: 1.0,
-			frequency_penalty: 0.0,
-			presence_penalty: 0.0,
-		});
-
-		resultData.push({
-			name: userName,
-			position: userPosition,
-			company: userCompany,
-			res: response.data.choices[0].text,
-			type
-		});
+		for(let j = 0; j < type.length; j++) {
+				const userName = data[i].Name;
+				const userPosition = data[i].Position;
+				const userCompany = data[i].Company;
+		
+				const currPrompt = prompts[type[j]]
+					.replace('MY_NAME', name)
+					.replace('USER_POSITION', userPosition)
+					.replace('USER_COMPANY', userCompany)
+					.replace('USER_NAME', userName);
+		
+				const response = await openai.createCompletion({
+					model: "text-davinci-003",
+					prompt: currPrompt,
+					max_tokens: 3000,
+					temperature: 0,
+					top_p: 1.0,
+					frequency_penalty: 0.0,
+					presence_penalty: 0.0,
+				});
+		
+				resultData.push({
+					name: userName,
+					position: userPosition,
+					company: userCompany,
+					res: response.data.choices[0].text,
+					type: type[j]
+				});
+		}
 	}
 
 	return resultData;
