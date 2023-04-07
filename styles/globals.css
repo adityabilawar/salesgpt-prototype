@@ -56,3 +56,9 @@ input:focus {
 .BTN {
   background: linear-gradient(to bottom right, #01B7C5, #C417E0);
 }
+
+.selected {
+  background-color: #303450;
+  border-color: #586FD1;
+  color: rgb(129 140 248);
+}
