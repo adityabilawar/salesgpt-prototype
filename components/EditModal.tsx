@@ -1,6 +1,4 @@
-
-
-const EditModal = (props: { display: boolean, type: string, message: string }) => {
+const EditModal = (props: { display: boolean, type: string, message: string, hideDisplay: () => void }) => {
 	if(!props.display) {
 		return <></>
 	}
