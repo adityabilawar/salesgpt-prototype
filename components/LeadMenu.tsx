@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { useEffect, useRef, useState } from "react";
 import EditModal from '@/components/EditModal';
 
-const LeadMenu = (props: { processLeads: (f: File, messageType: MessageType) => void, leadData: (ResponseData[] | null), status: string }) => {
+const LeadMenu = (props: { processLeads: (f: File, messageType: MessageType, p: any) => void, leadData: (ResponseData[] | null), status: string }) => {
 	const fileInput = useRef<HTMLInputElement>(null);
 	const [file, setFile] = useState<File | null>(null);
 	const [prompts, setPrompts] = useState<any>(null);
@@ -25,18 +25,22 @@ const LeadMenu = (props: { processLeads: (f: File, messageType: MessageType) => 
 		const localPrompts = localStorage.getItem('prompts');
 		if(!localPrompts) {
 			const initPrompts = {
-				'Linkedin': 'Hi! Can you write me a 300 character linkedin invite message on behalf of MY_NAME to the USER_POSITION of the company USER_COMPANY whos name is USER_NAME explaining that you want to help provide value to their business.',
+				'Linkedin invite': 'Hi! Can you write me a 300 character linkedin invite message on behalf of MY_NAME to the USER_POSITION of the company USER_COMPANY whos name is USER_NAME explaining that you want to help provide value to their business.',
 				'Intro Email': 'Write me a personlized introduction email to USER_NAME, who has the USER_POSITION position at the company USER_COMPANY on behalf of MY_NAME explaining that I want to help provide value to their business & request a phone call',
 				'Coffee Chat': 'Write me 5 coffee chat questions on behalf of MY_NAME to ask to USER_NAME that has the USER_POSITION position at the company USER_COMPANY.'
 			}
 			localStorage.setItem('prompts', JSON.stringify(initPrompts));
 			setPrompts(initPrompts);
-		} else setPrompts(JSON.parse(localPrompts))
-	});
+		} else if(!prompts) setPrompts(JSON.parse(localPrompts))
+	}, []);
 
-	const savePrompt = (prompt: string) => {
+	const savePrompt = (newPrompt: string) => {
 		const type = modalDisplay.type;
 		setModalDisplay({ display: false, type: '', message: '' });
+		const currPrompts = prompts;
+		currPrompts[type] = newPrompt;
+		localStorage.setItem('prompts', JSON.stringify(currPrompts));
+		setPrompts(currPrompts);
 	}
 
 	return (
@@ -77,8 +81,8 @@ const LeadMenu = (props: { processLeads: (f: File, messageType: MessageType) => 
 									:
 										<div className="flex flex-col gap-16 self-center mt-24">
 											<div className="flex gap-32 self-center">
-												<div className="w-80 h-64 border-[2px] border-solid border-[#6E5ED4] bg-[#2C2F48] rounded-3xl cursor-pointer borderTransition bgTransition flex flex-col hover:border-[#586FD1] hover:bg-[#303450]" onClick={(e) => { e.stopPropagation(); props.processLeads(file, 'Linkedin invite') }}>
-													<Image src={penImg} alt="pencil" className="w-8 h-8 fixed self-end mr-5 mt-5" onClick={(e) => { e.stopPropagation(); setModalDisplay({display: true, type: 'Linkedin', message: prompts['Linkedin']}) }} />
+												<div className="w-80 h-64 border-[2px] border-solid border-[#6E5ED4] bg-[#2C2F48] rounded-3xl cursor-pointer borderTransition bgTransition flex flex-col hover:border-[#586FD1] hover:bg-[#303450]" onClick={(e) => { e.stopPropagation(); props.processLeads(file, 'Linkedin invite', prompts) }}>
+													<Image src={penImg} alt="pencil" className="w-8 h-8 fixed self-end mr-5 mt-5" onClick={(e) => { e.stopPropagation(); setModalDisplay({display: true, type: 'Linkedin invite', message: prompts['Linkedin invite']}) }} />
 													<div className="flex flex-col justify-end w-full h-full">
 														<div className="mb-5 ml-5 w-5/6">
 															<div className="text-2xl text-blue-100 font-medium">Linkedin Invite</div>
@@ -86,7 +90,7 @@ const LeadMenu = (props: { processLeads: (f: File, messageType: MessageType) => 
 														</div>
 													</div>
 												</div>
-												<div className="w-80 h-64 border-[2px] border-solid border-[#6E5ED4] bg-[#2C2F48] rounded-3xl cursor-pointer borderTransition bgTransition flex flex-col hover:border-[#586FD1] hover:bg-[#303450]" onClick={(e) => { e.stopPropagation(); props.processLeads(file, 'Intro Email') }}>
+												<div className="w-80 h-64 border-[2px] border-solid border-[#6E5ED4] bg-[#2C2F48] rounded-3xl cursor-pointer borderTransition bgTransition flex flex-col hover:border-[#586FD1] hover:bg-[#303450]" onClick={(e) => { e.stopPropagation(); props.processLeads(file, 'Intro Email', prompts) }}>
 													<Image src={penImg} alt="pencil" className="w-8 h-8 fixed self-end mr-5 mt-5" onClick={(e) => { e.stopPropagation(); setModalDisplay({display: true, type: 'Intro Email', message: prompts['Intro Email']}) }} />
 													<div className="flex flex-col justify-end w-full h-full">
 														<div className="mb-5 ml-5 w-5/6">
@@ -97,7 +101,7 @@ const LeadMenu = (props: { processLeads: (f: File, messageType: MessageType) => 
 												</div>
 											</div>	
 											<div className="flex gap-32 self-center">
-												<div className="w-80 h-64 border-[2px] border-solid border-[#6E5ED4] bg-[#2C2F48] rounded-3xl cursor-pointer borderTransition bgTransition flex flex-col hover:border-[#586FD1] hover:bg-[#303450]" onClick={() => (!modalDisplay.display) ? props.processLeads(file, 'Coffee Chat') : {}}>
+												<div className="w-80 h-64 border-[2px] border-solid border-[#6E5ED4] bg-[#2C2F48] rounded-3xl cursor-pointer borderTransition bgTransition flex flex-col hover:border-[#586FD1] hover:bg-[#303450]" onClick={(e) => { e.stopPropagation(); props.processLeads(file, 'Coffee Chat', prompts) }}>
 													<Image src={penImg} alt="pencil" className="w-8 h-8 fixed self-end mr-5 mt-5" onClick={(e) => { e.stopPropagation(); setModalDisplay({display: true, type: 'Coffee Chat', message: prompts['Coffee Chat']}) }} />
 													<div className="flex flex-col justify-end w-full h-full">
 														<div className="mb-5 ml-5 w-5/6">

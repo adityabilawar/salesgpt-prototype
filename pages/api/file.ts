@@ -28,6 +28,11 @@ export default (req: NextApiRequest, res: NextApiResponse) => {
 				return res.status(404).send('error while parsing file');
 			}
 			const name = (typeof fields.name === 'string') ? fields.name : '';
+			const prompts = (typeof fields.prompts === 'string') ? fields.prompts : {
+				'Linkedin invite': 'Hi! Can you write me a 300 character linkedin invite message on behalf of MY_NAME to the USER_POSITION of the company USER_COMPANY whos name is USER_NAME explaining that you want to help provide value to their business.',
+				'Intro Email': 'Write me a personlized introduction email to USER_NAME, who has the USER_POSITION position at the company USER_COMPANY on behalf of MY_NAME explaining that I want to help provide value to their business & request a phone call',
+				'Coffee Chat': 'Write me 5 coffee chat questions on behalf of MY_NAME to ask to USER_NAME that has the USER_POSITION position at the company USER_COMPANY.'
+			};
 			const messageType: MessageType = (typeof fields.type === 'string') ? fields.type as MessageType : 'Linkedin invite';
 			const workbook = xlsx.readFile(files.file.filepath);
 			const data = xlsx.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
@@ -51,7 +56,7 @@ export default (req: NextApiRequest, res: NextApiResponse) => {
 
 // const LETTER_TYPES: MessageType[] = ['Linkedin invite', 'Intro Email', 'Coffee Chat'];
 
-const getResponses = async(data: any[], name: string, type: MessageType) => {
+const getResponses = async(data: any[], name: string, type: MessageType, prompts: any) => {
 	const resultData: ResponseData[] = [];
 	
 	for(let i = 0; i < data.length; i++) {
@@ -59,15 +64,21 @@ const getResponses = async(data: any[], name: string, type: MessageType) => {
 		const userPosition = data[i].Position;
 		const userCompany = data[i].Company;
 
-		const LETTER_PROMPTS: any = {
-			'Linkedin invite': `Hi! Can you write me a 300 character linkedin invite message on behalf of ${name} to the ${userPosition} of the company ${userCompany} whos name is ${userName} explaining that you want to help provide value to their business.`,
-			'Intro Email': `Write me a personlized introduction email to ${userName}, who has the ${userPosition} position at the company ${userCompany} on behalf of ${name} explaining that I want to help provide value to their business & request a phone call`,
-			'Coffee Chat': `Write me 5 coffee chat questions on behalf of ${name} to ask to ${userName} that has the ${userPosition} position at the company ${userCompany}.`
-		};
+		// const LETTER_PROMPTS: any = {
+		// 	'Linkedin invite': `Hi! Can you write me a 300 character linkedin invite message on behalf of ${name} to the ${userPosition} of the company ${userCompany} whos name is ${userName} explaining that you want to help provide value to their business.`,
+		// 	'Intro Email': `Write me a personlized introduction email to ${userName}, who has the ${userPosition} position at the company ${userCompany} on behalf of ${name} explaining that I want to help provide value to their business & request a phone call`,
+		// 	'Coffee Chat': `Write me 5 coffee chat questions on behalf of ${name} to ask to ${userName} that has the ${userPosition} position at the company ${userCompany}.`
+		// };
+
+		const currPrompt = prompts[type]
+			.replace('MY_NAME', name)
+			.replace('USER_POSITION', userPosition)
+			.replace('USER_COMPANY', userCompany)
+			.replace('USER_NAME', userName);
 
 		const response = await openai.createCompletion({
 			model: "text-davinci-003",
-			prompt: LETTER_PROMPTS[type],
+			prompt: currPrompt,
 			max_tokens: 3000,
 			temperature: 0,
 			top_p: 1.0,
