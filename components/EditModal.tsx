@@ -1,6 +1,16 @@
-const EditModal = (props: { display: boolean, type: string, message: string, hideDisplay: () => void }) => {
+import { useEffect, useState } from "react";
+
+const EditModal = (props: { display: boolean, type: string, message: string, hideDisplay: () => void, savePrompt: (p: string) => void }) => {
+
+	const [promptInput, setPromptInput] = useState(props.message);
+
+	
+	useEffect(() => {
+		if(props.display) setPromptInput(props.message);
+	}, [props.display]);
+	
 	if(!props.display) {
-		return <></>
+		return <></>;
 	}
 
 	return (
@@ -17,8 +27,9 @@ const EditModal = (props: { display: boolean, type: string, message: string, hid
 										{/* <p className="text-base text-slate-400">Are you sure you want to deactivate your account? All of your data will be permanently removed. This action cannot be undone.</p> */}
 										<textarea 
 											placeholder="New prompt"
-											value={props.message}
+											value={promptInput}
 											className='text-xl p-2 w-11/12 h-64 min-h-64 max-h-64 text-[#f1f5f9] bg-slate-600 rounded-lg focus:outline-none'
+											onChange={e => setPromptInput(e.target.value)}
 										/>
 									</div>
 								</div>
@@ -26,7 +37,7 @@ const EditModal = (props: { display: boolean, type: string, message: string, hid
 						</div>
 						<div className="bg-slate-700 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
 							<button type="button" className="inline-flex w-full justify-center rounded-md bg-pink-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-pink-600 sm:ml-3 sm:w-auto">Save</button>
-							<button type="button" className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto">Cancel</button>
+							<button type="button" className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto" onClick={props.hideDisplay}>Cancel</button>
 						</div>
 					</div>
 				</div>
