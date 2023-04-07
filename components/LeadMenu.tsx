@@ -39,7 +39,8 @@ const LeadMenu = (props: { processLeads: (f: File, messageType: MessageType) => 
 										
 										<div className="text-blue-200 text-2xl">{res.type} for {res.name}</div>
 										<div className="text-blue-100 text-sm overflow-y-auto">
-											{res.res.split('\n').map((str: any, i: any) => <p key={i}>{str}</p>)}
+											{/* {res.res.split('\n').map((str: any, i: any) => <p key={i}>{str}</p>)} */}
+											{res.res}
 										</div>
 									</div>
 								))}

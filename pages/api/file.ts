@@ -33,7 +33,7 @@ export default (req: NextApiRequest, res: NextApiResponse) => {
 			const data = xlsx.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
 			fs.unlinkSync(files.file.filepath);
 			// const responseData = await getResponses(data, name, messageType);
-			const responseData = Array(10).fill([
+			const responseData = Array(10).fill(
 				{
 					name: 'Elon Musk',
 					position: 'CEO',
@@ -41,7 +41,7 @@ export default (req: NextApiRequest, res: NextApiResponse) => {
 					res: 'My message here',
 					type: messageType
 				}
-			]);
+			);
 			return res.status(200).json(responseData);
 		});
 	} catch(e) {
