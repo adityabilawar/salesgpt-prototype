@@ -65,7 +65,8 @@ const LeadMenu = (props: { processLeads: (f: File, messageType: MessageType[], p
 										
 										<div className="mt-4 flex flex-between">
 											<div className="text-blue-200 text-2xl">{res.type} for {res.name}</div>
-											<div className="text-blue-200 text-lg">Copy</div>
+											<Image src={copyImg} className="w-5 h-5 mt-1 cursor-pointer" alt="copy icon" onClick={() => navigator.clipboard.writeText(res.res) } />
+											{/* <div className="text-blue-200 text-lg">Copy</div> */}
 										</div>
 										<div className="text-blue-100 text-sm overflow-y-auto mt-2">
 											{res.res.split('\n').map((str: any, i: any) => <p key={i}>{str}</p>)}
