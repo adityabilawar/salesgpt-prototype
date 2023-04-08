@@ -1,6 +1,7 @@
 import { MessageType, ResponseData } from "@/@types/Response";
 import importImg from '@/public/import.png';
 import penImg from '@/public/square-pen-solid.svg';
+import copyImg from '@/public/copy-solid.svg';
 import Image from 'next/image';
 import { useEffect, useRef, useState } from "react";
 import EditModal from '@/components/EditModal';
@@ -62,7 +63,10 @@ const LeadMenu = (props: { processLeads: (f: File, messageType: MessageType[], p
 								{props.leadData.map((res: any, ind: any) => (
 									<div className="leads-option w-96 max-w-96 h-72 max-h-72 bg-[#2C2F48] flex justify-start p-5 rounded-xl flex-col" key={`option-${ind}`}>
 										
-										<div className="text-blue-200 text-2xl mt-4">{res.type} for {res.name}</div>
+										<div className="mt-4 flex flex-between">
+											<div className="text-blue-200 text-2xl">{res.type} for {res.name}</div>
+											<div className="text-blue-200 text-lg">Copy</div>
+										</div>
 										<div className="text-blue-100 text-sm overflow-y-auto mt-2">
 											{res.res.split('\n').map((str: any, i: any) => <p key={i}>{str}</p>)}
 										</div>
