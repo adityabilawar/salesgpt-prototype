@@ -38,16 +38,16 @@ export default (req: NextApiRequest, res: NextApiResponse) => {
 			const workbook = xlsx.readFile(files.file.filepath);
 			const data = xlsx.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
 			fs.unlinkSync(files.file.filepath);
-			// const responseData: any = await getResponses(data, name, messageTypes, prompts);
-			const responseData = Array(10).fill(
-				{
-					name: 'Elon Musk',
-					position: 'CEO',
-					company: 'Tesla',
-					res: 'My message here',
-					type: messageTypes
-				}
-			);
+			const responseData: any = await getResponses(data, name, messageTypes, prompts);
+			// const responseData = Array(10).fill(
+			// 	{
+			// 		name: 'Elon Musk',
+			// 		position: 'CEO',
+			// 		company: 'Tesla',
+			// 		res: 'My message here',
+			// 		type: messageTypes
+			// 	}
+			// );
 			return res.status(200).json(responseData);
 		});
 	} catch(e) {
