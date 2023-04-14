@@ -11,7 +11,7 @@ const LoginPage = () => {
 	const [pass, setPass] = useState('');
   
 	const submitLogin = () => {
-	  axios.post('/api/login', {name: user, pass})
+	  axios.post('/api/login', {user, pass})
 	  	.then(res => {
 				if(res.data.login) localStorage.setItem('auth', JSON.stringify({user, pass}));
 				router.push('/leads');

@@ -17,10 +17,16 @@ const LeadsPage = () => {
 
 		const formData = new FormData();
 		formData.append('file', file);
-		const name = localStorage.getItem('fullName') ? localStorage.getItem('fullName') as string : '';
+		const authStorage = localStorage.getItem('auth');
+		if(!authStorage) {
+			router.push('/login');
+			return;
+		}
+		const name = JSON.parse(authStorage).user;
 		formData.append('name', name);
 		formData.append('type', JSON.stringify(messageType));
 		formData.append('prompts', JSON.stringify(prompts));
+		formData.append('storage', JSON.stringify(authStorage));
 		axios.post('/api/file', formData)
 			.then(res => {
 				setLeadData(res.data);
@@ -35,7 +41,14 @@ const LeadsPage = () => {
 
 	const router = useRouter();
 	useEffect(() => {
-		if(localStorage.getItem('auth') !== 'true') router.push('/login');
+		const authStorage = localStorage.getItem('auth');
+		if(!authStorage) {
+			router.push('/login');
+			return;
+		}
+
+		const auth = JSON.parse(authStorage);
+		axios.post('/api/login', {user: auth.user, pass: auth.pass}).catch(err => router.push('/login'));
 	});
 
 	return (
