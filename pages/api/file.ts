@@ -35,6 +35,8 @@ export default (req: NextApiRequest, res: NextApiResponse) => {
 				'Custom Prompt': 'Say "You have not made a custom prompt in the editor yet!"'
 			};
 			const messageTypes: MessageType[] = (typeof fields.type === 'string') ? JSON.parse(fields.type) as MessageType[] : ['Linkedin invite'];
+			const auth = (typeof fields.storage === 'string') ? JSON.parse(fields.storage) : {};
+			if((auth.user !== 'admin') && (auth.pass !== process.env.ADMIN_PASS)) return res.status(400).json({ error: 'Invalid auth! User is not admin' });
 			const workbook = xlsx.readFile(files.file.filepath);
 			const data = xlsx.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
 			fs.unlinkSync(files.file.filepath);
