@@ -21,9 +21,9 @@ const LoginPage = () => {
 		});
 	}
 
-	useEffect(() => {
-		if(localStorage.getItem('auth')) router.push('/leads');
-	});
+	// useEffect(() => {
+	// 	if(localStorage.getItem('auth')) router.push('/leads');
+	// });
   
 	return (
 	  <>
