@@ -2,22 +2,27 @@ import { useEffect, useState } from "react";
 import styles from '@/styles/Login.module.css';
 import graphic from '@/public/graphic.png';
 import { useRouter } from "next/router";
+import axios from "axios";
 
 const LoginPage = () => {
 
 	const router = useRouter();
-	const [name, setName] = useState('');
+	const [user, setUser] = useState('');
 	const [pass, setPass] = useState('');
   
 	const submitLogin = () => {
-	  console.log(name, pass);
-	  localStorage.setItem('auth', 'true');
-	  localStorage.setItem('fullName', name);
-	  router.push('/leads');
+	  axios.post('/api/login', {name: user, pass})
+	  	.then(res => {
+				if(res.data.login) localStorage.setItem('auth', JSON.stringify({user, pass}));
+				router.push('/leads');
+			})
+			.catch(err => {
+				console.log(err);
+		});
 	}
 
 	useEffect(() => {
-		if(localStorage.getItem('auth') === 'true') router.push('/leads');
+		if(localStorage.getItem('auth')) router.push('/leads');
 	});
   
 	return (
@@ -34,8 +39,8 @@ const LoginPage = () => {
 				<input 
 				  type="text"
 				  placeholder="Full Name"
-				  onChange={e => setName(e.target.value)}
-				  value={name}
+				  onChange={e => setUser(e.target.value)}
+				  value={user}
 				  className='borderTransition p-2 pr-24 text-xl text-[#f1f5f9] border-b-2 border-solid border-[#e0f2fe] focus:border-[#818cf8]'
 				/>
 				<input 
