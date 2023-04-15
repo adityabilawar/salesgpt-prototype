@@ -1,13 +1,20 @@
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import LoginPage from './login'
+import axios from 'axios';
 
 export default function Home() {
 
 	const router = useRouter();
 	useEffect(() => {
-		if(localStorage.getItem('auth') === 'true') router.push('/leads');
-    else router.push('/login');
+    const authStorage = localStorage.getItem('auth');
+		if(!authStorage) {
+			router.push('/login');
+			return;
+		}
+
+		const auth = JSON.parse(authStorage);
+		axios.post('/api/login', {user: auth.user, pass: auth.pass}).then(() => router.push('/leads')).catch(() => router.push('/login'));
 	});
 
   return (
