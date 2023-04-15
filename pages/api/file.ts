@@ -76,7 +76,16 @@ const getResponses = async(data: any[], name: string, type: MessageType[], promp
 					.replace('USER_COMPANY', userCompany)
 					.replace('USER_NAME', userName);
 				
-				const personalizedInfo = await '';
+				const personalizedInfo = await sdk.enhance({
+					type: 'Person',
+					url: data[i].Social,
+					size: '1',
+					refresh: 'false',
+					search: 'false',
+					nonCanonicalFacts: 'false',
+					useCache: 'false',
+					jsonmode: '%20'
+				  });
 		
 				const response = await openai.createCompletion({
 					model: "text-davinci-003",
