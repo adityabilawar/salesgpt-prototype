@@ -1,6 +1,5 @@
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
-import LoginPage from './login'
 import axios from 'axios';
 
 export default function Home() {
