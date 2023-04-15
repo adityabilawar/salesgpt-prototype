@@ -71,10 +71,12 @@ const getResponses = async(data: any[], name: string, type: MessageType[], promp
 					.replace('USER_POSITION', userPosition)
 					.replace('USER_COMPANY', userCompany)
 					.replace('USER_NAME', userName);
+				
+				const personalizedInfo = await '';
 		
 				const response = await openai.createCompletion({
 					model: "text-davinci-003",
-					prompt: currPrompt,
+					prompt: `${currPrompt} based on this background info: ${personalizedInfo}`,
 					max_tokens: 3000,
 					temperature: 0,
 					top_p: 1.0,
