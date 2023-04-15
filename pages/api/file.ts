@@ -4,11 +4,7 @@ import fs from 'fs';
 import xlsx from 'xlsx';
 import { Configuration, OpenAIApi } from 'openai';
 import { MessageType, ResponseData } from '@/@types/Response';
-import diffbotAPI from 'api';
 import axios from 'axios';
-
-const sdk = diffbotAPI('@diffbot-2/v1.0#l0pbovlg5r7imz');
-sdk.auth(process.env.DIFFBOT_KEY);
 
 const configuration = new Configuration({
     apiKey: process.env.OPEN_AI_KEY,
