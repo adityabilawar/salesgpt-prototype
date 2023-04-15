@@ -5,6 +5,7 @@ import xlsx from 'xlsx';
 import { Configuration, OpenAIApi } from 'openai';
 import { MessageType, ResponseData } from '@/@types/Response';
 import diffbotAPI from 'api';
+import axios from 'axios';
 
 const sdk = diffbotAPI('@diffbot-2/v1.0#l0pbovlg5r7imz');
 sdk.auth(process.env.DIFFBOT_KEY);
@@ -31,7 +32,6 @@ export default (req: NextApiRequest, res: NextApiResponse) => {
 				console.error(err);
 				return res.status(404).send('error while parsing file');
 			}
-			const name = (typeof fields.name === 'string') ? fields.name : '';
 			const prompts = (typeof fields.prompts === 'string') ? JSON.parse(fields.prompts) : {
 				'Linkedin invite': 'Hi! Can you write me a 300 character linkedin invite message on behalf of MY_NAME to the USER_POSITION of the company USER_COMPANY whos name is USER_NAME explaining that you want to help provide value to their business.',
 				'Intro Email': 'Write me a personlized introduction email to USER_NAME, who has the USER_POSITION position at the company USER_COMPANY on behalf of MY_NAME explaining that I want to help provide value to their business & request a phone call',
@@ -45,7 +45,7 @@ export default (req: NextApiRequest, res: NextApiResponse) => {
 			const workbook = xlsx.readFile(files.file.filepath);
 			const data = xlsx.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
 			fs.unlinkSync(files.file.filepath);
-			const responseData: any = await getResponses(data, name, messageTypes, prompts);
+			const responseData: any = await getResponses(data, auth.user, messageTypes, prompts);
 			// const responseData = Array(10).fill(
 			// 	{
 			// 		name: 'Elon Musk',
@@ -76,22 +76,18 @@ const getResponses = async(data: any[], name: string, type: MessageType[], promp
 					.replace('USER_POSITION', userPosition)
 					.replace('USER_COMPANY', userCompany)
 					.replace('USER_NAME', userName);
-				
-				const personalizedInfo = await sdk.enhance({
-					type: 'Person',
-					url: data[i].Social,
-					size: '1',
-					refresh: 'false',
-					search: 'false',
-					nonCanonicalFacts: 'false',
-					useCache: 'false',
-					jsonmode: '%20'
-				  });
-				  console.log(personalizedInfo.data);
+
+				const options = {
+					method: 'GET',
+					url: `https://kg.diffbot.com/kg/v3/enhance?type=Person&url=${data[i].Social}&size=1&refresh=false&search=false&nonCanonicalFacts=false&useCache=false&jsonmode=%20&token=${process.env.DIFFBOT_KEY}`,
+					headers: {accept: 'application/json'}
+				  };
+				  
+				const personalizedRes = await axios.request(options);
 		
 				const response = await openai.createCompletion({
 					model: "text-davinci-003",
-					prompt: `${currPrompt} based on this background info: ${personalizedInfo}`,
+					prompt: `${currPrompt} based on this background info: ${personalizedRes.data.data[0].entity.description}`,
 					max_tokens: 3000,
 					temperature: 0,
 					top_p: 1.0,
