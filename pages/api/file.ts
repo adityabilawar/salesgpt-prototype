@@ -72,18 +72,18 @@ const getResponses = async(data: any[], name: string, type: MessageType[], promp
 					.replace('USER_POSITION', userPosition)
 					.replace('USER_COMPANY', userCompany)
 					.replace('USER_NAME', userName);
-
+				
 				const options = {
 					method: 'GET',
 					url: `https://kg.diffbot.com/kg/v3/enhance?type=Person&url=${data[i].Social}&size=1&refresh=false&search=false&nonCanonicalFacts=false&useCache=false&jsonmode=%20&token=${process.env.DIFFBOT_KEY}`,
 					headers: {accept: 'application/json'}
 				  };
 				  
-				const personalizedRes = await axios.request(options);
+				const personalizedRes = data[i].Social ? (await axios.request(options)).data.data[0].entity.description : '';
 		
 				const response = await openai.createCompletion({
 					model: "text-davinci-003",
-					prompt: `${currPrompt} based on this background info: ${personalizedRes.data.data[0].entity.description}`,
+					prompt: `${currPrompt} based on this background info: ${personalizedRes}`,
 					max_tokens: 3000,
 					temperature: 0,
 					top_p: 1.0,
