@@ -70,3 +70,7 @@ input:focus {
   -o-transition : color 200ms ease-in-out;
   color: rgb(129 140 248);
 }
+
+.selected-tab {
+  background-color: #383B59;
+}
