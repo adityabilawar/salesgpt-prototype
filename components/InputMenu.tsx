@@ -2,7 +2,7 @@ import { useRef, useState } from "react";
 import importImg from '@/public/import.png';
 import Image from 'next/image';
 
-const InputMenu = (props: { processInput: (type: number, val: string, f: File) => void }) => {
+const InputMenu = (props: { processInput: (type: number, val: string, f: File | null) => void }) => {
 
 	const [tab, setTab] = useState(1);
 	const [inputVal, setInputVal] = useState('');
@@ -13,6 +13,8 @@ const InputMenu = (props: { processInput: (type: number, val: string, f: File) =
 		if(target.files === null) return;
 		setFile(target.files[0]);
 	}
+
+	const importInput = () => props.processInput(tab, inputVal, file);
 
 	return (
 		<>
@@ -42,7 +44,7 @@ const InputMenu = (props: { processInput: (type: number, val: string, f: File) =
 						<div className="flex w-full h-2/3 justify-center items-center cursor-pointer" onClick={() => (fileInput.current) ? fileInput.current.click() : console.log('invalid ref')}>
 							<Image src={importImg} className="w-40 h-40" alt="import icon" />
 						</div>
-						<div className="ml-10 mt-5 w-36 h-10 bg-[#383B59] text-blue-200 text-lg font-medium rounded-md flex justify-center items-center cursor-pointer">Import</div>
+						<div className="ml-10 mt-5 w-36 h-10 bg-[#383B59] text-blue-200 text-lg font-medium rounded-md flex justify-center items-center cursor-pointer" onClick={importInput}>Import</div>
 						<input type="file" className="hidden" ref={fileInput} onChange={(e) => fileUpload(e.target)} />
 					</div>
 					:
@@ -52,7 +54,7 @@ const InputMenu = (props: { processInput: (type: number, val: string, f: File) =
 						</div>
 						<div className="ml-10 mt-5 w-full h-full">
 							<textarea className="resize-none w-5/6 h-2/3 bg-[#383B59] text-blue-100 rounded-md focus:outline-none p-4 text-lg" value={inputVal} onChange={(e) => setInputVal(e.target.value)} />
-							<div className="mt-5 w-36 h-10 bg-[#383B59] text-blue-200 text-lg font-medium rounded-md flex justify-center items-center cursor-pointer">Import</div>
+							<div className="mt-5 w-36 h-10 bg-[#383B59] text-blue-200 text-lg font-medium rounded-md flex justify-center items-center cursor-pointer" onClick={importInput}>Import</div>
 						</div>
 					</div>
 				}

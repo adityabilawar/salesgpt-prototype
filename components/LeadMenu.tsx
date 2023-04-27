@@ -6,10 +6,10 @@ import { useEffect, useState } from "react";
 import EditModal from '@/components/EditModal';
 import InputMenu from "./InputMenu";
 
-const LeadMenu = (props: { processLeads: (f: File, messageType: MessageType[], p: any) => void, leadData: (ResponseData[] | null), status: string }) => {
+const LeadMenu = (props: { processLeads: (inp: {type: number, val: string, f: File | null}, messageType: MessageType[], p: any) => void, leadData: (ResponseData[] | null), status: string }) => {
 	// const fileInput = useRef<HTMLInputElement>(null);
 	// const [file, setFile] = useState<File | null>(null);
-	const [input, setInput] = useState(null);
+	const [input, setInput] = useState<{type: number, val: string, f: File | null} | null>(null);
 	const [prompts, setPrompts] = useState<any>(null);
 	const [selected, setSelected] = useState<MessageType[]>([]);
 
@@ -19,9 +19,7 @@ const LeadMenu = (props: { processLeads: (f: File, messageType: MessageType[], p
 		message: ''
 	});
 
-	const processInput = (type: number, val: string, f: File) => {
-		
-	}
+	const processInput = (type: number, val: string, f: File | null) => setInput({type,val,f});
 
 	useEffect(() => {
 		const localPrompts = localStorage.getItem('prompts');
