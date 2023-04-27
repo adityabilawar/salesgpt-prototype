@@ -2,7 +2,7 @@ import { useRef, useState } from "react";
 import importImg from '@/public/import.png';
 import Image from 'next/image';
 
-const InputMenu = () => {
+const InputMenu = (props: { processInput: (type: number, val: string, f: File) => void }) => {
 
 	const [tab, setTab] = useState(1);
 	const [inputVal, setInputVal] = useState('');

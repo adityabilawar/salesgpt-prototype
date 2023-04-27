@@ -1,15 +1,15 @@
 import { MessageType, ResponseData } from "@/@types/Response";
-import importImg from '@/public/import.png';
 import penImg from '@/public/square-pen-solid.svg';
 import copyImg from '@/public/copy-solid.svg';
 import Image from 'next/image';
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import EditModal from '@/components/EditModal';
 import InputMenu from "./InputMenu";
 
 const LeadMenu = (props: { processLeads: (f: File, messageType: MessageType[], p: any) => void, leadData: (ResponseData[] | null), status: string }) => {
-	const fileInput = useRef<HTMLInputElement>(null);
-	const [file, setFile] = useState<File | null>(null);
+	// const fileInput = useRef<HTMLInputElement>(null);
+	// const [file, setFile] = useState<File | null>(null);
+	const [input, setInput] = useState(null);
 	const [prompts, setPrompts] = useState<any>(null);
 	const [selected, setSelected] = useState<MessageType[]>([]);
 
@@ -19,9 +19,8 @@ const LeadMenu = (props: { processLeads: (f: File, messageType: MessageType[], p
 		message: ''
 	});
 
-	const fileUpload = (target: EventTarget & HTMLInputElement) => {
-		if(target.files === null) return;
-		setFile(target.files[0]);
+	const processInput = (type: number, val: string, f: File) => {
+		
 	}
 
 	useEffect(() => {
@@ -77,7 +76,7 @@ const LeadMenu = (props: { processLeads: (f: File, messageType: MessageType[], p
 							</div>
 						:
 							<>
-								{(file === null) ? 
+								{(input === null) ? 
 										// <div 
 										// 	className="leads-import w-96 h-72 border-[1px] border-solid border-[#6E5ED4] bg-[#2C2F48] self-center mt-24 rounded-3xl flex flex-col justify-center items-center gap-5 cursor-pointer"
 										// 	onClick={() => (fileInput.current) ? fileInput.current.click() : console.log('invalid ref')}
@@ -86,7 +85,7 @@ const LeadMenu = (props: { processLeads: (f: File, messageType: MessageType[], p
 										// 	<div className="import-title text-2xl text-blue-100 font-medium">Import a .XLSX file (Excel)</div>
 										// 	<input type="file" className="hidden" ref={fileInput} onChange={(e) => fileUpload(e.target)} />
 										// </div>
-										<InputMenu />
+										<InputMenu processInput={processInput} />
 									:
 										<>
 										<div className="flex flex-col gap-16 self-center mt-24">
@@ -131,7 +130,7 @@ const LeadMenu = (props: { processLeads: (f: File, messageType: MessageType[], p
 												</div>
 											</div>
 										</div>
-										<div className='self-center BTN p-3 text-2xl text-indigo-200 rounded-3xl font-semibold cursor-pointer select-none w-50 text-center mt-5 mb-5' onClick={() => props.processLeads(file, selected, prompts)}>
+										<div className='self-center BTN p-3 text-2xl text-indigo-200 rounded-3xl font-semibold cursor-pointer select-none w-50 text-center mt-5 mb-5' onClick={() => props.processLeads(input, selected, prompts)}>
 											SUBMIT
 										</div>
 										</>
