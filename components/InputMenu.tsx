@@ -17,19 +17,21 @@ const InputMenu = () => {
 	return (
 		<>
 			<div className="w-2/3 h-3/5 shrink-0 mt-5 rounded-2xl self-center border-2 bg-[#2C2F48] border-solid border-[#586FD1] flex-col overflow-hidden">
-				<table className="table-fixed h-14 w-full text-center text-xl text-blue-100">
-					<tbody>
-						<td className='w-1/3 hover:bg-[#383B59] cursor-pointer' onClick={() => setTab(1)}>
+				{/* <table className="table-fixed h-14 w-full text-center text-xl text-blue-100">
+					<thead> */}
+					<div className="w-full h-14 flex text-center text-xl text-blue-100 font-medium">
+						<div className={`${(tab == 1) ? 'bg-[#383B59]' : ''} w-1/3 h-14 hover:bg-[#383B59] flex items-center justify-center cursor-pointer`} onClick={() => setTab(1)}>
 							Linkedin URLs
-						</td>
-						<td className={`${(tab == 2) ? 'bg-[#383B59]' : ''} w-1/3 hover:bg-[#383B59] cursor-pointer`} onClick={() => setTab(2)}>
+						</div>
+						<div className={`${(tab == 2) ? 'bg-[#383B59]' : ''} w-1/3 h-14 hover:bg-[#383B59] flex items-center justify-center cursor-pointer`} onClick={() => setTab(2)}>
 							Social Links
-						</td>
-						<td className={`${(tab == 3) ? 'bg-[#383B59]' : ''} w-1/3 hover:bg-[#383B59] cursor-pointer`} onClick={() => setTab(3)}>
+						</div>
+						<div className={`${(tab == 3) ? 'bg-[#383B59]' : ''} w-1/3 h-14 hover:bg-[#383B59] flex items-center justify-center cursor-pointer`} onClick={() => setTab(3)}>
 							Import File
-						</td>
-					</tbody>
-				</table>
+						</div>
+					</div>
+					{/* </thead>
+				</table> */}
 				<div className="bg-[#383B59] w-full h-1" />
 
 				{(tab == 3) ?
