@@ -86,7 +86,7 @@ const LeadsPage = () => {
 									<tbody>
 										{leadData.map((res: any, ind: any) => (
 											<tr className="lead-listing cursor-pointer hover:bg-[#393D5D] select-none" key={ind}>
-												<td className="lead-listing-name text-xl text-blue-100 align-middle p-2 pl-5" key={`name-${ind}`}>
+												<td className="lead-listing-name text-xl text-blue-100 align-middle p-2 pl-5 overflow-scroll" key={`name-${ind}`}>
 													{res.name}
 												</td>
 												<td className="lead-listing-info flex flex-col align-middle p-2" key={`info-${ind}`}>

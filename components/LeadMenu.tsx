@@ -62,8 +62,8 @@ const LeadMenu = (props: { processLeads: (inp: {type: number, val: string, f: Fi
 									<div className="leads-option w-96 max-w-96 h-72 max-h-72 bg-[#2C2F48] flex justify-start p-5 rounded-xl flex-col" key={`option-${ind}`}>
 										
 										<div className="mt-4 flex justify-between">
-											<div className="text-blue-200 text-2xl">{res.type} for {res.name}</div>
-											<Image src={copyImg} className="w-5 h-5 mt-1 cursor-pointer" alt="copy icon" onClick={() => navigator.clipboard.writeText(res.res)} />
+											<div className="text-blue-200 text-2xl overflowbreak">{res.type} for {res.name}</div>
+											<Image src={copyImg} className="w-5 h-5  mt-1 cursor-pointer" alt="copy icon" onClick={() => navigator.clipboard.writeText(res.res)} />
 											{/* <div className="text-blue-200 text-lg">Copy</div> */}
 										</div>
 										<div className="text-blue-100 text-sm overflow-y-auto mt-2">
