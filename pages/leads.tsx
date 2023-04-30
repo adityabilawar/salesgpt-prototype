@@ -12,31 +12,52 @@ const LeadsPage = () => {
 	const [status, setStatus] = useState('No leads');
 
 	const processLeads = (input: {type: number, val: string, f: File | null}, messageType: MessageType[], prompts: any) => {
-		console.log(file.type)
-		if(file.type !== 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') window.location.reload();
-
-		const formData = new FormData();
-		formData.append('file', file);
 		const authStorage = localStorage.getItem('auth');
 		if(!authStorage) {
 			router.push('/login');
 			return;
 		}
 		const name = JSON.parse(authStorage).user;
-		formData.append('name', name);
-		formData.append('type', JSON.stringify(messageType));
-		formData.append('prompts', JSON.stringify(prompts));
-		formData.append('storage', JSON.stringify(authStorage));
-		axios.post('/api/file', formData)
-			.then(res => {
-				setLeadData(res.data);
-				setStatus('Complete');
-			})
-			.catch(err => {
-				console.log(err);
-				setStatus('Error while Uploading');
-			});
-		setStatus('Loading...');
+		if((input.type === 3) && (input.f !== null)) {
+			const file = input.f;
+			console.log(file.type);
+
+			if(file.type !== 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') window.location.reload();
+
+			const formData = new FormData();
+			formData.append('file', file);
+			formData.append('name', name);
+			formData.append('type', JSON.stringify(messageType));
+			formData.append('prompts', JSON.stringify(prompts));
+			formData.append('storage', JSON.stringify(authStorage));
+			axios.post('/api/file', formData)
+				.then(res => {
+					console.log(res.data);
+					setLeadData(res.data);
+					setStatus('Complete');
+				})
+				.catch(err => {
+					console.log(err);
+					setStatus('Error while Uploading');
+				});
+			setStatus('Loading...');
+		} else if (input.type !== 3) {
+			axios.post('/api/input', {
+				input: input.val,
+				type: messageType,
+				prompts,
+				auth: JSON.parse(authStorage),
+				name
+				}).then(res => {
+					console.log(res.data);
+					setLeadData(res.data);
+					setStatus('Complete');
+				}).catch(err => {
+					console.log(err);
+					setStatus('Error while Uploading');
+				});
+			setStatus('Loading...');
+		}
 	}
 
 	const router = useRouter();
@@ -88,11 +109,17 @@ const LeadsPage = () => {
 					
 				</div>
 				<div className="leads-sec w-4/5 h-full flex flex-col overflow-y-auto">
-					<div style={{backgroundImage: `url(${graphic.src})`}} className="leads-banner w-3/5 h-48 shrink-0 mt-5 rounded-2xl bg-center bg-no-repeat self-center border-2 border-solid border-[#586FD1] flex items-center justify-center">
-						<div className="banner-title text-2xl text-blue-200">
-							Create your personalized message
+					{(status !== 'Complete') ?
+						<div style={{backgroundImage: `url(${graphic.src})`}} className="leads-banner w-3/5 h-48 shrink-0 mt-5 rounded-2xl bg-center bg-no-repeat self-center border-2 border-solid border-[#586FD1] flex items-center justify-center">
+							<div className="banner-title text-2xl text-blue-200">
+								Create your personalized message
+							</div>
 						</div>
-					</div>
+						:
+						<div className="ml-24 mt-10 text-3xl text-indigo-300">
+							Results
+						</div>
+					}
 					<LeadMenu processLeads={processLeads} leadData={leadData} status={status} />
 				</div>
 			</div>

@@ -2,8 +2,8 @@ export type MessageType = 'Linkedin invite' | 'Intro Email' | 'Coffee Chat' | 'C
 
 export interface ResponseData {
 	name: string
-	position: string
-	company: string
+	position?: string
+	company?: string
 	res: string | undefined
 	type: MessageType
 }

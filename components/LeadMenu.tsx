@@ -57,7 +57,7 @@ const LeadMenu = (props: { processLeads: (inp: {type: number, val: string, f: Fi
 				:
 				<>
 					{(props.leadData !== null) ? 
-							<div className="leads-options flex flex-wrap gap-10 mt-10 ml-20 mb-8">
+							<div className="leads-options flex flex-wrap gap-10 mt-5 ml-20 mb-8">
 								{props.leadData.map((res: any, ind: any) => (
 									<div className="leads-option w-96 max-w-96 h-72 max-h-72 bg-[#2C2F48] flex justify-start p-5 rounded-xl flex-col" key={`option-${ind}`}>
 										
@@ -75,14 +75,6 @@ const LeadMenu = (props: { processLeads: (inp: {type: number, val: string, f: Fi
 						:
 							<>
 								{(input === null) ? 
-										// <div 
-										// 	className="leads-import w-96 h-72 border-[1px] border-solid border-[#6E5ED4] bg-[#2C2F48] self-center mt-24 rounded-3xl flex flex-col justify-center items-center gap-5 cursor-pointer"
-										// 	onClick={() => (fileInput.current) ? fileInput.current.click() : console.log('invalid ref')}
-										// >
-										// 	<Image src={importImg} className="w-32 h-32" alt="import icon" />
-										// 	<div className="import-title text-2xl text-blue-100 font-medium">Import a .XLSX file (Excel)</div>
-										// 	<input type="file" className="hidden" ref={fileInput} onChange={(e) => fileUpload(e.target)} />
-										// </div>
 										<InputMenu processInput={processInput} />
 									:
 										<>
