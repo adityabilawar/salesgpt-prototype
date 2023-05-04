@@ -7,8 +7,6 @@ import EditModal from '@/components/EditModal';
 import InputMenu from "./InputMenu";
 
 const LeadMenu = (props: { processLeads: (inp: {type: number, val: string, f: File | null}, messageType: MessageType[], p: any) => void, leadData: (ResponseData[] | null), status: string }) => {
-	// const fileInput = useRef<HTMLInputElement>(null);
-	// const [file, setFile] = useState<File | null>(null);
 	const [input, setInput] = useState<{type: number, val: string, f: File | null} | null>(null);
 	const [prompts, setPrompts] = useState<any>(null);
 	const [selected, setSelected] = useState<MessageType[]>([]);
@@ -16,7 +14,8 @@ const LeadMenu = (props: { processLeads: (inp: {type: number, val: string, f: Fi
 	const [modalDisplay, setModalDisplay] = useState({
 		display: false,
 		type: '',
-		message: ''
+		message: '',
+		customTitle: ''
 	});
 
 	const processInput = (type: number, val: string, f: File | null) => setInput({type,val,f});
@@ -28,25 +27,34 @@ const LeadMenu = (props: { processLeads: (inp: {type: number, val: string, f: Fi
 				'Linkedin invite': 'Hi! Can you write me a 300 character linkedin invite message on behalf of MY_NAME to the USER_POSITION of the company USER_COMPANY whos name is USER_NAME explaining that you want to help provide value to their business.',
 				'Intro Email': 'Write me a personlized introduction email to USER_NAME, who has the USER_POSITION position at the company USER_COMPANY on behalf of MY_NAME explaining that I want to help provide value to their business & request a phone call',
 				'Coffee Chat': 'Write me 5 coffee chat questions on behalf of MY_NAME to ask to USER_NAME that has the USER_POSITION position at the company USER_COMPANY.',
-				'Custom Prompt': 'Say "You have not made a custom prompt in the editor yet!"'
+				'Custom Prompt': {
+					title: 'Custom Prompt',
+					prompt: 'Say "You have not made a custom prompt in the editor yet!"'
+				}
 			}
 			localStorage.setItem('prompts', JSON.stringify(initPrompts));
 			setPrompts(initPrompts);
+		} else if(!JSON.parse(localPrompts)['Custom Prompt'].title) {
+			const newPrompts = JSON.parse(localPrompts);
+			newPrompts['Custom Prompt'] = {title: 'Custom Prompt', prompt: newPrompts['Custom Prompt']};
+			localStorage.setItem('prompts', JSON.stringify(newPrompts));
+			setPrompts(newPrompts);
 		} else if(!prompts) setPrompts(JSON.parse(localPrompts))
 	}, []);
 
-	const savePrompt = (newPrompt: string) => {
+	const savePrompt = (newPrompt: string, newTitle: string) => {
 		const type = modalDisplay.type;
-		setModalDisplay({ display: false, type: '', message: '' });
+		setModalDisplay({ display: false, type: '', message: '', customTitle: '' });
 		const currPrompts = prompts;
-		currPrompts[type] = newPrompt;
+		if(type === 'Custom Prompt') currPrompts[type] = {title: newTitle, prompt: newPrompt};
+		else currPrompts[type] = newPrompt;
 		localStorage.setItem('prompts', JSON.stringify(currPrompts));
 		setPrompts(currPrompts);
 	}
 
 	return (
 		<>
-			<EditModal display={modalDisplay.display} type={modalDisplay.type} message={modalDisplay.message} hideDisplay={() => setModalDisplay({display: false, type: '', message: ''})} savePrompt={savePrompt} />
+			<EditModal display={modalDisplay.display} type={modalDisplay.type} message={modalDisplay.message} customTitle={modalDisplay.customTitle} hideDisplay={() => setModalDisplay({display: false, type: '', message: '', customTitle: ''})} savePrompt={savePrompt} />
 			{(props.status === 'Loading...') ? 
 				<div className="self-center mt-64">
 					<svg className="animate-spin h-24 w-24 text-white" fill="none" viewBox="0 0 24 24">
@@ -81,7 +89,7 @@ const LeadMenu = (props: { processLeads: (inp: {type: number, val: string, f: Fi
 										<div className="flex flex-col gap-16 self-center mt-24">
 											<div className="flex gap-32 self-center">
 												<div className={`w-80 h-64 border-[2px] border-solid border-[#6E5ED4] bg-[#2C2F48] rounded-3xl cursor-pointer borderTransition bgTransition flex flex-col hover:border-[#586FD1] hover:bg-[#303450] ${(selected.includes('Linkedin invite')) ? 'selected' : ''}`} onClick={() => { (selected.includes('Linkedin invite')) ? setSelected(selected.filter(i => i !== 'Linkedin invite')) : setSelected([...selected, 'Linkedin invite']) }}>
-													<Image src={penImg} alt="pencil" className="w-8 h-8 relative self-end mr-5 mt-5" onClick={(e) => { e.stopPropagation(); setModalDisplay({display: true, type: 'Linkedin invite', message: prompts['Linkedin invite']}) }} />
+													<Image src={penImg} alt="pencil" className="w-8 h-8 relative self-end mr-5 mt-5" onClick={(e) => { e.stopPropagation(); setModalDisplay({display: true, type: 'Linkedin invite', message: prompts['Linkedin invite'], customTitle: ''}) }} />
 													<div className="flex flex-col justify-end w-full h-full">
 														<div className="mb-5 ml-5 w-5/6">
 															<div className="text-2xl text-blue-100 font-medium">Linkedin Invite</div>
@@ -90,7 +98,7 @@ const LeadMenu = (props: { processLeads: (inp: {type: number, val: string, f: Fi
 													</div>
 												</div>
 												<div className={`w-80 h-64 border-[2px] border-solid border-[#6E5ED4] bg-[#2C2F48] rounded-3xl cursor-pointer borderTransition bgTransition flex flex-col hover:border-[#586FD1] hover:bg-[#303450] ${(selected.includes('Intro Email')) ? 'selected' : ''}`} onClick={() => { (selected.includes('Intro Email')) ? setSelected(selected.filter(i => i !== 'Intro Email')) : setSelected([...selected, 'Intro Email']) }}>
-													<Image src={penImg} alt="pencil" className="w-8 h-8 relative self-end mr-5 mt-5" onClick={(e) => { e.stopPropagation(); setModalDisplay({display: true, type: 'Intro Email', message: prompts['Intro Email']}) }} />
+													<Image src={penImg} alt="pencil" className="w-8 h-8 relative self-end mr-5 mt-5" onClick={(e) => { e.stopPropagation(); setModalDisplay({display: true, type: 'Intro Email', message: prompts['Intro Email'], customTitle: ''}) }} />
 													<div className="flex flex-col justify-end w-full h-full">
 														<div className="mb-5 ml-5 w-5/6">
 															<div className="text-2xl text-blue-100 font-medium">Introduction Email</div>
@@ -101,7 +109,7 @@ const LeadMenu = (props: { processLeads: (inp: {type: number, val: string, f: Fi
 											</div>	
 											<div className="flex gap-32 self-center">
 												<div className={`w-80 h-64 border-[2px] border-solid border-[#6E5ED4] bg-[#2C2F48] rounded-3xl cursor-pointer borderTransition bgTransition flex flex-col hover:border-[#586FD1] hover:bg-[#303450] ${(selected.includes('Coffee Chat')) ? 'selected' : ''}`} onClick={() => { (selected.includes('Coffee Chat')) ? setSelected(selected.filter(i => i !== 'Coffee Chat')) : setSelected([...selected, 'Coffee Chat']) }}>
-													<Image src={penImg} alt="pencil" className="w-8 h-8 relative self-end mr-5 mt-5" onClick={(e) => { e.stopPropagation(); setModalDisplay({display: true, type: 'Coffee Chat', message: prompts['Coffee Chat']}) }} />
+													<Image src={penImg} alt="pencil" className="w-8 h-8 relative self-end mr-5 mt-5" onClick={(e) => { e.stopPropagation(); setModalDisplay({display: true, type: 'Coffee Chat', message: prompts['Coffee Chat'], customTitle: ''}) }} />
 													<div className="flex flex-col justify-end w-full h-full">
 														<div className="mb-5 ml-5 w-5/6">
 															<div className="text-2xl text-blue-100 font-medium">Coffee Chat Questions</div>
@@ -110,10 +118,10 @@ const LeadMenu = (props: { processLeads: (inp: {type: number, val: string, f: Fi
 													</div>
 												</div>
 												<div className={`w-80 h-64 border-[2px] border-solid border-[#6E5ED4] bg-[#2C2F48] rounded-3xl cursor-pointer borderTransition bgTransition flex flex-col hover:border-[#586FD1] hover:bg-[#303450] ${(selected.includes('Custom Prompt')) ? 'selected' : ''}`} onClick={() => { (selected.includes('Custom Prompt')) ? setSelected(selected.filter(i => i !== 'Custom Prompt')) : setSelected([...selected, 'Custom Prompt']) }}>
-													<Image src={penImg} alt="pencil" className="w-8 h-8 relative self-end mr-5 mt-5" onClick={(e) => { e.stopPropagation(); setModalDisplay({display: true, type: 'Custom Prompt', message: prompts['Custom Prompt']}) }} />
+													<Image src={penImg} alt="pencil" className="w-8 h-8 relative self-end mr-5 mt-5" onClick={(e) => { e.stopPropagation(); setModalDisplay({display: true, type: 'Custom Prompt', message: prompts['Custom Prompt'].prompt, customTitle: prompts['Custom Prompt'].title}); console.log(prompts['Custom Prompt'].title); }} />
 													<div className="flex flex-col justify-end w-full h-full">
 														<div className="mb-5 ml-5 w-5/6">
-															<div className="text-2xl text-blue-100 font-medium">Custom Prompt</div>
+															<div className="text-2xl text-blue-100 font-medium">{prompts['Custom Prompt'].title}</div>
 															<div className="text-base text-blue-200">Create your own custom prompt</div>
 														</div>
 													</div>
