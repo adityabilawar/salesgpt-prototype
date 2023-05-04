@@ -82,3 +82,11 @@ input:focus {
 .lead-listing-name::-webkit-scrollbar {
   display: none;
 }
+
+.leads-banner {
+  background: url(../public/graphic.png) no-repeat center center; 
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: 100% 120%;
+}
