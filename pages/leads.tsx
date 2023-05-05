@@ -9,6 +9,7 @@ import LeadMenu from '@/components/LeadMenu';
 
 const LeadsPage = () => {
 	const [leadData, setLeadData] = useState<ResponseData[] | null>(null);
+	const [about, setAbout] = useState<About | null>(null);
 	const [status, setStatus] = useState('No leads');
 
 	const processLeads = (input: {type: number, val: string, f: File | null}, messageType: MessageType[], prompts: any) => {
@@ -30,6 +31,7 @@ const LeadsPage = () => {
 			formData.append('type', JSON.stringify(messageType));
 			formData.append('prompts', JSON.stringify(prompts));
 			formData.append('storage', JSON.stringify(authStorage));
+			formData.append('about', JSON.stringify(about));
 			axios.post('/api/file', formData)
 				.then(res => {
 					console.log(res.data);
@@ -47,7 +49,8 @@ const LeadsPage = () => {
 				type: messageType,
 				prompts,
 				auth: JSON.parse(authStorage),
-				name
+				name,
+				about
 				}).then(res => {
 					console.log(res.data);
 					setLeadData(res.data);
@@ -70,6 +73,13 @@ const LeadsPage = () => {
 
 		const auth = JSON.parse(authStorage);
 		axios.post('/api/login', {user: auth.user, pass: auth.pass}).catch(err => router.push('/login'));
+
+		const aboutStorage = localStorage.getItem('about');
+		if(!aboutStorage) {
+			router.push('/about');
+			return;
+		}
+		setAbout(JSON.parse(aboutStorage));
 	});
 
 	return (
