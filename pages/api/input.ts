@@ -12,7 +12,7 @@ export default async(req: NextApiRequest, res: NextApiResponse) => {
 	if(req.method !== 'POST') return res.status(404).send("only POST allowed");
 
 	try {
-		const { input, type, prompts, auth, name } = req.body;
+		const { input, type, prompts, auth, name, about } = req.body;
 
 		if((auth.user !== 'admin') || (auth.pass !== process.env.ADMIN_PASS)) return res.status(400).json({ error: 'Invalid auth! User is not admin' });
 

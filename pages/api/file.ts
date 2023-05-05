@@ -34,6 +34,15 @@ export default (req: NextApiRequest, res: NextApiResponse) => {
 				'Coffee Chat': 'Write me 5 coffee chat questions on behalf of MY_NAME to ask to USER_NAME that has the USER_POSITION position at the company USER_COMPANY.',
 				'Custom Prompt': 'Say "You have not made a custom prompt in the editor yet!"'
 			};
+			const about: About = (typeof fields.about === 'string') ? JSON.parse(fields.about) : {
+				firstName: '',
+				lastName: '',
+				companyName: '',
+				jobTitle: '',
+				companyDetails: '',
+				companyValue: '',
+				specialOffers: ''
+			};
 			const messageTypes: MessageType[] = (typeof fields.type === 'string') ? JSON.parse(fields.type) as MessageType[] : ['Linkedin invite'];
 			let auth = (typeof fields.storage === 'string') ? JSON.parse(fields.storage) : {};
 			auth = JSON.parse(auth);
@@ -41,7 +50,7 @@ export default (req: NextApiRequest, res: NextApiResponse) => {
 			const workbook = xlsx.readFile(files.file.filepath);
 			const data = xlsx.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
 			fs.unlinkSync(files.file.filepath);
-			const responseData: any = await getResponses(data, auth.user, messageTypes, prompts);
+			const responseData: any = await getResponses(data, messageTypes, prompts, getAboutInput(about));
 			// const responseData = Array(10).fill(
 			// 	{
 			// 		name: 'Elon Musk',
@@ -58,7 +67,21 @@ export default (req: NextApiRequest, res: NextApiResponse) => {
 	}
 }
 
-const getResponses = async(data: any[], name: string, type: MessageType[], prompts: any) => {
+export const getAboutInput = (about: About) => {
+	const name = `${about.firstName} ${about.lastName}`;
+	let inp = (`${about.jobTitle}${about.companyName}` === '') ? `A person named ${name}` : `A ${about.jobTitle} at ${about.companyName} named ${name}`;
+
+	if(about.companyDetails)
+		inp += `, whose company details include: "${about.companyDetails}"`;
+	if(about.companyValue)
+		inp += `and company value is: "${about.companyValue}"`;
+	if(about.specialOffers)
+		inp += `, and their company is having these special offers/compaigns: ${about.specialOffers}`;
+	
+	return inp;
+}
+
+const getResponses = async(data: any[], type: MessageType[], prompts: any, aboutInput: string) => {
 	const resultData: ResponseData[] = [];
 	
 	for(let i = 0; i < data.length; i++) {
@@ -85,7 +108,7 @@ const getResponses = async(data: any[], name: string, type: MessageType[], promp
 
 				const response = await openai.createCompletion({
 					model: "text-davinci-003",
-					prompt: `${currPrompt} based on this background info: ${personalizedRes}`,
+					prompt: `${currPrompt} based on this background info on the receiver: ${personalizedRes}, and on behalf of ${aboutInput}`,
 					max_tokens: 3000,
 					temperature: 0,
 					top_p: 1.0,
