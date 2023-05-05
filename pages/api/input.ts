@@ -2,6 +2,7 @@ import { ResponseData } from '@/@types/Response';
 import axios from 'axios';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { Configuration, OpenAIApi } from 'openai';
+import { getAboutInput } from './file';
 
 const configuration = new Configuration({
     apiKey: process.env.OPEN_AI_KEY,
@@ -17,7 +18,7 @@ export default async(req: NextApiRequest, res: NextApiResponse) => {
 		if((auth.user !== 'admin') || (auth.pass !== process.env.ADMIN_PASS)) return res.status(400).json({ error: 'Invalid auth! User is not admin' });
 
 		const resultData: ResponseData[] = [];
-
+		const aboutInput = getAboutInput(about);
 		const links = input.split('\n');
 		for(let i = 0; i < links.length; i++) {
 			for(let j = 0; j < type.length; j++) {
@@ -45,7 +46,7 @@ export default async(req: NextApiRequest, res: NextApiResponse) => {
 				
 				const response = await openai.createCompletion({
 					model: "text-davinci-003",
-					prompt: `${currPrompt} based on this background info: ${personalizedRes}`,
+					prompt: `${currPrompt} based on this background info on the receiver: ${personalizedRes}, and on behalf of ${aboutInput}`,
 					max_tokens: 3000,
 					temperature: 0,
 					top_p: 1.0,

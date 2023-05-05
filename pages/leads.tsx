@@ -80,7 +80,7 @@ const LeadsPage = () => {
 			return;
 		}
 		setAbout(JSON.parse(aboutStorage));
-	});
+	}, []);
 
 	return (
 		<>
