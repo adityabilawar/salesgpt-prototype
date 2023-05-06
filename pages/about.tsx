@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import importImg from '@/public/import.png';
 import Image from 'next/image';
 import { useRouter } from "next/router";
+import graphic from '@/public/graphic.png';
 
 const AboutPage = () => {
 
@@ -50,7 +51,7 @@ const AboutPage = () => {
 					</div>
 				</div>
 				<div className="leads-sec w-4/5 h-full flex flex-col overflow-y-auto">
-					<div className="leads-banner w-3/5 h-1/5 shrink-0 mt-5 rounded-2xl self-center border-2 border-solid border-[#586FD1] flex items-center justify-center">
+					<div style={{backgroundImage: `url(${graphic.src})`}} className="leads-banner w-3/5 h-1/5 shrink-0 mt-5 rounded-2xl self-center border-2 border-solid border-[#586FD1] flex items-center justify-center">
 						<div className="banner-title text-2xl text-blue-200">
 							Create your personalized message
 						</div>

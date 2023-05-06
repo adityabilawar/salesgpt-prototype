@@ -120,7 +120,7 @@ const LeadsPage = () => {
 				</div>
 				<div className="leads-sec w-4/5 h-full flex flex-col overflow-y-auto">
 					{(status !== 'Complete') ?
-						<div className="leads-banner w-3/5 h-56 shrink-0 mt-5 rounded-2xl self-center border-2 border-solid border-[#586FD1] flex items-center justify-center">
+						<div style={{backgroundImage: `url(${graphic.src})`}} className="leads-banner w-3/5 h-56 shrink-0 mt-5 rounded-2xl self-center border-2 border-solid border-[#586FD1] flex items-center justify-center">
 							<div className="banner-title text-2xl text-blue-200">
 								Create your personalized message
 							</div>

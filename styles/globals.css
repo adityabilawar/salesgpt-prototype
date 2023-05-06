@@ -84,7 +84,9 @@ input:focus {
 }
 
 .leads-banner {
-  background: url(../public/graphic.png) no-repeat center center; 
+  background-repeat: no-repeat;
+  background-position: center center;
+
   -webkit-background-size: cover;
   -moz-background-size: cover;
   -o-background-size: cover;
