@@ -1,16 +1,19 @@
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import importImg from '@/public/import.png';
+import addImg from '@/public/circle-plus-solid.svg';
 import Image from 'next/image';
 import graphic from '@/public/graphic.png';
 import { useRouter } from 'next/router';
 import { MessageType, ResponseData } from '@/@types/Response';
 import LeadMenu from '@/components/LeadMenu';
+import InputMenu from '@/components/InputMenu';
 
 const LeadsPage = () => {
 	const [leadData, setLeadData] = useState<ResponseData[] | null>(null);
 	const [about, setAbout] = useState<About | null>(null);
 	const [status, setStatus] = useState('No leads');
+	const [inpmode, addInput] = useState(false);
 
 	const processLeads = (input: {type: number, val: string, f: File | null}, messageType: MessageType[], prompts: any) => {
 		const authStorage = localStorage.getItem('auth');
@@ -63,6 +66,10 @@ const LeadsPage = () => {
 		}
 	}
 
+	const processInput = (type: number, val: string, f: File | null) => {
+		addInput(false);
+	}
+
 	const router = useRouter();
 	useEffect(() => {
 		const authStorage = localStorage.getItem('auth');
@@ -85,10 +92,30 @@ const LeadsPage = () => {
 	return (
 		<>
 			<div className="leads-main flex w-full h-full">
-				<div className={`leads-sidebar w-1/5 h-full min-h-full bg-[#2C2F48] flex flex-col justify-start ${(leadData === null) ? "gap-80" : "gap-5"}`}>
-					<div className="leads-title text-4xl font-semibold text-blue-200 mt-10 self-center">
-						Leads
+				{(inpmode) && 
+				<div className="relative z-10" aria-labelledby="edit-modal" role="dialog" aria-modal="true">
+					<div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
+					<div className="fixed min-h-full inset-0 z-10 overflow-y-auto">
+						<div className="flex justify-center p-4 sm:items-center sm:p-0 h-full w-full">
+							{/* <div className="max-w-7xl"> */}
+								<InputMenu processInput={processInput} widget />
+							{/* </div> */}
+						</div>
 					</div>
+				</div>
+				}
+				<div className={`leads-sidebar w-1/5 h-full min-h-full bg-[#2C2F48] flex flex-col justify-start ${(leadData === null) ? "gap-80" : "gap-5"}`}>
+					<div className="flex self-center items-center justify-center">
+						<div className="leads-title text-4xl font-semibold text-blue-200 mt-10 self-center">
+							Leads
+						</div>
+						{(leadData !== null) &&
+							<div className="self-center align-middle">
+								<Image src={addImg} className="w-8 h-8 mt-9 ml-3 cursor-pointer" alt="add icon" onClick={() => addInput(true)} />
+							</div>
+						}
+					</div>
+					
 					{(leadData !== null)
 						? 
 							<div className="overflow-y-auto w-full">

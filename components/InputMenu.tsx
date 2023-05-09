@@ -2,7 +2,7 @@ import { useRef, useState } from "react";
 import importImg from '@/public/import.png';
 import Image from 'next/image';
 
-const InputMenu = (props: { processInput: (type: number, val: string, f: File | null) => void }) => {
+const InputMenu = (props: { processInput: (type: number, val: string, f: File | null) => void, widget?: boolean }) => {
 
 	const [tab, setTab] = useState(1);
 	const [inputVal, setInputVal] = useState('');
@@ -18,18 +18,18 @@ const InputMenu = (props: { processInput: (type: number, val: string, f: File | 
 
 	return (
 		<>
-			<div className="w-2/3 h-3/5 shrink-0 mt-5 rounded-2xl self-center border-2 bg-[#2C2F48] border-solid border-[#586FD1] flex-col overflow-hidden">
-					<div className="w-full h-14 flex text-center text-xl text-blue-100 font-medium">
-						<div className={`${(tab == 1) ? 'bg-[#383B59]' : ''} w-1/3 h-14 hover:bg-[#383B59] flex items-center justify-center cursor-pointer`} onClick={() => setTab(1)}>
-							Linkedin URLs
-						</div>
-						<div className={`${(tab == 2) ? 'bg-[#383B59]' : ''} w-1/3 h-14 hover:bg-[#383B59] flex items-center justify-center cursor-pointer border-x-2 border-[#586FD1]`} onClick={() => setTab(2)}>
-							Social Links
-						</div>
-						<div className={`${(tab == 3) ? 'bg-[#383B59]' : ''} w-1/3 h-14 hover:bg-[#383B59] flex items-center justify-center cursor-pointer`} onClick={() => setTab(3)}>
-							Import File
-						</div>
+			<div className={`${(props.widget) ? 'w-1/2 h-1/2' : 'w-2/3 h-3/5'} shrink-0 mt-5 rounded-2xl self-center border-2 bg-[#2C2F48] border-solid border-[#586FD1] flex-col overflow-hidden`}>
+				<div className="w-full h-14 flex text-center text-xl text-blue-100 font-medium">
+					<div className={`${(tab == 1) ? 'bg-[#383B59]' : ''} w-1/3 h-14 hover:bg-[#383B59] flex items-center justify-center cursor-pointer`} onClick={() => setTab(1)}>
+						Linkedin URLs
 					</div>
+					<div className={`${(tab == 2) ? 'bg-[#383B59]' : ''} w-1/3 h-14 hover:bg-[#383B59] flex items-center justify-center cursor-pointer border-x-2 border-[#586FD1]`} onClick={() => setTab(2)}>
+						Social Links
+					</div>
+					<div className={`${(tab == 3) ? 'bg-[#383B59]' : ''} w-1/3 h-14 hover:bg-[#383B59] flex items-center justify-center cursor-pointer`} onClick={() => setTab(3)}>
+						Import File
+					</div>
+				</div>
 				<div className="bg-[#383B59] w-full h-1" />
 
 				{(tab == 3) ?
