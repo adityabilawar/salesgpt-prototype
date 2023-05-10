@@ -14,6 +14,7 @@ const LeadsPage = () => {
 	const [about, setAbout] = useState<About | null>(null);
 	const [status, setStatus] = useState('No leads');
 	const [inpmode, addInput] = useState(false);
+	const [leadSettings, setLeadSettings] = useState<{ messageType: MessageType[], prompts: any }>({messageType: ['Linkedin invite'], prompts: {}});
 
 	const processLeads = (input: {type: number, val: string, f: File | null}, messageType: MessageType[], prompts: any) => {
 		const authStorage = localStorage.getItem('auth');
@@ -64,9 +65,60 @@ const LeadsPage = () => {
 				});
 			setStatus('Loading...');
 		}
+		setLeadSettings({messageType,prompts});
 	}
 
 	const processInput = (type: number, val: string, f: File | null) => {
+		const authStorage = localStorage.getItem('auth');
+		if(!authStorage) {
+			router.push('/login');
+			return;
+		}
+		const name = JSON.parse(authStorage).user;
+		if((type === 3) && (f !== null)) {
+			const file = f;
+			console.log(file.type);
+
+			if(file.type !== 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') window.location.reload();
+
+			const formData = new FormData();
+			formData.append('file', file);
+			formData.append('name', name);
+			formData.append('type', JSON.stringify(leadSettings.messageType));
+			formData.append('prompts', JSON.stringify(leadSettings.prompts));
+			formData.append('storage', JSON.stringify(authStorage));
+			formData.append('about', JSON.stringify(about));
+			axios.post('/api/file', formData)
+				.then(res => {
+					console.log(res.data);
+					if(leadData) setLeadData([...res.data, ...leadData]);
+					else setLeadData(res.data);
+					setStatus('Complete');
+				})
+				.catch(err => {
+					console.log(err);
+					setStatus('Error while Uploading');
+				});
+			setStatus('Loading...');
+		} else if (type !== 3) {
+			axios.post('/api/input', {
+				input: val,
+				type: leadSettings.messageType,
+				prompts: leadSettings.prompts,
+				auth: JSON.parse(authStorage),
+				name,
+				about
+				}).then(res => {
+					console.log(res.data);
+					if(leadData) setLeadData([...res.data, ...leadData]);
+					else setLeadData(res.data);
+					setStatus('Complete');
+				}).catch(err => {
+					console.log(err);
+					setStatus('Error while Uploading');
+				});
+			setStatus('Loading...');
+		}
 		addInput(false);
 	}
 
