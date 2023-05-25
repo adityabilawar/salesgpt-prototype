@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import importImg from '@/public/import.png';
 import Image from 'next/image';
 import { useRouter } from "next/router";
@@ -8,21 +8,38 @@ const AboutPage = () => {
 
 	const [aboutData, setAbout] = useState<About | null>(null);
 	const [status, setStatus] = useState('Import leads');
+	const aboutFetchedRef = useRef(false);
 	const router = useRouter();
 
 	useEffect(() => {
+		if(aboutFetchedRef.current) return;
+		aboutFetchedRef.current = true;
 		const aboutStorage = localStorage.getItem('about');
-		
-		if(!aboutStorage) setAbout({
-			firstName: '',
-			lastName: '',
-			companyName: '',
-			jobTitle: '',
-			companyDetails: '',
-			companyValue: '',
-			specialOffers: ''
-		}); else setAbout(JSON.parse(aboutStorage));
+		console.log(aboutStorage);
+		const about = JSON.parse((aboutStorage) ? aboutStorage : '{}');
+		console.log(about);
+
+		if(about) {
+			if(about.purpose) setAbout(about);
+			else setAbout({...about, purpose: ''});
+		}
+		else {
+			setAbout({
+				firstName: '',
+				lastName: '',
+				companyName: '',
+				jobTitle: '',
+				companyDetails: '',
+				companyValue: '',
+				specialOffers: '',
+				purpose: ''
+			});
+		}
 	}, []);
+
+	useEffect(() => {
+		localStorage.setItem('about', JSON.stringify(aboutData));
+	}, [aboutData]);
 
 	const saveAbout = () => {
 		if(!aboutData) return;
@@ -89,6 +106,8 @@ const AboutPage = () => {
 								<textarea value={aboutData.companyValue} className='text-xl p-2 w-2/3 h-32 resize-none text-[#f1f5f9] bg-[#383B59] rounded-lg focus:outline-none text-center' onChange={e => setAbout({...aboutData, companyValue: e.target.value})}/>
 								<div className="text-xl text-blue-200 font-medium">List out special offers or campaign offerings that you are running currently:</div>
 								<textarea value={aboutData.specialOffers} className='text-xl p-2 w-2/3 h-32 resize-none text-[#f1f5f9] bg-[#383B59] rounded-lg focus:outline-none text-center' onChange={e => setAbout({...aboutData, specialOffers: e.target.value})}/>
+								<div className="text-xl text-blue-200 font-medium">What is your overall purpose/goal for your messages?</div>
+								<textarea value={aboutData.specialOffers} className='text-xl p-2 w-2/3 h-32 resize-none text-[#f1f5f9] bg-[#383B59] rounded-lg focus:outline-none text-center' onChange={e => setAbout({...aboutData, purpose: e.target.value})}/>
 							</div>
 							
 						</div>

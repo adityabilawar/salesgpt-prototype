@@ -18,7 +18,7 @@ const InputMenu = (props: { processInput: (type: number, val: string, f: File | 
 
 	return (
 		<>
-			<div className={`${(props.widget) ? 'w-1/2 h-1/2' : 'w-2/3 h-3/5'} shrink-0 mt-5 rounded-2xl self-center border-2 bg-[#2C2F48] border-solid border-[#586FD1] flex-col overflow-hidden`}>
+			<div className={`${(props.widget) ? 'w-1/2 h-1/2' : 'w-2/3 h-3/5'} shrink-0 mt-5 rounded-2xl self-center border-2 bg-[#2C2F48] border-solid border-[#586FD1] flex-col overflow-hidden`} onClick={(e) => e.stopPropagation()}>
 				<div className="w-full h-14 flex text-center text-xl text-blue-100 font-medium">
 					<div className={`${(tab == 1) ? 'bg-[#383B59]' : ''} w-1/3 h-14 hover:bg-[#383B59] flex items-center justify-center cursor-pointer`} onClick={() => setTab(1)}>
 						Linkedin URLs

@@ -30,35 +30,36 @@ export default async(req: NextApiRequest, res: NextApiResponse) => {
 				};
 				const diffreq = (await axios.request(options)).data;
 				console.log(diffreq);
-				if(diffreq.data.length == 0) {
-					resultData.push({name: links[i], position: '', company: '', res: 'Linkedin account does not have valid scraping data!', type: type[j]});
-					continue;
-				}
-				const personalizedRes = (links[i] && diffreq.data.length!==0) ? diffreq.data[0].entity.description : '';
+				// if(diffreq.data.length == 0) {
+				// 	resultData.push({name: links[i], position: '', company: '', res: 'Linkedin account does not have valid scraping data!', type: type[j]});
+				// 	continue;
+				// }
+				const leadName = (diffreq.data.length>0) ? diffreq.data[0].entity.name : links[i].split('/in/')[1].split('/')[0];
+				const personalizedRes = ((links[i]) && (diffreq.data.length>0)) ? `You have the following personalized info on the customer: ${diffreq.data[0].entity.description}.` : `The customer's name is ${leadName}.`;
 				// const personalizedRes = '';
 
 
-				const currPrompt = prompts[type[j]]
-					.replace('MY_NAME', name)
-					.replace('USER_POSITION', '')
-					.replace('USER_COMPANY', '')
-					.replace('USER_NAME', diffreq.data[0].entity.name);
+				const currPrompt = (type[j] === 'Custom Prompt') ? prompts[type[j]].title : prompts[type[j]];
 				
-				const response = await openai.createCompletion({
-					model: "text-davinci-003",
-					prompt: `${currPrompt} based on this background info on the receiver: ${personalizedRes}, and on behalf of ${aboutInput}`,
+				const response = await openai.createChatCompletion({
+					model: "gpt-3.5-turbo",
+					messages: [
+						{
+							role: 'user',
+							content: `${aboutInput} ${currPrompt} ${personalizedRes} Make sure to add bits of their previous work experiences and make it relevant to your company values, and include light bits of humor.`
+						}
+					],
 					max_tokens: 3000,
 					temperature: 0,
-					top_p: 1.0,
-					frequency_penalty: 0.0,
-					presence_penalty: 0.0,
+					n: 1
 				});
-		
+				
+				
 				resultData.push({
-					name: diffreq.data[0].entity.name,
+					name: leadName,
 					position: '',
 					company: '',
-					res: response.data.choices[0].text,
+					res: response.data.choices[0].message?.content,
 					type: type[j]
 				});
 			}

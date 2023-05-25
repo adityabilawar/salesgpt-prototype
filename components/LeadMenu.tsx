@@ -22,24 +22,25 @@ const LeadMenu = (props: { processLeads: (inp: {type: number, val: string, f: Fi
 
 	useEffect(() => {
 		const localPrompts = localStorage.getItem('prompts');
-		if(!localPrompts) {
-			const initPrompts = {
-				'Linkedin invite': 'Hi! Can you write me a 300 character linkedin invite message on behalf of MY_NAME to the USER_POSITION of the company USER_COMPANY whos name is USER_NAME explaining that you want to help provide value to their business.',
-				'Intro Email': 'Write me a personlized introduction email to USER_NAME, who has the USER_POSITION position at the company USER_COMPANY on behalf of MY_NAME explaining that I want to help provide value to their business & request a phone call',
-				'Coffee Chat': 'Write me 5 coffee chat questions on behalf of MY_NAME to ask to USER_NAME that has the USER_POSITION position at the company USER_COMPANY.',
-				'Custom Prompt': {
-					title: 'Custom Prompt',
-					prompt: 'Say "You have not made a custom prompt in the editor yet!"'
-				}
+		const initPrompts = {
+			'Linkedin invite': 'Make a brief 200 word linkedin invite message for this potential customer. Make sure this message is personalized for the customer and include light bits of humor.',
+			'Intro Email': 'Make a brief 200 word introduction email for this potential customer. Make sure this message is personalized for the customer and include light bits of humor.',
+			'Coffee Chat': 'List out 5 coffee chat questions you can have with this person. Make the questions personalized and add light bits of humor.',
+			'Custom Prompt': {
+				title: 'Custom Prompt',
+				prompt: 'Say "You have not made a custom prompt in the editor yet!"'
 			}
+		}
+		if((!localPrompts) || (localStorage.getItem('u-key') !== process.env.NEXT_PUBLIC_UPDATEKEY)) {
 			localStorage.setItem('prompts', JSON.stringify(initPrompts));
+			localStorage.setItem('u-key', JSON.stringify(process.env.NEXT_PUBLIC_UPDATEKEY));
 			setPrompts(initPrompts);
 		} else if(!JSON.parse(localPrompts)['Custom Prompt'].title) {
 			const newPrompts = JSON.parse(localPrompts);
 			newPrompts['Custom Prompt'] = {title: 'Custom Prompt', prompt: newPrompts['Custom Prompt']};
 			localStorage.setItem('prompts', JSON.stringify(newPrompts));
 			setPrompts(newPrompts);
-		} else if(!prompts) setPrompts(JSON.parse(localPrompts))
+		} else if(!prompts) setPrompts(JSON.parse(localPrompts));
 	}, []);
 
 	const savePrompt = (newPrompt: string, newTitle: string) => {

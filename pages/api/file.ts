@@ -29,10 +29,13 @@ export default (req: NextApiRequest, res: NextApiResponse) => {
 				return res.status(404).send('error while parsing file');
 			}
 			const prompts = (typeof fields.prompts === 'string') ? JSON.parse(fields.prompts) : {
-				'Linkedin invite': 'Hi! Can you write me a 300 character linkedin invite message on behalf of MY_NAME to the USER_POSITION of the company USER_COMPANY whos name is USER_NAME explaining that you want to help provide value to their business.',
-				'Intro Email': 'Write me a personlized introduction email to USER_NAME, who has the USER_POSITION position at the company USER_COMPANY on behalf of MY_NAME explaining that I want to help provide value to their business & request a phone call',
-				'Coffee Chat': 'Write me 5 coffee chat questions on behalf of MY_NAME to ask to USER_NAME that has the USER_POSITION position at the company USER_COMPANY.',
-				'Custom Prompt': 'Say "You have not made a custom prompt in the editor yet!"'
+				'Linkedin invite': 'Make a brief 200 word linkedin invite message for this potential customer. Make sure this message is personalized for the customer and include light bits of humor.',
+				'Intro Email': 'Make a brief 200 word introduction email for this potential customer. Make sure this message is personalized for the customer and include light bits of humor.',
+				'Coffee Chat': 'List out 5 coffee chat questions you can have with this person. Make the questions personalized and add light bits of humor.',
+				'Custom Prompt': {
+					title: 'Custom Prompt',
+					prompt: 'Say "You have not made a custom prompt in the editor yet!"'
+				}
 			};
 			const about: About = (typeof fields.about === 'string') ? JSON.parse(fields.about) : {
 				firstName: '',
@@ -69,14 +72,13 @@ export default (req: NextApiRequest, res: NextApiResponse) => {
 
 export const getAboutInput = (about: About) => {
 	const name = `${about.firstName} ${about.lastName}`;
-	let inp = (`${about.jobTitle}${about.companyName}` === '') ? `A person named ${name}` : `A ${about.jobTitle} at ${about.companyName} named ${name}`;
-
-	if(about.companyDetails)
-		inp += `, whose company details include: "${about.companyDetails}"`;
-	if(about.companyValue)
-		inp += `and company value is: "${about.companyValue}"`;
-	if(about.specialOffers)
-		inp += `, and their company is having these special offers/compaigns: ${about.specialOffers}`;
+	let inp = `Never forget your name is ${name}.`;
+	if(about.jobTitle) inp+=` You work as a ${about.jobTitle}.`;
+	if(about.companyName) inp+=` You work at a company named ${about.companyName}.`;
+	if(about.companyDetails) inp+=` The company's business does the following: ${about.companyDetails}.`;
+	if(about.companyValue) inp+=` The company values are the following: ${about.companyValue}.`;
+	if(about.specialOffers) inp+=`The company is holding the following special offers: ${about.specialOffers}.`;
+	if(about.purpose) inp+=`You are contacting a potential customer for the following purpose: ${about.purpose}.`;
 	
 	return inp;
 }
@@ -90,11 +92,7 @@ const getResponses = async(data: any[], name: string, type: MessageType[], promp
 				const userPosition = data[i].Position;
 				const userCompany = data[i].Company;
 		
-				const currPrompt = prompts[type[j]]
-					.replace('MY_NAME', name)
-					.replace('USER_POSITION', userPosition)
-					.replace('USER_COMPANY', userCompany)
-					.replace('USER_NAME', userName);
+				const currPrompt = (type[j] === 'Custom Prompt') ? prompts[type[j]].title : prompts[type[j]];
 				
 				const options = {
 					method: 'GET',
@@ -106,21 +104,24 @@ const getResponses = async(data: any[], name: string, type: MessageType[], promp
 				const personalizedRes = (data[i].Social && diffreq.data.length!=0) ? diffreq.data[0].entity.description : '';
 				// const personalizedRes = '';
 
-				const response = await openai.createCompletion({
-					model: "text-davinci-003",
-					prompt: `${currPrompt} based on this background info on the receiver: ${personalizedRes}, and on behalf of ${aboutInput}`,
+				const response = await openai.createChatCompletion({
+					model: "gpt-3.5-turbo",
+					messages: [
+						{
+							role: 'user',
+							content: `${aboutInput} ${currPrompt} You have the following personalized info on the customer: ${personalizedRes}. Make sure to add bits of their previous work experiences and make it relevant to your company values, and include light bits of humor.`
+						}
+					],
 					max_tokens: 3000,
 					temperature: 0,
-					top_p: 1.0,
-					frequency_penalty: 0.0,
-					presence_penalty: 0.0,
+					n: 1
 				});
 		
 				resultData.push({
-					name: userName,
-					position: userPosition,
-					company: userCompany,
-					res: response.data.choices[0].text,
+					name: diffreq.data[0].entity.name,
+					position: '',
+					company: '',
+					res: response.data.choices[0].message?.content,
 					type: type[j]
 				});
 		}

@@ -2,6 +2,7 @@ import axios from 'axios';
 import { useEffect, useState } from 'react';
 import importImg from '@/public/import.png';
 import addImg from '@/public/circle-plus-solid.svg';
+import settingsImg from '@/public/gear-solid.svg';
 import Image from 'next/image';
 import graphic from '@/public/graphic.png';
 import { useRouter } from 'next/router';
@@ -144,8 +145,13 @@ const LeadsPage = () => {
 	return (
 		<>
 			<div className="leads-main flex w-full h-full">
+				<div className="absolute w-full h-20">
+					<div className="flex w-full h-full justify-end items-center">
+						<Image src={settingsImg} className="w-10 h-10 mr-10 cursor-pointer" alt="settings icon" onClick={() => router.push('/about')} />
+					</div>
+				</div>
 				{(inpmode) && 
-				<div className="relative z-10" aria-labelledby="edit-modal" role="dialog" aria-modal="true">
+				<div className="relative z-10" aria-labelledby="edit-modal" role="dialog" aria-modal="true" onClick={() => addInput(false)}>
 					<div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
 					<div className="fixed min-h-full inset-0 z-10 overflow-y-auto">
 						<div className="flex justify-center p-4 sm:items-center sm:p-0 h-full w-full">
