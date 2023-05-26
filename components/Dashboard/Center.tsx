@@ -18,13 +18,13 @@ const Center = () => {
     const [isOpen, setIsOpen] = useState(new Array(leads.length).fill(false));
     const [isSelected, setIsSelected] = useState(new Array(leads.length).fill(false));
 
-    const toggleOpen = (index) => {
+    const toggleOpen = (index: number) => {
         const newIsOpen = [...isOpen];
         newIsOpen[index] = !newIsOpen[index];
         setIsOpen(newIsOpen);
     };
 
-    const handleCircleClick = (index) => {
+    const handleCircleClick = (index: number) => {
         const newIsSelected = [...isSelected];
         newIsSelected[index] = !newIsSelected[index];
         setIsSelected(newIsSelected);
