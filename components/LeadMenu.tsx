@@ -1,9 +1,9 @@
-import { MessageType, ResponseData } from "@/@types/Response";
+import { MessageType, ResponseData } from "../@types/Response";
 import penImg from '@/public/square-pen-solid.svg';
 import copyImg from '@/public/copy-solid.svg';
 import Image from 'next/image';
 import { useEffect, useState } from "react";
-import EditModal from '@/components/EditModal';
+import EditModal from '../components/EditModal';
 import InputMenu from "./InputMenu";
 
 const LeadMenu = (props: { processLeads: (inp: {type: number, val: string, f: File | null}, messageType: MessageType[], p: any) => void, leadData: (ResponseData[] | null), status: string }) => {

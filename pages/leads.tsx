@@ -7,8 +7,8 @@ import Image from 'next/image';
 import graphic from '@/public/graphic.png';
 import { useRouter } from 'next/router';
 import { MessageType, ResponseData } from '@/@types/Response';
-import LeadMenu from '@/components/LeadMenu';
-import InputMenu from '@/components/InputMenu';
+import LeadMenu from '../components/LeadMenu';
+import InputMenu from '../components/InputMenu';
 
 const LeadsPage = () => {
 	const [leadData, setLeadData] = useState<ResponseData[] | null>(null);

@@ -51,6 +51,7 @@ const InputMenu = (props: { processInput: (type: number, val: string, f: File | 
 						<div className="ml-10 mt-5 w-full h-full">
 							<textarea className="resize-none w-5/6 h-2/3 bg-[#383B59] text-blue-100 rounded-md focus:outline-none p-4 text-lg" value={inputVal} onChange={(e) => setInputVal(e.target.value)} />
 							<div className="mt-5 w-36 h-10 bg-[#383B59] text-blue-200 text-lg font-medium rounded-md flex justify-center items-center cursor-pointer" onClick={importInput}>Import</div>
+							<div className="mt-5 w-64 h-10 bg-[#383B59] text-blue-200 text-lg font-medium rounded-md flex justify-center items-center cursor-pointer" onClick={importInput}>Generate lead profiles</div>
 						</div>
 					</div>
 				}
