@@ -13,7 +13,7 @@ export default function Home() {
 		}
 
 		const auth = JSON.parse(authStorage);
-		axios.post('/api/login', {user: auth.user, pass: auth.pass}).then(() => router.push('/profile')).catch(() => router.push('/login'));
+		axios.post('/api/login', {user: auth.user, pass: auth.pass}).then(() => router.push('/leads')).catch(() => router.push('/login'));
 	});
   return (
     <>
