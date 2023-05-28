@@ -38,8 +38,7 @@ export default async(req: NextApiRequest, res: NextApiResponse) => {
 				const personalizedRes = ((links[i]) && (diffreq.data.length>0)) ? `You have the following personalized info on the customer: ${diffreq.data[0].entity.description}.` : `The customer's name is ${leadName}.`;
 				// const personalizedRes = '';
 
-
-				const currPrompt = (type[j] === 'Custom Prompt') ? prompts[type[j]].title : prompts[type[j]];
+				const currPrompt = (type[j] === 'Custom Prompt') ? prompts[j].prompt : prompts[type[j]];
 				
 				const response = await openai.createChatCompletion({
 					model: "gpt-3.5-turbo",
@@ -54,13 +53,12 @@ export default async(req: NextApiRequest, res: NextApiResponse) => {
 					n: 1
 				});
 				
-				
 				resultData.push({
 					name: leadName,
 					position: '',
 					company: '',
 					res: response.data.choices[0].message?.content,
-					type: type[j]
+					type: (type[j] === 'Custom Prompt') ? prompts[j].title : type[j]
 				});
 			}
 		}

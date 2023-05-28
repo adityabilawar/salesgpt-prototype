@@ -6,12 +6,11 @@ const EditModal = (props: { display: boolean, type: string, message: string, cus
 	const [titleInput, setTitleInput] = useState(props.customTitle);
 	
 	useEffect(() => {
-		if(props.display) setPromptInput(props.message);
+		if(props.display) {
+			setPromptInput(props.message);
+			setTitleInput(props.customTitle);
+		}
 	}, [props.display]);
-
-	useEffect(() => {
-		setTitleInput(props.customTitle);
-	}, [props.customTitle]);
 	
 	if(!props.display) {
 		return <></>;
@@ -30,7 +29,7 @@ const EditModal = (props: { display: boolean, type: string, message: string, cus
 									<div className="mt-2 w-full h-full">
 										{/* <p className="text-base text-slate-400">Are you sure you want to deactivate your account? All of your data will be permanently removed. This action cannot be undone.</p> */}
 
-										{(props.customTitle !== '') && 
+										{(props.type === 'Custom Prompt') && 
 											<input
 												type='text' 
 												placeholder="New prompt"

@@ -32,10 +32,7 @@ export default (req: NextApiRequest, res: NextApiResponse) => {
 				'Linkedin invite': 'Make a brief 200 word linkedin invite message for this potential customer. Make sure this message is personalized for the customer and include light bits of humor.',
 				'Intro Email': 'Make a brief 200 word introduction email for this potential customer. Make sure this message is personalized for the customer and include light bits of humor.',
 				'Coffee Chat': 'List out 5 coffee chat questions you can have with this person. Make the questions personalized and add light bits of humor.',
-				'Custom Prompt': {
-					title: 'Custom Prompt',
-					prompt: 'Say "You have not made a custom prompt in the editor yet!"'
-				}
+				'Custom Prompt': []
 			};
 			const about: About = (typeof fields.about === 'string') ? JSON.parse(fields.about) : {
 				firstName: '',

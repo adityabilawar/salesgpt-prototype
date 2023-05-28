@@ -145,9 +145,9 @@ const LeadsPage = () => {
 	return (
 		<>
 			<div className="leads-main flex w-full h-full">
-				<div className="absolute w-full h-20">
-					<div className="flex w-full h-full justify-end items-center">
-						<Image src={settingsImg} className="w-10 h-10 mr-10 cursor-pointer" alt="settings icon" onClick={() => router.push('/about')} />
+				<div className="-z-10 absolute w-full h-20">
+					<div className="absolute flex w-full h-full justify-end items-center">
+						<Image src={settingsImg} className="w-10 h-10 mr-5 cursor-pointer" alt="settings icon" onClick={() => router.push('/about')} />
 					</div>
 				</div>
 				{(inpmode) && 
