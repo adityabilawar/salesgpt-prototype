@@ -26,7 +26,7 @@ const socials = [
 
 const LeadDetails = () => {
     const [activeTab, setActiveTab] = useState('leads');
-    const selectedLead = useSelector((state: RootState) => state.leads.selectedLead);
+    const selectedLead: any = useSelector((state: RootState) => state.leads.selectedLead);
     const getDetail = (value: string | null) => value ? value : <span className="text-gray-900">unknown</span>;
     const springProps = useSpring({
         borderBottom: activeTab === 'leads' ? '2px solid white' : '2px solid white',
