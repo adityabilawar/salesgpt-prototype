@@ -1,34 +1,74 @@
-import { useState } from 'react';
-import { animated, useSpring } from 'react-spring';
+import { useState, useEffect } from 'react';
+import { animated, useSpring, useSprings } from 'react-spring';
 import { FiChevronDown, FiCircle, FiMail, FiSearch, FiEdit3, FiMoreHorizontal } from 'react-icons/fi';
+import Link from 'next/link';
+import { useDispatch } from 'react-redux';
+import { addSelectedLead, setSelectedLead, clearSelectedLeads } from '@/pages/store/leadsSlice';
+import { setView } from '@/pages/store/sidebarSlice';
+
 
 const leads = [
     {
         leadName: "Tony Stark",
+        email: "tonystark@example.com",
+        phoneNumber: "123-456-7890",
+        jobTitle: "CEO",
+        linkedInProfile: "https://linkedin.com/in/tonystark",
+        address: "10880 Malibu Point, Malibu, California",
+        companyName: "Stark Industries"
     },
     {
         leadName: "Iron Man",
+        email: "ironman@example.com",
+        phoneNumber: "098-765-4321",
+        jobTitle: "Superhero",
+        linkedInProfile: "https://linkedin.com/in/ironman",
+        address: "10880 Malibu Point, Malibu, California",
+        companyName: "Avengers"
     },
     {
         leadName: "Captain America",
+        email: "captainamerica@example.com",
+        phoneNumber: "321-654-0987",
+        jobTitle: "Leader",
+        linkedInProfile: "https://linkedin.com/in/captainamerica",
+        address: "Brooklyn, New York City, New York",
+        companyName: "Avengers"
     },
 ]
 
+
 const Center = () => {
-    const [isOpen, setIsOpen] = useState(new Array(leads.length).fill(false));
-    const [isSelected, setIsSelected] = useState(new Array(leads.length).fill(false));
+    const dispatch = useDispatch();
+    const [selectedDetail, setSelectedDetail] = useState<string | null>(null);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [isOpen, setIsOpen] = useState<Record<string, boolean>>({});
+    const [isSelected, setIsSelected] = useState<Record<string, boolean>>({});
 
-    const toggleOpen = (index: number) => {
-        const newIsOpen = [...isOpen];
-        newIsOpen[index] = !newIsOpen[index];
-        setIsOpen(newIsOpen);
+    const toggleOpen = (id: string) => {
+        setIsOpen(prev => ({ ...prev, [id]: !prev[id] }));
     };
 
-    const handleCircleClick = (index: number) => {
-        const newIsSelected = [...isSelected];
-        newIsSelected[index] = !newIsSelected[index];
-        setIsSelected(newIsSelected);
+    const handleCircleClick = (id: string, lead: typeof leads[0]) => {
+        setIsSelected(prev => ({ ...prev, [id]: !prev[id] }));
+        isSelected[id] && dispatch(addSelectedLead(lead));
     };
+
+    const handleContactAll = () => {
+        dispatch(clearSelectedLeads());
+        Object.keys(isSelected).forEach(id => {
+            isSelected[id] && dispatch(addSelectedLead(leads.find(lead => lead.id === id)));
+        });
+        dispatch(setView('SELECTED_LEADS'));
+    };
+
+    const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchTerm(event.target.value);
+    }
+
+    const springs = useSprings(leads.length, leads.map((_, index) => ({
+        transform: isOpen[index.toString()] ? 'rotate(0deg)' : 'rotate(180deg)',
+    })));;
 
     return (
         <div className="border-r-[1px] h-screen flex flex-col">
@@ -43,58 +83,69 @@ const Center = () => {
                             <FiSearch size={24} />
                         </div>
                         <input
-                            className="py-2 pl-10 pr-4 w-full text-black rounded-md bg-transparent focus:outline-none"
+                            className="py-2 pl-10 pr-4 w-full text-white rounded-md bg-transparent focus:outline-none"
                             placeholder="Search..."
+                            onChange={handleSearchChange}
                         />
                     </div>
-                    <button className="border-[1px] px-6 py-3">Contact All</button>
+                    <Link href="/dashboard/send">
+                        <button className="border-[1px] px-6 py-3" onClick={handleContactAll}>Contact All</button>
+                    </Link>
                 </div>
                 <div className="p-10 space-y-4">
-                    {leads.map((lead, i) => {
-                        const animation = useSpring({
-                            transform: isOpen[i] ? 'rotate(0deg)' : 'rotate(180deg)',
-                        });
+                    {leads
+                        .filter((lead) => lead.leadName.toLowerCase().includes(searchTerm.toLowerCase()))
+                        .map((lead, index) => {
+                            const id = index.toString();
 
-                        return (
-                            <div className="flex flex-col border border-white w-full select-none" key={i}>
-                                <div className="grid grid-cols-4 items-center cursor-pointer">
-                                    <div className="flex items-center p-4 col-span-1" onClick={() => handleCircleClick(i)}>
-                                        <FiCircle
-                                            size={24}
-                                            className={isSelected[i] ? 'fill-current text-white' : ''}
-                                        />
-                                        <p className="ml-2">{lead.leadName}</p>
+                            return (
+                                <div className="flex flex-col border border-white w-full select-none" key={id}>
+                                    <div className="grid grid-cols-5 items-center cursor-pointer">
+                                        <div className="flex items-center p-4 col-span-1" onClick={() => handleCircleClick(id, lead)}>
+                                            <FiCircle
+                                                size={24}
+                                                className={isSelected[id] ? 'fill-current text-white' : ''}
+                                            />
+                                            <p className="ml-2">{lead.leadName}, {lead.jobTitle}, {lead.companyName}</p>
+                                        </div>
+                                        <div className="flex items-end justify-end p-4 col-span-4" onClick={() => toggleOpen(id)}>
+                                            {isSelected[id] && <p className="text-gray-500 mr-2">Selected</p>}
+                                            <animated.div style={springs[index]}>
+                                                <FiChevronDown size={24} />
+                                            </animated.div>
+                                        </div>
                                     </div>
-                                    <div className="flex items-end justify-end p-4 col-span-3" onClick={() => toggleOpen(i)}>
-                                        {isSelected[i] && <p className="text-gray-500 mr-2">Selected</p>}
-                                        <animated.div style={animation}>
-                                            <FiChevronDown size={24} />
-                                        </animated.div>
-                                    </div>
+                                    {isOpen[id] && (
+                                        <div className="flex space-x-6 items-center p-4 border-t border-white">
+                                            <button className="flex items-center border-[1px] px-6 py-2">
+                                                <FiEdit3 size={24} />
+                                                <p className="ml-2">Edit</p>
+                                            </button>
+                                            <button
+                                                className={`flex items-center border-[1px] px-6 py-2 ${selectedDetail === id ? 'bg-white text-black' : ''}`}
+                                                onClick={() => {
+                                                    setSelectedDetail(id);
+                                                    dispatch(setSelectedLead(leads[index]));
+                                                    dispatch(setView('LEAD_DETAILS'));
+                                                }}
+                                            >
+                                                <FiMoreHorizontal size={24} />
+                                                <p className="ml-2">Details</p>
+                                            </button>
+                                            <button className="flex items-center border-[1px] px-6 py-2">
+                                                <FiMail size={24} />
+                                                <p className="ml-2">Contact</p>
+                                            </button>
+                                        </div>
+                                    )}
                                 </div>
-                                {isOpen[i] && (
-                                    <div className="flex space-x-6 items-center p-4 border-t border-white">
-                                        <button className="flex items-center border-[1px] px-6 py-2">
-                                            <FiEdit3 size={24} />
-                                            <p className="ml-2">Edit</p>
-                                        </button>
-                                        <button className="flex items-center border-[1px] px-6 py-2">
-                                            <FiMoreHorizontal size={24} />
-                                            <p className="ml-2">Details</p>
-                                        </button>
-                                        <button className="flex items-center border-[1px] px-6 py-2">
-                                            <FiMail size={24} />
-                                            <p className="ml-2">Contact</p>
-                                        </button>
-                                    </div>
-                                )}
-                            </div>
-                        )
-                    })}
+                            )
+                        })}
                 </div>
             </div>
         </div>
     )
 }
 
-export default Center
+
+export default Center;
