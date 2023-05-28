@@ -1,7 +1,7 @@
 import Center from '../components/Profile/Center'
 import Navbar from '../components/Profile/Navbar'
 import RightBar from '../components/Profile/RightBar'
-import Sidebar from '../components/Profile/Sidebar'
+import Sidebar from '../components/Sidebar'
 import React from 'react'
 
 const profile = () => {
