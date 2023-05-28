@@ -8,7 +8,7 @@ import { animated, useSpring } from 'react-spring';
 
 const SelectedLeads = () => {
     const dispatch = useDispatch();
-    const selectedLeads = useSelector(state => state.leads.selectedLeads) || [];
+    const selectedLeads = useSelector((state: any) => state.leads.selectedLeads) || [];
     const filteredLeads = selectedLeads ? selectedLeads.filter(Boolean) : [];
     const [activeTab, setActiveTab] = useState('leads');
     const [profileData, setProfileData] = useState(null);
@@ -30,14 +30,14 @@ const SelectedLeads = () => {
         }
     }, []);
 
-    const removeLeadHandler = (lead) => {
+    const removeLeadHandler = (lead: any) => {
         if (window.confirm(`Are you sure you want to remove ${lead.leadName} from the list?`)) {
             dispatch(removeLead(lead));
         }
     }
     return (
         <div className="border-r-[1px] h-screen flex flex-col">
-            {activeTab === 'leads' && selectedLeads.map((lead, i) => (
+            {activeTab === 'leads' && selectedLeads.map((lead: any, i: any) => (
                 lead && (
                     <div key={i} className="flex w-full justify-between p-5">
                         {lead.leadName}

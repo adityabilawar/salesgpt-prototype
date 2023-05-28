@@ -5,7 +5,7 @@ import SelectedLeads from './SidebarContents/SelectedLeads';
 import { useSelector } from 'react-redux'
 
 const Sidebar = () => {
-    const view = useSelector(state => state.sidebar.view);
+    const view = useSelector((state: any) => state.sidebar.view);
 
     let content;
     if (view === 'PROFILE') {
