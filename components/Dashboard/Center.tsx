@@ -3,12 +3,12 @@ import { animated, useSpring, useSprings } from 'react-spring';
 import { FiChevronDown, FiCircle, FiMail, FiSearch, FiEdit3, FiMoreHorizontal } from 'react-icons/fi';
 import Link from 'next/link';
 import { useDispatch } from 'react-redux';
-import { addSelectedLead, setSelectedLead, clearSelectedLeads } from '@/pages/store/leadsSlice';
+import { addSelectedLead, setSelectedLead, clearSelectedLeads, removeLead } from '@/pages/store/leadsSlice';
 import { setView } from '@/pages/store/sidebarSlice';
-
 
 const leads = [
     {
+        id: '1',
         leadName: "Tony Stark",
         email: "tonystark@example.com",
         phoneNumber: "123-456-7890",
@@ -18,6 +18,7 @@ const leads = [
         companyName: "Stark Industries"
     },
     {
+        id: '2',
         leadName: "Iron Man",
         email: "ironman@example.com",
         phoneNumber: "098-765-4321",
@@ -27,6 +28,7 @@ const leads = [
         companyName: "Avengers"
     },
     {
+        id: '3',
         leadName: "Captain America",
         email: "captainamerica@example.com",
         phoneNumber: "321-654-0987",
@@ -50,9 +52,17 @@ const Center = () => {
     };
 
     const handleCircleClick = (id: string, lead: typeof leads[0]) => {
-        setIsSelected(prev => ({ ...prev, [id]: !prev[id] }));
-        isSelected[id] && dispatch(addSelectedLead(lead));
+        setIsSelected(prev => {
+            const updatedIsSelected = { ...prev, [id]: !prev[id] };
+            if (updatedIsSelected[id]) {
+                dispatch(addSelectedLead(lead));
+            } else {
+                dispatch(removeLead(lead));
+            }
+            return updatedIsSelected;
+        });
     };
+
 
     const handleContactAll = () => {
         dispatch(clearSelectedLeads());
@@ -95,8 +105,8 @@ const Center = () => {
                 <div className="p-10 space-y-4">
                     {leads
                         .filter((lead) => lead.leadName.toLowerCase().includes(searchTerm.toLowerCase()))
-                        .map((lead, index) => {
-                            const id = index.toString();
+                        .map((lead) => {
+                            const id = lead.id.toString();
 
                             return (
                                 <div className="flex flex-col border border-white w-full select-none" key={id}>
@@ -110,7 +120,7 @@ const Center = () => {
                                         </div>
                                         <div className="flex items-end justify-end p-4 col-span-4" onClick={() => toggleOpen(id)}>
                                             {isSelected[id] && <p className="text-gray-500 mr-2">Selected</p>}
-                                            <animated.div style={springs[index]}>
+                                            <animated.div style={springs[lead.id]}>
                                                 <FiChevronDown size={24} />
                                             </animated.div>
                                         </div>
