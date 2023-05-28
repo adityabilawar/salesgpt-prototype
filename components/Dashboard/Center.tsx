@@ -120,7 +120,7 @@ const Center = () => {
                                         </div>
                                         <div className="flex items-end justify-end p-4 col-span-4" onClick={() => toggleOpen(id)}>
                                             {isSelected[id] && <p className="text-gray-500 mr-2">Selected</p>}
-                                            <animated.div style={springs[lead.id]}>
+                                            <animated.div style={springs[parseInt(lead.id)]}>
                                                 <FiChevronDown size={24} />
                                             </animated.div>
                                         </div>
@@ -135,7 +135,7 @@ const Center = () => {
                                                 className={`flex items-center border-[1px] px-6 py-2 ${selectedDetail === id ? 'bg-white text-black' : ''}`}
                                                 onClick={() => {
                                                     setSelectedDetail(id);
-                                                    dispatch(setSelectedLead(leads[index]));
+                                                    dispatch(setSelectedLead(leads[parseInt(id)]));
                                                     dispatch(setView('LEAD_DETAILS'));
                                                 }}
                                             >
