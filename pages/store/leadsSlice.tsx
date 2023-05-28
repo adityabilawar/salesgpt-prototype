@@ -8,10 +8,10 @@ const leadsSlice = createSlice({
     selectedLead: null,
   },
   reducers: {
-    setLeads: (state, action) => {
+    setLeads: (state, action: any) => {
       state.leads = action.payload;
     },
-    addSelectedLead: (state, action) => {
+    addSelectedLead: (state: any, action: any) => {
       state.selectedLeads.push(action.payload);
     },
     clearSelectedLeads: (state) => { // New action to clear selected leads
@@ -19,7 +19,7 @@ const leadsSlice = createSlice({
     },
     removeLead: (state, action) => {
       state.selectedLeads = state.selectedLeads.filter(
-        lead => lead.leadName !== action.payload.leadName
+        (lead: any) => lead.leadName !== action.payload.leadName
       );
     },
     setSelectedLead: (state, action) => {

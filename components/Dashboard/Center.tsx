@@ -6,7 +6,7 @@ import { useDispatch } from 'react-redux';
 import { addSelectedLead, setSelectedLead, clearSelectedLeads, removeLead } from '@/pages/store/leadsSlice';
 import { setView } from '@/pages/store/sidebarSlice';
 
-const leads = [
+const leads: any = [
     {
         id: '1',
         leadName: "Tony Stark",
@@ -51,7 +51,7 @@ const Center = () => {
         setIsOpen(prev => ({ ...prev, [id]: !prev[id] }));
     };
 
-    const handleCircleClick = (id: string, lead: typeof leads[0]) => {
+    const handleCircleClick = (id: string, lead: any) => {
         setIsSelected(prev => {
             const updatedIsSelected = { ...prev, [id]: !prev[id] };
             if (updatedIsSelected[id]) {
@@ -66,8 +66,8 @@ const Center = () => {
 
     const handleContactAll = () => {
         dispatch(clearSelectedLeads());
-        Object.keys(isSelected).forEach(id => {
-            isSelected[id] && dispatch(addSelectedLead(leads.find(lead => lead.id === id)));
+        Object.keys(isSelected).forEach((id: any) => {
+            isSelected[id] && dispatch(addSelectedLead(leads.find((lead: any) => lead.id === id)));
         });
         dispatch(setView('SELECTED_LEADS'));
     };
@@ -76,7 +76,7 @@ const Center = () => {
         setSearchTerm(event.target.value);
     }
 
-    const springs = useSprings(leads.length, leads.map((_, index) => ({
+    const springs: any = useSprings(leads.length, leads.map((_: any, index: any) => ({
         transform: isOpen[index.toString()] ? 'rotate(0deg)' : 'rotate(180deg)',
     })));;
 
@@ -104,8 +104,8 @@ const Center = () => {
                 </div>
                 <div className="p-10 space-y-4">
                     {leads
-                        .filter((lead) => lead.leadName.toLowerCase().includes(searchTerm.toLowerCase()))
-                        .map((lead) => {
+                        .filter((lead: any) => lead.leadName.toLowerCase().includes(searchTerm.toLowerCase()))
+                        .map((lead: any) => {
                             const id = lead.id.toString();
 
                             return (
