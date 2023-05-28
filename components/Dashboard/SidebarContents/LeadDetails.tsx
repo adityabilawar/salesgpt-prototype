@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { BsPlusLg, BsTelephone, BsThreeDots } from "react-icons/bs"
 import { AiOutlineMail } from "react-icons/ai"
+import { useSelector } from 'react-redux';
+import { RootState } from '@/pages/store';
 import { animated, useSpring } from 'react-spring';
 
 const socials = [
@@ -22,9 +24,10 @@ const socials = [
     }
 ]
 
-const Sidebar = () => {
+const LeadDetails = () => {
     const [activeTab, setActiveTab] = useState('leads');
-    const [profileData, setProfileData] = useState(null);
+    const selectedLead = useSelector((state: RootState) => state.leads.selectedLead);
+    const getDetail = (value: string | null) => value ? value : <span className="text-gray-900">unknown</span>;
     const springProps = useSpring({
         borderBottom: activeTab === 'leads' ? '2px solid white' : '2px solid white',
         left: activeTab === 'leads' ? '0%' : '50%',
@@ -34,21 +37,13 @@ const Sidebar = () => {
         config: { friction: 30, tension: 180 },
     });
 
-    useEffect(() => {
-        const storedProfileData = localStorage.getItem('about');
-        if (storedProfileData) {
-          const parsedProfileData = JSON.parse(storedProfileData);
-          setProfileData(parsedProfileData);
-        }
-      }, []);
-
     return (
         <div className="border-r-[1px] h-screen flex flex-col">
             <div className="flex-grow">
                 <div className="flex relative justify-center items-center flex-col p-10">
                     <div className="rounded-full h-32 w-32 bg-white" />
-                    {profileData && <h1 className="text-2xl mt-5">Tony Stark</h1>}
-                    {profileData && <p className="text-md text-gray-400 mt-2">Stark Industries</p>}
+                    {selectedLead && <h1 className="text-2xl mt-5">{getDetail(selectedLead.leadName)}</h1>}
+                    {selectedLead && <p className="text-md text-gray-400 mt-2">{selectedLead.companyName}</p>}
                     <div className="flex justify-center items-center space-x-4">
                         {socials.map((social, i) => (
                             <div className="mt-5 flex flex-col justify-center items-center space-x-2" key={i}>
@@ -79,14 +74,14 @@ const Sidebar = () => {
                 <div className="flex-grow-0 px-10 py-5">
                 {activeTab === 'leads' ? (
                     <>
-                        <p>Email: example@example.com</p>
-                        <p>Phone: 123-456-7890</p>
-                        <p>Job Title: Job Title</p>
-                        <p>LinkedIn: LinkedIn Profile</p>
+                        {selectedLead && <p>Email: {selectedLead.email}</p>}
+                        {selectedLead && <p>Phone: {selectedLead.phoneNumber}</p>}
+                        {selectedLead && <p>Job Title: {selectedLead.jobTitle}</p>}
+                        {selectedLead && <p>LinkedIn: <a href={selectedLead.linkedInProfile}>{selectedLead.linkedInProfile}</a></p>}
                     </>
                 ) : (
                     <>
-                        <p>Address: 123 Main St, City, State, Country</p>
+                        {selectedLead && <p>Address: {selectedLead.address}</p>}
                     </>
                 )}
             </div>
@@ -95,4 +90,4 @@ const Sidebar = () => {
     )
 }
 
-export default Sidebar
+export default LeadDetails
