@@ -4,7 +4,7 @@ import RightBar from '../components/Profile/RightBar'
 import Center from '@/components/Dashboard/Center'
 import React, { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { setView } from '@/pages/store/sidebarSlice';
+import { setView } from '@/components/store/sidebarSlice';
 
 const dashboard = () => {
     const dispatch = useDispatch();

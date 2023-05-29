@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { BsPlusLg, BsTelephone, BsThreeDots } from "react-icons/bs"
 import { AiOutlineMail } from "react-icons/ai"
 import { useSelector } from 'react-redux';
-import { RootState } from '@/pages/store';
+import { RootState } from '@/components/store';
 import { animated, useSpring } from 'react-spring';
 
 const socials = [

@@ -3,7 +3,7 @@ import { BsPlusLg, BsTelephone, BsThreeDots } from "react-icons/bs"
 import { AiOutlineMail } from "react-icons/ai"
 import { FiTrash2 } from "react-icons/fi"
 import { useDispatch, useSelector } from "react-redux"
-import { removeLead } from "@/pages/store/leadsSlice"
+import { removeLead } from "@/components/store/leadsSlice"
 import { animated, useSpring } from 'react-spring';
 
 const SelectedLeads = () => {

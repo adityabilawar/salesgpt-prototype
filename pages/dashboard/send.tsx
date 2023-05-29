@@ -3,7 +3,7 @@ import Navbar from '../../components/Profile/Navbar'
 import RightBar from '../../components/Profile/RightBar'
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { setView } from '@/pages/store/sidebarSlice';
+import { setView } from '@/components/store/sidebarSlice';
 import Center from '@/components/Dashboard/Send/Center'
 
 const send = () => {

@@ -5,7 +5,7 @@ import { animated, useSpring } from 'react-spring';
 import { FiChevronDown, FiCircle, FiMail, FiSearch, FiEdit3, FiMoreHorizontal } from 'react-icons/fi';
 import Link from 'next/link';
 import { useDispatch } from 'react-redux'
-import { setLeads } from '@/pages/store/leadsSlice';
+import { setLeads } from '@/components/store/leadsSlice';
 
 const leads = [
     {

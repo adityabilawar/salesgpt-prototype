@@ -3,8 +3,8 @@ import { animated, useSpring, useSprings } from 'react-spring';
 import { FiChevronDown, FiCircle, FiMail, FiSearch, FiEdit3, FiMoreHorizontal } from 'react-icons/fi';
 import Link from 'next/link';
 import { useDispatch } from 'react-redux';
-import { addSelectedLead, setSelectedLead, clearSelectedLeads, removeLead } from '@/pages/store/leadsSlice';
-import { setView } from '@/pages/store/sidebarSlice';
+import { addSelectedLead, setSelectedLead, clearSelectedLeads, removeLead } from '@/components/store/leadsSlice';
+import { setView } from '@/components/store/sidebarSlice';
 
 const leads: any = [
     {
