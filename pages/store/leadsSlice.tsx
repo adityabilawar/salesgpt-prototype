@@ -8,7 +8,7 @@ const leadsSlice = createSlice({
     selectedLead: null,
   },
   reducers: {
-    setLeads: (state, action: any) => {
+    setLeads: (state: any, action: any): any => {
       state.leads = action.payload;
     },
     addSelectedLead: (state: any, action: any) => {

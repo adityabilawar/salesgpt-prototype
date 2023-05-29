@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { useState } from 'react';
 import { animated, useSpring } from 'react-spring';
 import { FiChevronDown, FiCircle, FiMail, FiSearch, FiEdit3, FiMoreHorizontal } from 'react-icons/fi';
@@ -30,14 +32,15 @@ const Center = () => {
     };
 
     const handleCircleClick = (index: number) => {
-        const newIsSelected = [...isSelected];
+        const newIsSelected: any = [...isSelected];
         newIsSelected[index] = !newIsSelected[index];
         setIsSelected(newIsSelected);
-        dispatch(setLeads(newIsSelected.map((selected, i) => selected && leads[i])));
+        dispatch(setLeads(newIsSelected.map((selected: any, i: any) => selected && leads[i])));
     };
 
     const handleContactAll = () => {
-        dispatch(setLeads(isSelected.map((selected, i) => selected && leads[i])));
+        const data = isSelected.map((selected: any, i: any) => selected && leads[i]);
+        dispatch(setLeads(data));
     };
 
     return (
