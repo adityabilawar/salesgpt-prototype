@@ -3,6 +3,7 @@ import Head from 'next/head'
 import type { AppProps } from 'next/app'
 import { Provider } from 'react-redux';
 import store from '../components/store';
+import Layout from '@/components/Layout';
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
@@ -14,7 +15,9 @@ export default function App({ Component, pageProps }: AppProps) {
         {/* <link rel="icon" href="/favicon.ico" /> */}
       </Head>
       <Provider store={store}>
-        <Component {...pageProps} />
+        <Layout>
+          <Component {...pageProps} />
+        </Layout>
       </Provider>
     </>
   )

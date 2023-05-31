@@ -42,7 +42,7 @@ const LeadDetails = () => {
             <div className="flex-grow">
                 <div className="flex relative justify-center items-center flex-col p-10">
                     <div className="rounded-full h-32 w-32 bg-white" />
-                    {selectedLead && <h1 className="text-2xl mt-5">{getDetail(selectedLead.leadName)}</h1>}
+                    {selectedLead && <h1 className="text-2xl mt-5">{getDetail(selectedLead.firstName)} {getDetail(selectedLead.lastName)}</h1>}
                     {selectedLead && <p className="text-md text-gray-400 mt-2">{selectedLead.companyName}</p>}
                     <div className="flex justify-center items-center space-x-4">
                         {socials.map((social, i) => (
@@ -56,35 +56,47 @@ const LeadDetails = () => {
                     </div>
                 </div>
                 <div className="relative flex justify-between mt-5">
-                    <button 
+                    <button
                         className={`w-full py-2 ${activeTab === 'leads' ? 'text-white' : 'text-gray-500'}`}
                         onClick={() => setActiveTab('leads')}
                     >
                         Leads Info
                     </button>
-                    <button 
-                        className={`w-full py-2 ${activeTab === 'address' ? 'text-white' : 'text-gray-500'}`}
-                        onClick={() => setActiveTab('address')}
+                    <button
+                        className={`w-full py-2 ${activeTab === 'companyInfo' ? 'text-white' : 'text-gray-500'}`}
+                        onClick={() => setActiveTab('companyInfo')}
                     >
-                        Address Info
+                        Company Info
                     </button>
                     <animated.div />
                     {/* <animated.div style={springProps} /> */}
                 </div>
                 <div className="flex-grow-0 px-10 py-5">
-                {activeTab === 'leads' ? (
-                    <>
-                        {selectedLead && <p>Email: {selectedLead.email}</p>}
-                        {selectedLead && <p>Phone: {selectedLead.phoneNumber}</p>}
-                        {selectedLead && <p>Job Title: {selectedLead.jobTitle}</p>}
-                        {selectedLead && <p>LinkedIn: <a href={selectedLead.linkedInProfile}>{selectedLead.linkedInProfile}</a></p>}
-                    </>
-                ) : (
-                    <>
-                        {selectedLead && <p>Address: {selectedLead.address}</p>}
-                    </>
-                )}
-            </div>
+                    {activeTab === 'leads' ? (
+                        <div className="flex-col space-y-5">
+                            <div>
+                                <h1 className="text-gray-400">Email</h1>
+                                <p>{selectedLead?.email}</p>
+                            </div>
+                            <div>
+                                <h1 className="text-gray-400">Phone</h1>
+                                <p>{selectedLead?.phone}</p>
+                            </div>
+                            <div>
+                                <h1 className="text-gray-400">Job Title</h1>
+                                <p>Job Title: {selectedLead?.jobTitle}</p>
+                            </div>
+                            <div>
+                                <h1 className="text-gray-400">Linkedin</h1>
+                                <p>{selectedLead?.linkedIn}</p>
+                            </div>
+                        </div>
+                    ) : (
+                        <>
+                            {selectedLead && <p>{selectedLead.companyInfo}</p>}
+                        </>
+                    )}
+                </div>
             </div>
         </div>
     )

@@ -7,11 +7,11 @@ const Navbar = () => {
         <div className="flex justify-between items-center">
             <Link href="/about">
                 <div className="flex justify-center items-center space-x-2">
-                    <div className="bg-white text-black flex justify-center items-center rounded-full h-8 w-8">
+                    {/* <div className="bg-white text-black flex justify-center items-center rounded-full h-8 w-8">
                         <RxCaretLeft />
-                    </div>
+                    </div> */}
                     <div>
-                        Jerome Bell
+                        User
                     </div>
                 </div>
             </Link>

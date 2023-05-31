@@ -1,40 +1,65 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { doc, collection, getDocs } from 'firebase/firestore';
+import { db } from '@/lib/firebaseClient';
+
+interface Lead {
+  id: string;
+  firstName: string;
+  lastName: string;
+}
+
+interface LeadsState {
+  leads: Lead[];
+  selectedLeads: Lead[];
+  selectedLead: Lead | null;
+}
+
+const initialState: LeadsState = {
+  leads: [],
+  selectedLeads: [],
+  selectedLead: null,
+};
+
+export const fetchLeads = createAsyncThunk('leads/fetchLeads', async () => {
+  const userId = "jOgfvrI7EfqjqcH2Gfeo";
+  const userDocRef = doc(db, 'users', userId);
+  const leadsCol = collection(userDocRef, 'leads');
+  const leadSnapshot = await getDocs(leadsCol);
+  const leadsList: Lead[] = leadSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Lead));
+  return leadsList;
+});
 
 const leadsSlice = createSlice({
   name: 'leads',
-  initialState: {
-    leads: [],
-    selectedLeads: [],
-    selectedLead: null,
-  },
+  initialState,
   reducers: {
-    setLeads: (state: any, action: any): any => {
-      state.leads = action.payload;
-    },
-    addSelectedLead: (state: any, action: any) => {
+    addSelectedLead: (state, action: PayloadAction<Lead>) => {
       state.selectedLeads.push(action.payload);
     },
-    clearSelectedLeads: (state) => { // New action to clear selected leads
+    clearSelectedLeads: (state) => {
       state.selectedLeads = [];
     },
-    removeLead: (state, action) => {
+    removeLead: (state, action: PayloadAction<Lead>) => {
       state.selectedLeads = state.selectedLeads.filter(
-        (lead: any) => lead.leadName !== action.payload.leadName
+        (lead: Lead) => lead.id !== action.payload.id
       );
     },
-    setSelectedLead: (state, action) => {
+    setSelectedLead: (state, action: PayloadAction<Lead | null>) => {
       state.selectedLead = action.payload;
     },
+  },
+  extraReducers: (builder) => {
+    builder.addCase(fetchLeads.fulfilled, (state, action) => {
+      state.leads = action.payload;
+    });
   },
 });
 
 export const {
-  setLeads,
   addSelectedLead,
-  clearSelectedLeads, 
+  clearSelectedLeads,
   removeLead,
   setSelectedLead,
 } = leadsSlice.actions;
-
 
 export default leadsSlice.reducer;
