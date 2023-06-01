@@ -24,6 +24,7 @@ interface Lead {
 const Center = () => {
   const dispatch = useDispatch();
   const leads = useSelector((state: RootState) => state.leads.leads) || [];
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [selectedDetail, setSelectedDetail] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [isOpen, setIsOpen] = useState<Record<string, boolean>>({});
@@ -71,20 +72,18 @@ const Center = () => {
   );
 
   useEffect(() => {
-    const userId = 'jOgfvrI7EfqjqcH2Gfeo'; // Replace with the actual user ID
+    const userId = 'jOgfvrI7EfqjqcH2Gfeo'; 
     const leadsRef = collection(db, 'users', userId, 'leads');
-
-    // Subscribe to the leads collection
     const unsubscribe = onSnapshot(leadsRef, (snapshot) => {
       const updatedLeads: Lead[] = [];
       snapshot.forEach((doc) => {
         updatedLeads.push({ id: doc.id, ...doc.data() } as Lead);
       });
       dispatch(fetchLeads(updatedLeads));
+      setIsLoading(false);
     });
 
     return () => {
-      // Unsubscribe from the leads collection when the component unmounts
       unsubscribe();
     };
   }, [dispatch]);
@@ -97,7 +96,7 @@ const Center = () => {
         complete: async function (results) {
           results.data.forEach(async (lead) => {
             try {
-              const userRef = doc(db, 'users', 'jOgfvrI7EfqjqcH2Gfeo'); // Replace 'userId' with the actual user ID
+              const userRef = doc(db, 'users', 'jOgfvrI7EfqjqcH2Gfeo');
               const userSnapshot = await getDoc(userRef);
               if (userSnapshot.exists()) {
                 const leadsRef = collection(db, 'users', 'jOgfvrI7EfqjqcH2Gfeo', 'leads');
@@ -113,7 +112,6 @@ const Center = () => {
   };
 
   const handleDeleteLead = async (id: string) => {
-    // Remove the lead from the Redux store
     const leadToDelete = leads.find((lead: Lead) => lead.id === id);
     if (leadToDelete) {
       dispatch(removeLead(leadToDelete));
@@ -129,12 +127,11 @@ const Center = () => {
   };
 
   return (
-    <div className="border-r-[1px] h-screen flex flex-col">
+    <div className="border-r-[1px] flex flex-col h-full">
       <div className="flex-grow">
-        <div className="relative flex border-b-[1px] px-10 py-5 text-2xl">
-          Leads
-        </div>
-        <div className="flex-grow-0 px-10 py-5 flex space-x-5">
+        <div className="flex flex-col border-b-[1px] px-10 py-5 sticky top-0 bg-[#1D203E]">
+          <h1 className="text-2xl">Leads</h1>
+          <div className="flex-grow-0 py-5 flex space-x-5 bg-[#1D203E]">
           <div className="bg-white text-black px-5 flex justify-center items-center cursor-pointer">
             <label htmlFor="upload-button">
               {file ? `Uploaded ${file.name}` : 'Upload Leads'}
@@ -163,8 +160,22 @@ const Center = () => {
             </button>
           </Link>
         </div>
-        <div className="p-10 space-y-4 overflow-y-auto max-h-[900px]">
-          {leads
+        </div>
+        <div className="p-10 space-y-4 overflow-y-auto">
+          {isLoading ? (
+            <div className="animate-pulse flex space-x-4">
+              <div className="flex-1 space-y-6 py-1">
+                <div className="h-2 bg-slate-700 rounded"></div>
+                <div className="space-y-3">
+                  <div className="grid grid-cols-3 gap-4">
+                    <div className="h-2 bg-slate-700 rounded col-span-2"></div>
+                    <div className="h-2 bg-slate-700 rounded col-span-1"></div>
+                  </div>
+                  <div className="h-2 bg-slate-700 rounded"></div>
+                </div>
+              </div>
+            </div>
+          ) : (leads
             .filter((lead: Lead) => (lead.firstName + ' ' + lead.lastName).toLowerCase().includes(searchTerm.toLowerCase()))
             .map((lead: Lead) => {
               const id = lead.id;
@@ -217,7 +228,7 @@ const Center = () => {
                   )}
                 </div>
               );
-            })}
+            }))}
         </div>
       </div>
     </div>

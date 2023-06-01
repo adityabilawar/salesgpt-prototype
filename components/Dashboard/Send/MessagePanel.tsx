@@ -49,7 +49,7 @@ const MessagePanel = () => {
 
   useEffect(() => {
     async function fetchData() {
-      const campaignId = 'ShQWzH9paCZeT3KxuWQZ'; // Replace this with the actual campaign id
+      const campaignId = 'ShQWzH9paCZeT3KxuWQZ';
       const campaignDocRef = doc(db, 'users', 'jOgfvrI7EfqjqcH2Gfeo', 'campaigns', campaignId);
       const campaignSnapshot = await getDoc(campaignDocRef);
 

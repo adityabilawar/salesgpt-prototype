@@ -37,8 +37,6 @@ const CampaignPage = () => {
             fetchCampaign();
         }
     }, [campaignId]);
-
-    // Render your campaign data
     return (
         <div>
             {campaign && (

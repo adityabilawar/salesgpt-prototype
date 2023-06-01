@@ -14,9 +14,6 @@ const send = () => {
     }, [dispatch]);
     return (
         <div className="text-white">
-            <div className="border-b-[1px] p-10">
-                <Navbar />
-            </div>
             <div className="grid grid-cols-5">
                 <Sidebar />
                 <div className="col-span-4"><Center /></div>

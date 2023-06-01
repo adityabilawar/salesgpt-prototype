@@ -51,14 +51,12 @@ const LeadsSidebar = () => {
 
   const removeLeadHandler = async (lead: Lead) => {
     if (window.confirm(`Are you sure you want to remove ${lead.firstName} ${lead.lastName} from the list?`)) {
-      // Also remove the lead from the Firebase database
       const userId = 'jOgfvrI7EfqjqcH2Gfeo';
       const campaignRef = doc(db, 'users', userId, 'campaigns', campaignId as string);
       await updateDoc(campaignRef, {
         leads: arrayRemove(lead)
       });
 
-      // Update the local state
       setLeads(leads.filter(l => l.id !== lead.id));
     }
   }

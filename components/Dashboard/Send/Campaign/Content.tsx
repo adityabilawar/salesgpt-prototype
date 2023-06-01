@@ -3,7 +3,7 @@ import { animated, useSpring } from 'react-spring';
 import { FiChevronDown, FiCircle, FiMail, FiSearch, FiEdit3, FiMoreHorizontal, FiUpload } from 'react-icons/fi';
 import Link from 'next/link';
 import { collection, getDocs } from 'firebase/firestore';
-import { db } from '@/lib/firebaseClient'; // Replace with your Firebase config import path
+import { db } from '@/lib/firebaseClient';
 import { useSelector, useDispatch } from 'react-redux';
 import { addSelectedLead, clearSelectedLeads } from '@/components/store/leadsSlice';
 import { doc, setDoc } from 'firebase/firestore';
@@ -23,11 +23,8 @@ const Content = () => {
 
     const sendLeads = async (campaignId: string) => {
         try {
-            // Replace with your Firebase doc path
             const docRef = doc(db, 'users', 'jOgfvrI7EfqjqcH2Gfeo', 'campaigns', campaignId);
-            // Set the leads data to Firebase
             await setDoc(docRef, { leads: selectedLeads }, { merge: true });
-            // Clear the Redux leads data
             dispatch(clearSelectedLeads());
         } catch (error) {
             console.error("Error sending leads: ", error);

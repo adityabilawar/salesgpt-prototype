@@ -1,80 +1,65 @@
-import React, { useState } from 'react';
-import { FiGrid, FiMail, FiLayers } from 'react-icons/fi';
+import Image from "next/image";
+import { useState } from "react";
+import { FiGrid, FiMail } from 'react-icons/fi';
+import { HiOutlinePaperAirplane } from 'react-icons/hi';
+import { useRouter } from 'next/router';
+import Link from "next/link";
 
-const Sidebar: React.FC = () => {
-  const [activeIcon, setActiveIcon] = useState('');
-  const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0 });
+const Sidebar = () => {
+  const [open, setOpen] = useState(true);
+  const { asPath } = useRouter();
+  console.log(asPath);
 
-  const handleIconMouseEnter = (icon: string, event: React.MouseEvent<SVGElement, MouseEvent>) => {
-    setActiveIcon(icon);
-    const { top, height } = event.currentTarget.getBoundingClientRect();
-    const tooltipTop = top - height ;
-    const tooltipLeft = event.currentTarget.parentElement?.offsetWidth || 0;
-    setTooltipPosition({ top: tooltipTop, left: tooltipLeft });
-  };
-
-  const handleIconMouseLeave = () => {
-    setActiveIcon('');
-  };
-
-  const renderTooltip = () => {
-    if (activeIcon === 'dashboard') {
-      return <span>Dashboard</span>;
-    } else if (activeIcon === 'mail') {
-      return <span>Mail</span>;
-    } else if (activeIcon === 'campaigns') {
-      return <span>Campaigns</span>;
-    }
-    return null;
-  };
+  const Menus = [
+    { title: "Dashboard", src: (<FiGrid />), path: "/dashboard" },
+    { title: "Leads", src: (<FiMail />), path: "/leads" },
+    { title: "Campaigns", src: (<HiOutlinePaperAirplane className="rotate-[45deg]" />), path: "/dashboard/send" },
+  ];
 
   return (
-    <div className="flex flex-col relative h-screen w-32 border-r-[1px]">
-      <div className="flex flex-col items-center mt-4">
+    <div className="flex border-r-[1px]">
+      <div
+        className={` ${open ? "w-72" : "w-20 "
+          } bg-dark-purple h-screen p-5  pt-8 relative duration-300`}
+      >
         <div
-          className={`p-4 rounded-full cursor-pointer ${
-            activeIcon === 'dashboard' ? 'bg-white' : ''
-          }`}
-          onMouseEnter={(event) => handleIconMouseEnter('dashboard', event)}
-          onMouseLeave={handleIconMouseLeave}
-        >
-          <FiGrid
-            className={`${activeIcon === 'dashboard' ? 'text-black' : 'text-white'}`}
-            size={32}
+          className={`absolute cursor-pointer -right-4 top-11 w-7 bg-[#1D203E]
+           border-2 rounded-full  ${!open && "rotate-180"}`}
+          onClick={() => setOpen(!open)}
+        ><div className="h-4 w-4 bg-white rounded-full">
+          </div></div>
+        <div className="flex gap-x-4 items-center">
+          <Image
+            src="/templogo.svg" height={40} width={40}
+            alt=""
+            className={`cursor-pointer duration-500 ${open && "rotate-[360deg]"
+              }`}
           />
+          <h1
+            className={`text-white origin-left font-bold text-xl duration-200 ${!open && "scale-0"
+              }`}
+          >
+            Pipeline AI
+          </h1>
         </div>
-        <div
-          className={`p-4 rounded-full cursor-pointer ${
-            activeIcon === 'mail' ? 'bg-white' : ''
-          }`}
-          onMouseEnter={(event) => handleIconMouseEnter('mail', event)}
-          onMouseLeave={handleIconMouseLeave}
-        >
-          <FiMail className={`${activeIcon === 'mail' ? 'text-black' : 'text-white'}`} size={32} />
-        </div>
-        <div
-          className={`p-4 rounded-full cursor-pointer ${
-            activeIcon === 'campaigns' ? 'bg-white' : ''
-          }`}
-          onMouseEnter={(event) => handleIconMouseEnter('campaigns', event)}
-          onMouseLeave={handleIconMouseLeave}
-        >
-          <FiLayers
-            className={`${activeIcon === 'campaigns' ? 'text-black' : 'text-white'}`}
-            size={32}
-          />
-        </div>
+        <ul className="pt-6 flex flex-col space-y-2">
+          {Menus.map((Menu, index) => (
+            <Link href={Menu.path} key={index}>
+              <div
+                className={`flex justify-left rounded-md p-2 cursor-pointer duration-50 ease-in-out text-lg items-center gap-x-4 
+      text-white hover:bg-white hover:text-black ${asPath === Menu.path ? 'bg-[#292c50]' : ''}`}
+              >
+                {Menu.src}
+                <span className={`${!open && "hidden"} origin-left duration-200`}>
+                  {Menu.title}
+                </span>
+              </div>
+            </Link>
+          ))}
+
+        </ul>
       </div>
-      {activeIcon && (
-        <div
-          className="absolute bg-white px-5 py-2 ml-2 text-black rounded-md"
-          style={{ top: tooltipPosition.top, left: tooltipPosition.left }}
-        >
-          {renderTooltip()}
-        </div>
-      )}
     </div>
   );
 };
-
 export default Sidebar;

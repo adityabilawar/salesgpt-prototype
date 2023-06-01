@@ -16,7 +16,7 @@ const index = () => {
     const [prompt, setPrompt] = useState<string>('');
 
     useEffect(() => {
-        dispatch(fetchUserData('jOgfvrI7EfqjqcH2Gfeo')); // replace with the actual userId
+        dispatch(fetchUserData('jOgfvrI7EfqjqcH2Gfeo')); 
     }, [dispatch]);
 
     const handleGoBack = () => {
@@ -25,26 +25,24 @@ const index = () => {
 
     const handleSave = (event) => {
         event.preventDefault();
-        dispatch(updateUserData({ userId: 'jOgfvrI7EfqjqcH2Gfeo', updatedData: userData })); // replace with the actual userId
+        dispatch(updateUserData({ userId: 'jOgfvrI7EfqjqcH2Gfeo', updatedData: userData })); 
     };
 
     const handleChange = (event) => {
-        dispatch(updateUserData({ userId: 'jOgfvrI7EfqjqcH2Gfeo', updatedData: { ...userData, [event.target.name]: event.target.value } })); // replace with the actual userId
+        dispatch(updateUserData({ userId: 'jOgfvrI7EfqjqcH2Gfeo', updatedData: { ...userData, [event.target.name]: event.target.value } })); 
     };
 
-    // Save Campaign Function
     const saveCampaign = async (event) => {
         event.preventDefault();
         const campaignTitle = event.target.elements.campaignTitle.value;
         const platform = event.target.elements.platform.value;
         const callToAction = event.target.elements.callToAction.value;
         const toneOfVoice = event.target.elements.toneOfVoice.value;
-        const purpose = event.target.elements.toneOfVoice.value;
-    
-        const generatedPrompt = generatePrompt(campaignTitle, platform, callToAction, toneOfVoice);
+        const purpose = event.target.elements.purpose.value;
+
+        const generatedPrompt = generatePrompt(campaignTitle, platform, callToAction, toneOfVoice, purpose);
         setPrompt(generatedPrompt);
-        
-        // Set campaign details to Firebase
+
         try {
             await addDoc(collection(db, 'users', 'jOgfvrI7EfqjqcH2Gfeo', 'campaigns'), {
                 campaignTitle: campaignTitle,
@@ -52,19 +50,18 @@ const index = () => {
                 callToAction: callToAction,
                 toneOfVoice: toneOfVoice,
                 purpose: purpose,
-                generatedPrompt: generatedPrompt, // save generatedPrompt to Firebase
+                generatedPrompt: generatedPrompt,
             });
-        
+
             console.log('Campaign saved successfully');
         } catch (error) {
             console.error('Error saving campaign:', error);
         }
     };
-    
 
-    const generatePrompt = (campaignTitle: string = '', platform: string = '', callToAction: string = '', toneOfVoice: string = '') => {
-        // Here we construct the prompt. You can adjust this as needed.
-        const generatedPrompt = `Craft a ${campaignTitle} for ${platform}. The message should include a call to action for ${callToAction} and should be written in a ${toneOfVoice} tone.`;
+
+    const generatePrompt = (campaignTitle: string = '', platform: string = '', callToAction: string = '', toneOfVoice: string = '', purpose: string = '') => {
+        const generatedPrompt = `Craft a ${campaignTitle} for ${platform}. The message should include a call to action for ${callToAction} and should be written in a ${toneOfVoice} tone. The purpose of this message is ${purpose}`;
         return generatedPrompt;
     };
 
@@ -119,30 +116,27 @@ const index = () => {
                     <form onSubmit={saveCampaign}>
                         <div className="mb-4">
                             <label htmlFor="campaign-title" className="block text-sm">Campaign Title</label>
-                            <input placeholder="Cold Messaging" id="campaign-title" name="campaignTitle" className="w-full p-2 border-[1px]" />
+                            <input required placeholder="Cold Messaging" id="campaign-title" name="campaignTitle" className="w-full p-2 border-[1px]" />
                         </div>
                         <div className="mb-4">
                             <label htmlFor="platform" className="block text-sm">Platform</label>
-                            <input placeholder="LinkedIn" id="platform" name="platform" className="w-full p-2 border-[1px]" />
+                            <input required placeholder="LinkedIn" id="platform" name="platform" className="w-full p-2 border-[1px]" />
                         </div>
                         <div className="mb-4">
                             <label htmlFor="call-to-action" className="block text-sm">Call To Action</label>
-                            <input placeholder="More follow up calls" id="call-to-action" name="callToAction" className="w-full p-2 border-[1px]" />
+                            <input required placeholder="More follow up calls" id="call-to-action" name="callToAction" className="w-full p-2 border-[1px]" />
                         </div>
                         <div className="mb-4">
                             <label htmlFor="tone-of-voice" className="block text-sm">Tone of Voice</label>
-                            <input placeholder="Humorous" id="tone-of-voice" name="toneOfVoice" className="w-full p-2 border-[1px]" />
+                            <input required placeholder="Humorous" id="tone-of-voice" name="toneOfVoice" className="w-full p-2 border-[1px]" />
                         </div>
                         <div className="mb-4">
                             <label htmlFor="purpose" className="block text-sm">Purpose/goal for message</label>
-                            <input placeholder="To introduce our services to potential clients" id="purpose" name="purpose" className="w-full p-2 border-[1px]" />
+                            <input required placeholder="To introduce our services to potential clients" id="purpose" name="purpose" className="w-full p-2 border-[1px]" />
                         </div>
-                        {/* <div className="mb-4">
-                            <label htmlFor="word-count" className="block text-sm">Word Count</label>
-                            <input id="word-count" name="wordCount" type="range" min="0" max="1000" className="w-full" />
-                        </div> */}
                         <button type="submit" onClick={generatePrompt} className="border-[1px] px-4 py-2">Save and Generate Prompt</button>
                     </form>
+
                     <hr className="my-4" />
                     <h2 className="text-2xl mb-4">Prompt</h2>
                     <textarea value={prompt} className="w-full p-2 h-64 border-[1px] text-black mb-4"></textarea>

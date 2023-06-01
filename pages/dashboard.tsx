@@ -1,6 +1,5 @@
 import Sidebar from '@/components/Dashboard/Sidebar'
 import Navbar from '../components/Profile/Navbar'
-import RightBar from '../components/Profile/RightBar'
 import Center from '@/components/Dashboard/Center'
 import React, { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
@@ -14,16 +13,16 @@ const dashboard = () => {
     }, [dispatch]);
 
     return (
-        <div className="text-white">
-            <div className="border-b-[1px] p-10">
-                <Navbar />
+        <div className="text-white h-screen flex flex-col overflow-hidden">
+          <div className="grid grid-cols-5 h-full overflow-hidden">
+            <Sidebar />
+            <div className="col-span-4 overflow-auto">
+              <Center />
             </div>
-            <div className="grid grid-cols-5">
-                <Sidebar />
-                <div className="col-span-4"><Center /></div>
-            </div>
+          </div>
         </div>
-    )
+      )
+      
 }
 
-export default dashboard
+export default dashboard;
