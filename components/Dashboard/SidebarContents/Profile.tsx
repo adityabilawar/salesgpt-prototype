@@ -123,7 +123,7 @@ const Profile = () => {
               </div>
               <div>
                 <h1 className="text-gray-400">Job Title</h1>
-                <p>Job Title: {profileData?.jobTitle}</p>
+                <p>{profileData?.jobTitle}</p>
               </div>
               <div>
                 <h1 className="text-gray-400">Linkedin</h1>

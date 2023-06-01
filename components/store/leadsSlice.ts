@@ -44,7 +44,7 @@ const leadsSlice = createSlice({
         (lead: Lead) => lead.id !== action.payload.id
       );
     },
-    setSelectedLead: (state, action: PayloadAction<Lead | null>) => {
+    setSelectedLead: (state, action: PayloadAction<Lead>) => {
       state.selectedLead = action.payload;
     },
   },

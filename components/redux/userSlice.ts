@@ -2,7 +2,7 @@ import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebaseClient';
 
-interface User {
+export interface User {
   id: string;
   firstName: string;
   lastName: string;
@@ -12,6 +12,8 @@ interface User {
   email: string;
   phoneNumber: string;
   linkedInProfile: string;
+  companyValues: string;
+  problem: string;
 }
 
 const initialState: User = {
@@ -24,6 +26,8 @@ const initialState: User = {
   email: "",
   phoneNumber: "",
   linkedInProfile: "",
+  companyValues: "",
+  problem: "",
 };
 
 export const fetchUserData = createAsyncThunk('user/fetchUserData', async (userId: string) => {

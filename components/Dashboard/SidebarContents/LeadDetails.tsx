@@ -84,7 +84,7 @@ const LeadDetails = () => {
                             </div>
                             <div>
                                 <h1 className="text-gray-400">Job Title</h1>
-                                <p>Job Title: {selectedLead?.jobTitle}</p>
+                                <p>{selectedLead?.jobTitle}</p>
                             </div>
                             <div>
                                 <h1 className="text-gray-400">Linkedin</h1>

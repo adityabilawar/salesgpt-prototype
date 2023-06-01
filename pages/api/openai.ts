@@ -1,5 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { Configuration, OpenAIApi } from 'openai';
+import axios from 'axios';
 
 const configuration = new Configuration({
   organization: "org-z7m6hqrQHuHbpI0K9pYlJiR0",
@@ -11,26 +12,37 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const { lead, campaign } = req.body;
+  const { user, lead, campaign } = req.body;
+  let linkedInDescription = '';
+  if (lead.linkedIn) {
+    console.log("Accessing linkedin");
+    const options = {
+      method: 'GET',
+      url: `https://kg.diffbot.com/kg/v3/enhance?type=Person&url=${lead.linkedIn}&size=1&refresh=false&search=false&nonCanonicalFacts=false&useCache=false&jsonmode=%20&token=${process.env.DIFFBOT_KEY}`,
+      headers: { accept: 'application/json' },
+    };
+    const diffbotResponse = (await axios.request(options)).data;
+    linkedInDescription = diffbotResponse?.data?.[0]?.entity?.description || '';
+  }
 
-  const aboutInput = `The recipient's name is ${lead.firstName} ${lead.lastName}. They are the ${lead.jobTitle} of ${lead.companyName}, a company that ${lead.companyInfo}. Here is their LinkedIn profile: ${lead.linkedInProfile}. If any of these are blank it means that information should be excluded. Now, NEVER forget these details.`;
-
+  const aboutInput = `Make sure you write an engaging personalized hook and introduce yourself. Your word limit is 150 words, do not exceed this. Make sure to take note of every rule listed. Do not include the subject line. Never forget your name is ${user.firstName} ${user.lastName} & you work as a ${user.jobTitle}. You work at a company named ${user.companyName}. ${user.companyName}'s business is the following  ${user.companyInfo}. The company values are the following  ${user.companyValues}. The problems the company helps solve are  ${user.problem}.  You are contacting a potential customer for the purpose of ${campaign.purpose}. The person to connect with is ${lead.firstName} ${lead.lastName}, who works at ${lead.companyName} as a ${lead.jobTitle}. The tone of the email is going to be  ${campaign.toneOfVoice}. ${campaign.generatedPrompt}. ALWAYS BE CONCISE AND SPECIFIC. You have the following personalized info on the customer: ${linkedInDescription}. Make sure to add bits of their previous work experiences and make it relevant to your company values, and include light bits of humor.`;
+  console.log(aboutInput);
   try {
     const response = await openai.createChatCompletion({
       model: "gpt-3.5-turbo",
       messages: [
         {
           role: 'user',
-          content: `${aboutInput} ${campaign.generatedPrompt}`
-        }
+          content: aboutInput
+        },
       ],
-      max_tokens: 3000,
-      temperature: 0,
+      max_tokens: 600,
+      temperature: 0.8,
       n: 1
     });
 
     if (response.data && response.data.choices && response.data.choices[0] && response.data.choices[0].message) {
-      res.status(200).json({ message: `Dear ${lead.firstName} ${lead.lastName}, ${response.data.choices[0].message.content}` });
+      res.status(200).json({ message: `${response.data.choices[0].message.content}` });
     } else {
       res.status(500).json({ message: 'AI model failed to generate a personalized message' });
     }

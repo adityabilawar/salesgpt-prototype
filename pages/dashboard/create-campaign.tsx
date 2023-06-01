@@ -39,6 +39,7 @@ const index = () => {
         const platform = event.target.elements.platform.value;
         const callToAction = event.target.elements.callToAction.value;
         const toneOfVoice = event.target.elements.toneOfVoice.value;
+        const purpose = event.target.elements.toneOfVoice.value;
     
         const generatedPrompt = generatePrompt(campaignTitle, platform, callToAction, toneOfVoice);
         setPrompt(generatedPrompt);
@@ -50,7 +51,8 @@ const index = () => {
                 platform: platform,
                 callToAction: callToAction,
                 toneOfVoice: toneOfVoice,
-                generatedPrompt: generatedPrompt,
+                purpose: purpose,
+                generatedPrompt: generatedPrompt, // save generatedPrompt to Firebase
             });
         
             console.log('Campaign saved successfully');
@@ -101,6 +103,14 @@ const index = () => {
                             <label htmlFor="company-description" className="block text-sm">Company Description</label>
                             <textarea id="company-description" name="companyInfo" value={userData.companyInfo} onChange={handleChange} className="bg-transparent w-full p-2 border-[1px] border-white" />
                         </div>
+                        <div className="mb-4">
+                            <label htmlFor="company-values" className="block text-sm">Company Values</label>
+                            <textarea id="company-values" name="companyValues" value={userData.companyValues} onChange={handleChange} className="bg-transparent w-full p-2 border-[1px] border-white" />
+                        </div>
+                        <div className="mb-4">
+                            <label htmlFor="problem" className="block text-sm">Problem Being Solved</label>
+                            <textarea id="problem" name="problem" value={userData.problem} onChange={handleChange} className="bg-transparent w-full p-2 border-[1px] border-white" />
+                        </div>
                         <button type="submit">Save</button>
                     </form>
                 </div>
@@ -122,6 +132,10 @@ const index = () => {
                         <div className="mb-4">
                             <label htmlFor="tone-of-voice" className="block text-sm">Tone of Voice</label>
                             <input placeholder="Humorous" id="tone-of-voice" name="toneOfVoice" className="w-full p-2 border-[1px]" />
+                        </div>
+                        <div className="mb-4">
+                            <label htmlFor="purpose" className="block text-sm">Purpose/goal for message</label>
+                            <input placeholder="To introduce our services to potential clients" id="purpose" name="purpose" className="w-full p-2 border-[1px]" />
                         </div>
                         {/* <div className="mb-4">
                             <label htmlFor="word-count" className="block text-sm">Word Count</label>

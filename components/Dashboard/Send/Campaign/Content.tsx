@@ -11,11 +11,11 @@ interface Campaign {
     id: string;
     campaignTitle: string;
     generatedPrompt: string;
-    leads?: any[];  // Assuming that leads is an array, but you can replace 'any[]' with the correct type
+    leads?: any[];
 }
 
 
-const Center = () => {
+const Content = () => {
     const dispatch = useDispatch();
     const [campaigns, setCampaigns] = useState<Campaign[]>([]);
     const [isOpen, setIsOpen] = useState<Record<string, boolean>>({});
@@ -85,12 +85,11 @@ const Center = () => {
                                                 <FiUpload size={24} />
                                                 <p className="ml-2">Send Leads</p>
                                             </button>
-                                            <Link href={`/dashboard/generate/${campaign.id}`}>
+                                            <Link href="/dashboard/generate">
                                                 <button className="flex items-center border-[1px] px-6 py-2">
                                                     <p className="ml-2">Continue</p>
                                                 </button>
                                             </Link>
-
                                         </div>
                                     </div>
                                 )}
@@ -104,4 +103,4 @@ const Center = () => {
     )
 }
 
-export default Center
+export default Content
