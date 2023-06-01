@@ -1,4 +1,3 @@
-// redux/actions/userActions.js
 import { db } from "@/lib/firebaseClient";
 
 export const getUserData = async (userId) => {
