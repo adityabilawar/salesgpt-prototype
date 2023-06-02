@@ -1,15 +1,18 @@
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from "@/lib/firebaseClient";
 
-export const getUserData = async (userId) => {
-  const doc = await db.collection('users').doc(userId).get();
+export const getUserData = async (userId: any) => {
+  const userDoc = doc(db, 'users', userId);
+  const docSnap = await getDoc(userDoc);
   
-  if (!doc.exists) {
+  if (!docSnap.exists()) {
     console.log('No such user!');
   } else {
-    return doc.data();
+    return docSnap.data();
   }
 }
 
-export const updateUserData = async (userId, updatedData) => {
-  await db.collection('users').doc(userId).update(updatedData);
+export const updateUserData = async (userId: string, updatedData: any) => {
+  const userDoc = doc(db, 'users', userId);
+  await updateDoc(userDoc, updatedData);
 }

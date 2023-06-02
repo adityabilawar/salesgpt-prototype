@@ -14,6 +14,7 @@ import axios from 'axios';
 const Center = () => {
   const dispatch = useDispatch();
   const leads = useSelector((state: RootState) => state.leads.leads) || [];
+  const sidebarView = useSelector((state: RootState) => state.sidebar.view);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [selectedDetail, setSelectedDetail] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState<string>('');
@@ -24,6 +25,16 @@ const Center = () => {
   const [activeTab, setActiveTab] = useState<string>('linkedin');
   const [linkedinInput, setLinkedinInput] = useState<string>('');
   const fileInput = useRef<HTMLInputElement>(null);
+  const [createModalOpen, setCreateModalOpen] = useState<boolean>(false);
+  const [newLead, setNewLead] = useState({
+    firstName: '',
+    lastName: '',
+    jobTitle: '',
+    companyName: '',
+    email: '',
+    phone: '',
+    linkedIn: '',
+  });
 
   const toggleOpen = (id: string) => {
     setIsOpen((prev) => ({ ...prev, [id]: !prev[id] }));
@@ -41,51 +52,67 @@ const Center = () => {
     });
   };
 
-  
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event.target;
+    setNewLead((prevLead) => ({ ...prevLead, [name]: value }));
+  };
+
+  const handleCreateLead = async (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    event.preventDefault();
+    const userId = 'jOgfvrI7EfqjqcH2Gfeo';
+    const leadsRef = collection(db, 'users', userId, 'leads');
+    await addDoc(leadsRef, newLead);
+    setNewLead({
+      firstName: '',
+      lastName: '',
+      jobTitle: '',
+      companyName: '',
+      email: '',
+      phone: '',
+      linkedIn: '',
+    });
+    setCreateModalOpen(false);
+  };
+
+
+
   const fetchLinkedInData = async (url: string) => {
     const key = process.env.NEXT_PUBLIC_DIFFBOT_KEY;
     console.log("Diffbot key is: ", key);
     const options = {
       method: 'GET',
       url: `https://kg.diffbot.com/kg/v3/enhance?type=Person&url=${encodeURIComponent(url)}&size=1&refresh=false&search=false&nonCanonicalFacts=false&useCache=false&jsonmode=%20&token=${key}`,
-      headers: {accept: 'application/json'}
+      headers: { accept: 'application/json' }
     };
-    
+
     const diffreq = (await axios.request(options)).data;
     console.log(diffreq);
     return (url && diffreq.data.length !== 0) ? diffreq.data[0].entity.description : '';
   };
-  
-  
+
+
   const handleLinkedInInput = async () => {
-    // Split the input by newline to get a list of URLs
     const linkedInUrls = linkedinInput.split('\n');
-  
-    // Iterate over the list of URLs and fetch the data for each URL
+
     for (let url of linkedInUrls) {
       const data = await fetchLinkedInData(url);
-  
-      // Check if the data isn't blank
+
       if (data && data.name) {
-        // Parse the data to match the Lead schema
         const lead = {
           firstName: data.name.givenName,
           lastName: data.name.familyName,
           jobTitle: data.title,
           companyName: data.employer,
           email: data.email,
-          phone: data.phoneNumbers?.[0].number,  // assuming the first number is the primary one
+          phone: data.phoneNumbers?.[0].number,
           linkedIn: url,
         };
-  
-        // Add the lead to your Firestore database
+
         const userId = 'jOgfvrI7EfqjqcH2Gfeo';
         const leadsRef = collection(db, 'users', userId, 'leads');
         await addDoc(leadsRef, lead);
       }
     }
-  
-    // Clear the input
     setLinkedinInput('');
   }
   const handleContactAll = () => {
@@ -183,6 +210,9 @@ const Center = () => {
             <div className="bg-white text-black px-5 flex justify-center items-center cursor-pointer" onClick={() => setModalOpen(true)}>
               Upload Leads
             </div>
+            <div className="bg-white text-black px-5 flex justify-center items-center cursor-pointer" onClick={() => setCreateModalOpen(true)}>
+              Create Lead
+            </div>
             <div className="relative border border-white flex justify-center items-center space-x-2">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <FiSearch size={24} />
@@ -241,10 +271,6 @@ const Center = () => {
                   </div>
                   {isOpen[id] && (
                     <div className="flex space-x-6 items-center p-4 border-t border-white">
-                      <button className="flex items-center border-[1px] px-6 py-2">
-                        <FiEdit3 size={24} />
-                        <p className="ml-2">Edit</p>
-                      </button>
                       <button
                         className={`flex items-center border-[1px] px-6 py-2 ${selectedDetail === id ? 'bg-white text-black' : ''}`}
                         onClick={() => {
@@ -258,10 +284,6 @@ const Center = () => {
                       >
                         <FiMoreHorizontal size={24} />
                         <p className="ml-2">Details</p>
-                      </button>
-                      <button className="flex items-center border-[1px] px-6 py-2">
-                        <FiMail size={24} />
-                        <p className="ml-2">Contact</p>
                       </button>
                       <button className="flex items-center" onClick={() => handleDeleteLead(id)}>
                         <FiTrash size={24} />
@@ -305,23 +327,92 @@ const Center = () => {
               </div>
             )}
             {activeTab === 'csv' && (
-              <div className="mt-8 flex flex-col items-center justify-center h-48 bg-[#383B59] rounded-md">
-                <label htmlFor="upload-button" className="cursor-pointer flex items-center space-x-2">
-                  <FiUpload size={24} />
-                  <span>{file ? `Uploaded ${file.name}` : 'Click here to upload a file'}</span>
-                </label>
-                <input
-                  id="upload-button"
-                  type="file"
-                  accept=".csv"
-                  hidden
-                  onChange={handleUpload}
-                  ref={fileInput}
-                />
+              <div className="py-5">
+                CSV files must be formatted as firstName,lastName,jobTitle,companyName,email,phone,linkedIn
+                <div className="mt-8 flex flex-col items-center justify-center h-48 bg-[#383B59] rounded-md">
+                  <label htmlFor="upload-button" className="cursor-pointer flex items-center space-x-2">
+                    <FiUpload size={24} />
+                    <span>{file ? `Uploaded ${file.name}` : 'Click here to upload a file'}</span>
+                  </label>
+                  <input
+                    id="upload-button"
+                    type="file"
+                    accept=".csv"
+                    hidden
+                    onChange={handleUpload}
+                    ref={fileInput}
+                  />
+                </div>
               </div>
             )}
             <div className="mt-8 text-right">
               <button className="text-white" onClick={() => setModalOpen(false)}>
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {createModalOpen && (
+        <div className="absolute inset-0 bg-gray-800 bg-opacity-60 z-10 flex justify-center items-center">
+          <div className="bg-[#2C2F48] rounded-lg w-2/3 p-8">
+            <h2 className="text-2xl text-white mb-8">Create Lead</h2>
+            <form className="flex flex-col text-black">
+              <input
+                type="text"
+                name="firstName"
+                placeholder="First Name"
+                value={newLead.firstName}
+                onChange={handleInputChange}
+              />
+              <input
+                type="text"
+                name="lastName"
+                placeholder="Last Name"
+                value={newLead.lastName}
+                onChange={handleInputChange}
+              />
+              <input
+                type="text"
+                name="jobTitle"
+                placeholder="Job Title"
+                value={newLead.jobTitle}
+                onChange={handleInputChange}
+              />
+              <input
+                type="text"
+                name="companyName"
+                placeholder="Company Name"
+                value={newLead.companyName}
+                onChange={handleInputChange}
+              />
+              <input
+                type="text"
+                name="email"
+                placeholder="Email"
+                value={newLead.email}
+                onChange={handleInputChange}
+              />
+              <input
+                type="text"
+                name="phone"
+                placeholder="Phone"
+                value={newLead.phone}
+                onChange={handleInputChange}
+              />
+              <input
+                type="text"
+                name="linkedIn"
+                placeholder="LinkedIn"
+                value={newLead.linkedIn}
+                onChange={handleInputChange}
+              />
+              <button type="button" className="mt-4 bg-[#383B59] text-white py-2 px-4 rounded-md" onClick={handleCreateLead}>
+                Create
+              </button>
+            </form>
+            <div className="mt-8 text-right">
+              <button className="text-white" onClick={() => setCreateModalOpen(false)}>
                 Close
               </button>
             </div>

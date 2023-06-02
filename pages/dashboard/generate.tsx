@@ -1,13 +1,11 @@
 import Sidebar from '@/components/Dashboard/Sidebar'
 import Navbar from '../../components/Profile/Navbar'
-import RightBar from '../../components/Profile/RightBar'
-import Center from '@/components/Dashboard/Center'
 import React, { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { setView } from '@/components/store/sidebarSlice';
 import MessagePanel from '@/components/Dashboard/Send/MessagePanel';
 
-const dashboard = () => {
+const Generate = () => {
     const dispatch = useDispatch();
 
     useEffect(() => {
@@ -27,4 +25,4 @@ const dashboard = () => {
     )
 }
 
-export default dashboard
+export default Generate

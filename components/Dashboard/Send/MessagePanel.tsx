@@ -116,13 +116,9 @@ const MessagePanel = () => {
     let campaignData = campaignDoc.data();
   
     if (campaignData) {
-      // Find the index of the lead to be updated
-      let leadIndex = campaignData.leads.findIndex(lead => lead.id === selectedLead.id);
-      // Check if the lead was found in the array
+      let leadIndex = campaignData.leads.findIndex((lead: Lead) => lead.id === selectedLead.id);
       if (leadIndex !== -1) {
-        // Update the generatedMessage property of the lead
         campaignData.leads[leadIndex].generatedMessage = finalMessage;
-        // Save the updated campaign data back to Firestore
         await setDoc(campaignRef, campaignData);
         console.log('Message saved successfully');
       } else {
@@ -175,7 +171,7 @@ const MessagePanel = () => {
             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
           </svg>
         )}
-        <textarea className="w-full h-60 border text-black" value={finalMessage} readOnly>Hello</textarea>
+        <textarea className="w-full h-60 border text-black" value={finalMessage}></textarea>
         <button className="mt-5 px-4 py-2 border-[1px]" onClick={saveGeneratedMessage}>Save</button>
       </div>
     </div>
