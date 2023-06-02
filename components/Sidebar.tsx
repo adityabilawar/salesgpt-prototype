@@ -12,7 +12,7 @@ const Sidebar = () => {
 
   const Menus = [
     { title: "Dashboard", src: (<FiGrid />), path: "/dashboard" },
-    { title: "Leads", src: (<FiMail />), path: "/leads" },
+    // { title: "Leads", src: (<FiMail />), path: "/leads" },
     { title: "Campaigns", src: (<HiOutlinePaperAirplane className="rotate-[45deg]" />), path: "/dashboard/send" },
   ];
 

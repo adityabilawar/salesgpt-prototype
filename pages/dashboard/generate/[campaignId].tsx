@@ -8,12 +8,6 @@ import Navbar from '@/components/Profile/Navbar';
 import Sidebar from '@/components/Dashboard/Sidebar';
 import LeadsSidebar from '@/components/Dashboard/Send/Campaign/LeadsSidebar';
 
-interface Campaign {
-    id: string;
-    campaignTitle: string;
-    generatedPrompt: string;
-    leads?: any[];
-}
 
 const CampaignPage = () => {
     const router = useRouter();

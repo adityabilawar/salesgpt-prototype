@@ -110,24 +110,24 @@ const Profile = () => {
           </button>
           {/* <animated.div style={springProps} /> */}
         </div>
-        <div className="flex-grow-0 px-10 py-5">
+        <div className="flex-grow-0 px-10 py-5 overflow-x-auto">
           {activeTab === 'leads' ? (
             <div className="flex-col space-y-5">
               <div>
                 <h1 className="text-gray-400">Email</h1>
-                <p>{profileData?.email}</p>
+                <p style={{ wordWrap: 'break-word' }}>{profileData?.email}</p>
               </div>
               <div>
                 <h1 className="text-gray-400">Phone</h1>
-                <p>{profileData?.phoneNumber}</p>
+                <p style={{ wordWrap: 'break-word' }}>{profileData?.phoneNumber}</p>
               </div>
               <div>
                 <h1 className="text-gray-400">Job Title</h1>
-                <p>{profileData?.jobTitle}</p>
+                <p style={{ wordWrap: 'break-word' }}>{profileData?.jobTitle}</p>
               </div>
               <div>
                 <h1 className="text-gray-400">Linkedin</h1>
-                <p>{profileData?.linkedInProfile}</p>
+                <p style={{ wordWrap: 'break-word' }}>{profileData?.linkedInProfile}</p>
               </div>
             </div>
           ) : (

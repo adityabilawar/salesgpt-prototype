@@ -8,12 +8,12 @@ export default function Home() {
 	useEffect(() => {
     const authStorage = localStorage.getItem('auth');
 		if(!authStorage) {
-			router.push('/dashboard');
+			router.push('/login');
 			return;
 		}
 
 		const auth = JSON.parse(authStorage);
-		axios.post('/api/login', {user: auth.user, pass: auth.pass}).then(() => router.push('/leads')).catch(() => router.push('/login'));
+		axios.post('/api/login', {user: auth.user, pass: auth.pass}).then(() => router.push('/dashboard')).catch(() => router.push('/login'));
 	});
   return (
     <>

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { FiTrash2 } from "react-icons/fi"
 import { useDispatch, useSelector } from "react-redux"
-import { Lead, removeLead } from "@/components/store/leadsSlice"
+import { removeLead } from "@/components/store/leadsSlice"
 import { RootState } from '@/components/store';
 import { db } from '@/lib/firebaseClient';
 import { doc, updateDoc, arrayRemove } from 'firebase/firestore';

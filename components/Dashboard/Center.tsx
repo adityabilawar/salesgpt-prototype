@@ -1,25 +1,15 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store';
-import { fetchLeads, addSelectedLead, setSelectedLead, clearSelectedLeads, removeLead } from '@/components/store/leadsSlice';
+import { fetchLeads, addSelectedLead, setSelectedLead, clearSelectedLeads, removeLead, updateLeads } from '@/components/store/leadsSlice';
 import { setView } from '@/components/store/sidebarSlice';
-import { FiChevronDown, FiCircle, FiMail, FiSearch, FiEdit3, FiMoreHorizontal, FiTrash } from 'react-icons/fi';
+import { FiChevronDown, FiCircle, FiMail, FiSearch, FiEdit3, FiMoreHorizontal, FiTrash, FiUpload } from 'react-icons/fi';
 import Link from 'next/link';
 import Papa from "papaparse";
 import { addDoc, arrayUnion, collection, deleteDoc, doc, getDoc, onSnapshot, updateDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebaseClient';
 import { animated, useSpring, useSprings } from 'react-spring';
-
-interface Lead {
-  id: string;
-  firstName: string;
-  lastName: string;
-  jobTitle: string;
-  companyName: string;
-  email: string;
-  phone: string;
-  linkedIn: string;
-}
+import axios from 'axios';
 
 const Center = () => {
   const dispatch = useDispatch();
@@ -30,6 +20,10 @@ const Center = () => {
   const [isOpen, setIsOpen] = useState<Record<string, boolean>>({});
   const [isSelected, setIsSelected] = useState<Record<string, boolean>>({});
   const [file, setFile] = useState<File | null>(null);
+  const [modalOpen, setModalOpen] = useState<boolean>(false);
+  const [activeTab, setActiveTab] = useState<string>('linkedin');
+  const [linkedinInput, setLinkedinInput] = useState<string>('');
+  const fileInput = useRef<HTMLInputElement>(null);
 
   const toggleOpen = (id: string) => {
     setIsOpen((prev) => ({ ...prev, [id]: !prev[id] }));
@@ -47,6 +41,53 @@ const Center = () => {
     });
   };
 
+  
+  const fetchLinkedInData = async (url: string) => {
+    const key = process.env.NEXT_PUBLIC_DIFFBOT_KEY;
+    console.log("Diffbot key is: ", key);
+    const options = {
+      method: 'GET',
+      url: `https://kg.diffbot.com/kg/v3/enhance?type=Person&url=${encodeURIComponent(url)}&size=1&refresh=false&search=false&nonCanonicalFacts=false&useCache=false&jsonmode=%20&token=${key}`,
+      headers: {accept: 'application/json'}
+    };
+    
+    const diffreq = (await axios.request(options)).data;
+    console.log(diffreq);
+    return (url && diffreq.data.length !== 0) ? diffreq.data[0].entity.description : '';
+  };
+  
+  
+  const handleLinkedInInput = async () => {
+    // Split the input by newline to get a list of URLs
+    const linkedInUrls = linkedinInput.split('\n');
+  
+    // Iterate over the list of URLs and fetch the data for each URL
+    for (let url of linkedInUrls) {
+      const data = await fetchLinkedInData(url);
+  
+      // Check if the data isn't blank
+      if (data && data.name) {
+        // Parse the data to match the Lead schema
+        const lead = {
+          firstName: data.name.givenName,
+          lastName: data.name.familyName,
+          jobTitle: data.title,
+          companyName: data.employer,
+          email: data.email,
+          phone: data.phoneNumbers?.[0].number,  // assuming the first number is the primary one
+          linkedIn: url,
+        };
+  
+        // Add the lead to your Firestore database
+        const userId = 'jOgfvrI7EfqjqcH2Gfeo';
+        const leadsRef = collection(db, 'users', userId, 'leads');
+        await addDoc(leadsRef, lead);
+      }
+    }
+  
+    // Clear the input
+    setLinkedinInput('');
+  }
   const handleContactAll = () => {
     dispatch(clearSelectedLeads());
     Object.keys(isSelected).forEach((id: string) => {
@@ -72,14 +113,14 @@ const Center = () => {
   );
 
   useEffect(() => {
-    const userId = 'jOgfvrI7EfqjqcH2Gfeo'; 
+    const userId = 'jOgfvrI7EfqjqcH2Gfeo';
     const leadsRef = collection(db, 'users', userId, 'leads');
     const unsubscribe = onSnapshot(leadsRef, (snapshot) => {
       const updatedLeads: Lead[] = [];
       snapshot.forEach((doc) => {
         updatedLeads.push({ id: doc.id, ...doc.data() } as Lead);
       });
-      dispatch(fetchLeads(updatedLeads));
+      dispatch(updateLeads(updatedLeads));
       setIsLoading(false);
     });
 
@@ -94,18 +135,25 @@ const Center = () => {
       Papa.parse(event.target.files[0], {
         header: true,
         complete: async function (results) {
-          results.data.forEach(async (lead) => {
-            try {
-              const userRef = doc(db, 'users', 'jOgfvrI7EfqjqcH2Gfeo');
-              const userSnapshot = await getDoc(userRef);
-              if (userSnapshot.exists()) {
-                const leadsRef = collection(db, 'users', 'jOgfvrI7EfqjqcH2Gfeo', 'leads');
-                await addDoc(leadsRef, lead);
+          // Create batches of 500 items to conform with Firebase's limit
+          for (let i = 0; i < results.data.length; i += 500) {
+            const batch = results.data.slice(i, i + 500);
+            const batchPromises = batch.map(async (lead) => {
+              try {
+                const userRef = doc(db, 'users', 'jOgfvrI7EfqjqcH2Gfeo');
+                const userSnapshot = await getDoc(userRef);
+                if (userSnapshot.exists()) {
+                  const leadsRef = collection(db, 'users', 'jOgfvrI7EfqjqcH2Gfeo', 'leads');
+                  await addDoc(leadsRef, lead);
+                }
+              } catch (e) {
+                console.error("Error adding document: ", e);
               }
-            } catch (e) {
-              console.error("Error adding document: ", e);
-            }
-          });
+            });
+
+            // Wait for all items in the batch to upload
+            await Promise.all(batchPromises);
+          }
         },
       });
     }
@@ -132,34 +180,25 @@ const Center = () => {
         <div className="flex flex-col border-b-[1px] px-10 py-5 sticky top-0 bg-[#1D203E]">
           <h1 className="text-2xl">Leads</h1>
           <div className="flex-grow-0 py-5 flex space-x-5 bg-[#1D203E]">
-          <div className="bg-white text-black px-5 flex justify-center items-center cursor-pointer">
-            <label htmlFor="upload-button">
-              {file ? `Uploaded ${file.name}` : 'Upload Leads'}
-            </label>
-            <input
-              id="upload-button"
-              type="file"
-              accept=".csv"
-              style={{ display: 'none' }}
-              onChange={handleUpload}
-            />
-          </div>
-          <div className="relative border border-white flex justify-center items-center space-x-2">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <FiSearch size={24} />
+            <div className="bg-white text-black px-5 flex justify-center items-center cursor-pointer" onClick={() => setModalOpen(true)}>
+              Upload Leads
             </div>
-            <input
-              className="py-2 pl-10 pr-4 w-full text-white rounded-md bg-transparent focus:outline-none"
-              placeholder="Search..."
-              onChange={handleSearchChange}
-            />
+            <div className="relative border border-white flex justify-center items-center space-x-2">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <FiSearch size={24} />
+              </div>
+              <input
+                className="py-2 pl-10 pr-4 w-full text-white rounded-md bg-transparent focus:outline-none"
+                placeholder="Search..."
+                onChange={handleSearchChange}
+              />
+            </div>
+            <Link href="/dashboard/send">
+              <button className="border-[1px] px-6 py-3" onClick={handleContactAll}>
+                Contact All
+              </button>
+            </Link>
           </div>
-          <Link href="/dashboard/send">
-            <button className="border-[1px] px-6 py-3" onClick={handleContactAll}>
-              Contact All
-            </button>
-          </Link>
-        </div>
         </div>
         <div className="p-10 space-y-4 overflow-y-auto">
           {isLoading ? (
@@ -176,13 +215,16 @@ const Center = () => {
               </div>
             </div>
           ) : (leads
-            .filter((lead: Lead) => (lead.firstName + ' ' + lead.lastName).toLowerCase().includes(searchTerm.toLowerCase()))
+            .filter((lead: Lead) => {
+              const searchString = `${lead.firstName} ${lead.lastName} ${lead.companyName}`.toLowerCase();
+              return searchString.includes(searchTerm.toLowerCase());
+            })
             .map((lead: Lead) => {
               const id = lead.id;
 
               return (
                 <div className="flex flex-col border border-white w-full select-none" key={id}>
-                  <div className="grid grid-cols-5 items-center cursor-pointer">
+                  <div className="grid grid-cols-3 items-center cursor-pointer">
                     <div className="flex items-center p-4 col-span-1" onClick={() => handleCircleClick(id, lead)}>
                       <FiCircle
                         size={24}
@@ -190,7 +232,7 @@ const Center = () => {
                       />
                       <p className="ml-2">{lead.firstName} {lead.lastName}, {lead.companyName}</p>
                     </div>
-                    <div className="flex items-end justify-end p-4 col-span-4" onClick={() => toggleOpen(id)}>
+                    <div className="flex items-end justify-end p-4 col-span-2" onClick={() => toggleOpen(id)}>
                       {isSelected[id] && <p className="text-gray-500 mr-2">Selected</p>}
                       <animated.div style={springs[parseInt(lead.id)]}>
                         <FiChevronDown size={24} />
@@ -231,6 +273,61 @@ const Center = () => {
             }))}
         </div>
       </div>
+      {modalOpen && (
+        <div className="absolute inset-0 bg-gray-800 bg-opacity-60 z-10 flex justify-center items-center">
+          <div className="bg-[#2C2F48] rounded-lg w-2/3 p-8">
+            <h2 className="text-2xl text-white mb-8">Upload Leads</h2>
+            <div className="flex">
+              <div
+                className={`cursor-pointer rounded-t-md py-2 px-4 ${activeTab === 'linkedin' ? 'bg-[#383B59]' : ''}`}
+                onClick={() => setActiveTab('linkedin')}
+              >
+                LinkedIn URLs
+              </div>
+              <div
+                className={`cursor-pointer rounded-t-md py-2 px-4 ${activeTab === 'csv' ? 'bg-[#383B59]' : ''}`}
+                onClick={() => setActiveTab('csv')}
+              >
+                CSV File
+              </div>
+            </div>
+            {activeTab === 'linkedin' && (
+              <div>
+                <textarea
+                  className="mt-8 w-full h-48 bg-[#383B59] text-white p-2 rounded-md"
+                  placeholder="Paste LinkedIn URLs here..."
+                  value={linkedinInput}
+                  onChange={(e) => setLinkedinInput(e.target.value)}
+                />
+                <button className="mt-4 bg-[#383B59] text-white py-2 px-4 rounded-md" onClick={handleLinkedInInput}>
+                  Import
+                </button>
+              </div>
+            )}
+            {activeTab === 'csv' && (
+              <div className="mt-8 flex flex-col items-center justify-center h-48 bg-[#383B59] rounded-md">
+                <label htmlFor="upload-button" className="cursor-pointer flex items-center space-x-2">
+                  <FiUpload size={24} />
+                  <span>{file ? `Uploaded ${file.name}` : 'Click here to upload a file'}</span>
+                </label>
+                <input
+                  id="upload-button"
+                  type="file"
+                  accept=".csv"
+                  hidden
+                  onChange={handleUpload}
+                  ref={fileInput}
+                />
+              </div>
+            )}
+            <div className="mt-8 text-right">
+              <button className="text-white" onClick={() => setModalOpen(false)}>
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

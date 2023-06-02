@@ -2,12 +2,6 @@ import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { doc, collection, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebaseClient';
 
-interface Lead {
-  id: string;
-  firstName: string;
-  lastName: string;
-}
-
 interface LeadsState {
   leads: Lead[];
   selectedLeads: Lead[];
@@ -47,6 +41,9 @@ const leadsSlice = createSlice({
     setSelectedLead: (state, action: PayloadAction<Lead>) => {
       state.selectedLead = action.payload;
     },
+    updateLeads: (state, action: PayloadAction<Lead[]>) => {
+      state.leads = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(fetchLeads.fulfilled, (state, action) => {
@@ -60,6 +57,7 @@ export const {
   clearSelectedLeads,
   removeLead,
   setSelectedLead,
+  updateLeads,
 } = leadsSlice.actions;
 
 export default leadsSlice.reducer;

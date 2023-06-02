@@ -8,12 +8,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { addSelectedLead, clearSelectedLeads } from '@/components/store/leadsSlice';
 import { doc, setDoc } from 'firebase/firestore';
 import EditCampaign from './Campaign/EditCampaign';
-interface Campaign {
-    id: string;
-    campaignTitle: string;
-    generatedPrompt: string;
-    leads?: any[]; 
-}
+import { RootState } from '@/components/store';
 
 
 const Center = () => {
@@ -21,7 +16,7 @@ const Center = () => {
     const [campaigns, setCampaigns] = useState<Campaign[]>([]);
     const [editingCampaign, setEditingCampaign] = useState<Campaign | null>(null);
     const [isOpen, setIsOpen] = useState<Record<string, boolean>>({});
-    const selectedLeads = useSelector(state => state.leads.selectedLeads);
+    const selectedLeads = useSelector((state: RootState) => state.leads.selectedLeads);
 
     const sendLeads = async (campaignId: string) => {
         try {
@@ -51,7 +46,7 @@ const Center = () => {
         }
     }, []);
 
-    const toggleOpen = (id: string) => {
+    const toggleOpen = (id: number) => {
         setIsOpen(prev => ({ ...prev, [id]: !prev[id] }));
     };
 

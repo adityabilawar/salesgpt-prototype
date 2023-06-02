@@ -7,16 +7,6 @@ import { BsPlay } from 'react-icons/bs';
 import { useDispatch } from 'react-redux';
 import { setSelectedLead } from '@/components/store/leadsSlice';
 
-interface Lead {
-  id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  companyName: string;
-  jobTitle: string;
-  linkedIn: string;
-  phone: string;
-}
 
 interface Campaign {
   id: string;

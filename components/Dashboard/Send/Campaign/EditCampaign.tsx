@@ -3,16 +3,6 @@ import { doc, setDoc, deleteDoc } from "firebase/firestore";
 import { db } from "@/lib/firebaseClient";
 import { FiArrowLeftCircle, FiTrash2 } from 'react-icons/fi';
 
-interface Campaign {
-    id: string;
-    campaignTitle: string;
-    platform: string;
-    callToAction: string;
-    toneOfVoice: string;
-    purpose: string;
-    generatedPrompt: string;
-}
-
 interface EditCampaignProps {
     campaign: Campaign;
     onBack: () => void;

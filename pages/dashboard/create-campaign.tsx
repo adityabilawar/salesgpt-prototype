@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchUserData, updateUserData } from '@/components/redux/userSlice';
-import { RootState } from '@/components/store';
+import { AppDispatch, RootState } from '@/components/store';
 import { collection, addDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebaseClient';
 
@@ -23,47 +23,55 @@ const index = () => {
         router.back();
     };
 
-    const handleSave = (event) => {
+    const handleSave = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         dispatch(updateUserData({ userId: 'jOgfvrI7EfqjqcH2Gfeo', updatedData: userData })); 
     };
 
-    const handleChange = (event) => {
+    const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         dispatch(updateUserData({ userId: 'jOgfvrI7EfqjqcH2Gfeo', updatedData: { ...userData, [event.target.name]: event.target.value } })); 
     };
+    
 
-    const saveCampaign = async (event) => {
+    const saveCampaign = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        const campaignTitle = event.target.elements.campaignTitle.value;
-        const platform = event.target.elements.platform.value;
-        const callToAction = event.target.elements.callToAction.value;
-        const toneOfVoice = event.target.elements.toneOfVoice.value;
-        const purpose = event.target.elements.purpose.value;
-
-        const generatedPrompt = generatePrompt(campaignTitle, platform, callToAction, toneOfVoice, purpose);
+    
+        const form = event.target as HTMLFormElement;
+    
+        const campaignTitle = form.elements.namedItem('campaignTitle') as HTMLInputElement;
+        const platform = form.elements.namedItem('platform') as HTMLInputElement;
+        const callToAction = form.elements.namedItem('callToAction') as HTMLInputElement;
+        const toneOfVoice = form.elements.namedItem('toneOfVoice') as HTMLInputElement;
+        const purpose = form.elements.namedItem('purpose') as HTMLInputElement;
+    
+        const generatedPrompt = generatePrompt(campaignTitle.value, platform.value, callToAction.value, toneOfVoice.value, purpose.value);
         setPrompt(generatedPrompt);
-
+    
         try {
             await addDoc(collection(db, 'users', 'jOgfvrI7EfqjqcH2Gfeo', 'campaigns'), {
-                campaignTitle: campaignTitle,
-                platform: platform,
-                callToAction: callToAction,
-                toneOfVoice: toneOfVoice,
-                purpose: purpose,
+                campaignTitle: campaignTitle.value,
+                platform: platform.value,
+                callToAction: callToAction.value,
+                toneOfVoice: toneOfVoice.value,
+                purpose: purpose.value,
                 generatedPrompt: generatedPrompt,
             });
-
+    
             console.log('Campaign saved successfully');
         } catch (error) {
             console.error('Error saving campaign:', error);
         }
     };
-
+    
 
     const generatePrompt = (campaignTitle: string = '', platform: string = '', callToAction: string = '', toneOfVoice: string = '', purpose: string = '') => {
         const generatedPrompt = `Craft a ${campaignTitle} for ${platform}. The message should include a call to action for ${callToAction} and should be written in a ${toneOfVoice} tone. The purpose of this message is ${purpose}`;
         return generatedPrompt;
     };
+
+    const handleTextareaChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+        dispatch(updateUserData({ userId: 'jOgfvrI7EfqjqcH2Gfeo', updatedData: { ...userData, [event.target.name]: event.target.value } })); 
+    };    
 
 
     return (
@@ -98,15 +106,15 @@ const index = () => {
                         </div>
                         <div className="mb-4">
                             <label htmlFor="company-description" className="block text-sm">Company Description</label>
-                            <textarea id="company-description" name="companyInfo" value={userData.companyInfo} onChange={handleChange} className="bg-transparent w-full p-2 border-[1px] border-white" />
+                            <textarea id="company-description" name="companyInfo" value={userData.companyInfo} onChange={handleTextareaChange} className="bg-transparent w-full p-2 border-[1px] border-white" />
                         </div>
                         <div className="mb-4">
                             <label htmlFor="company-values" className="block text-sm">Company Values</label>
-                            <textarea id="company-values" name="companyValues" value={userData.companyValues} onChange={handleChange} className="bg-transparent w-full p-2 border-[1px] border-white" />
+                            <textarea id="company-values" name="companyValues" value={userData.companyValues} onChange={handleTextareaChange} className="bg-transparent w-full p-2 border-[1px] border-white" />
                         </div>
                         <div className="mb-4">
                             <label htmlFor="problem" className="block text-sm">Problem Being Solved</label>
-                            <textarea id="problem" name="problem" value={userData.problem} onChange={handleChange} className="bg-transparent w-full p-2 border-[1px] border-white" />
+                            <textarea id="problem" name="problem" value={userData.problem} onChange={handleTextareaChange} className="bg-transparent w-full p-2 border-[1px] border-white" />
                         </div>
                         <button type="submit">Save</button>
                     </form>
@@ -134,7 +142,7 @@ const index = () => {
                             <label htmlFor="purpose" className="block text-sm">Purpose/goal for message</label>
                             <input required placeholder="To introduce our services to potential clients" id="purpose" name="purpose" className="w-full p-2 border-[1px]" />
                         </div>
-                        <button type="submit" onClick={generatePrompt} className="border-[1px] px-4 py-2">Save and Generate Prompt</button>
+                        <button type="submit" className="border-[1px] px-4 py-2">Save and Generate Prompt</button>
                     </form>
 
                     <hr className="my-4" />

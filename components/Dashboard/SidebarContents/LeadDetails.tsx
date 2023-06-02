@@ -76,19 +76,19 @@ const LeadDetails = () => {
                         <div className="flex-col space-y-5">
                             <div>
                                 <h1 className="text-gray-400">Email</h1>
-                                <p>{selectedLead?.email}</p>
+                                <p style={{ wordWrap: 'break-word' }}>{selectedLead?.email}</p>
                             </div>
                             <div>
                                 <h1 className="text-gray-400">Phone</h1>
-                                <p>{selectedLead?.phone}</p>
+                                <p style={{ wordWrap: 'break-word' }}>{selectedLead?.phone}</p>
                             </div>
                             <div>
                                 <h1 className="text-gray-400">Job Title</h1>
-                                <p>{selectedLead?.jobTitle}</p>
+                                <p style={{ wordWrap: 'break-word' }}>{selectedLead?.jobTitle}</p>
                             </div>
                             <div>
                                 <h1 className="text-gray-400">Linkedin</h1>
-                                <p>{selectedLead?.linkedIn}</p>
+                                <p style={{ wordWrap: 'break-word' }}>{selectedLead?.linkedIn}</p>
                             </div>
                         </div>
                     ) : (
