@@ -4,6 +4,8 @@ import { FiGrid, FiMail } from 'react-icons/fi';
 import { HiOutlinePaperAirplane } from 'react-icons/hi';
 import { useRouter } from 'next/router';
 import Link from "next/link";
+import { signOut } from "firebase/auth";
+import { auth } from "@/lib/firebaseClient";
 
 const Sidebar = () => {
   const [open, setOpen] = useState(true);
@@ -56,8 +58,14 @@ const Sidebar = () => {
               </div>
             </Link>
           ))}
-
         </ul>
+        <div className="w-full h-[1px] bg-white my-5" />
+        <div
+          className={`flex justify-left rounded-md p-2 cursor-pointer duration-50 ease-in-out text-lg items-center gap-x-4 text-white hover:bg-white hover:text-black`}
+          onClick={() => signOut(auth)}
+        >
+          <span>Sign Out</span>
+        </div>
       </div>
     </div>
   );

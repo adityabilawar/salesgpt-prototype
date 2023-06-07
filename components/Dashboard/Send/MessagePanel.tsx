@@ -149,10 +149,14 @@ const MessagePanel = () => {
       } else {
         throw new Error("AI model failed to generate a personalized message");
       }
-
     } catch (error) {
-      console.error(error);
-      throw new Error("Error generating message");
+      if (error instanceof Error) {
+        console.error("This is the error:" + error);
+        if (error.message === 'getaddrinfo ENOTFOUND kg.diffbot.com') {
+          alert('Unable to access LinkedIn data. Please try again later.');
+        }
+      }
+      return '';
     } finally {
       setLoading(false);
     }
@@ -171,12 +175,22 @@ const MessagePanel = () => {
             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
           </svg>
         )}
-        <textarea className="w-full h-60 border text-black" value={finalMessage}></textarea>
-        <button className="mt-5 px-4 py-2 border-[1px]" onClick={saveGeneratedMessage}>Save</button>
+        <textarea
+          className="w-full h-60 border text-black"
+          value={finalMessage}
+          onChange={(e) => setFinalMessage(e.target.value)}
+        ></textarea>
+        <button
+          className="mt-5 px-4 py-2 border-[1px]"
+          onClick={saveGeneratedMessage}
+          disabled={loading}
+        >
+          Save
+        </button>
       </div>
     </div>
-
   );
+
 }
 
 export default MessagePanel;

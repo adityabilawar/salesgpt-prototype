@@ -96,7 +96,7 @@ const Center = () => {
                                                     </button>
                                                     <Link href={`/dashboard/generate/${campaign.id}`}>
                                                         <button className="flex items-center border-[1px] px-6 py-2">
-                                                            <p className="ml-2">Continue</p>
+                                                            <p className="ml-2">Generate Emails</p>
                                                         </button>
                                                     </Link>
 

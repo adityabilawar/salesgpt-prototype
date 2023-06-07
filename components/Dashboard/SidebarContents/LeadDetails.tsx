@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { BsPlusLg, BsTelephone, BsThreeDots } from "react-icons/bs"
+import { BsCheckCircleFill, BsExclamationCircleFill, BsPlusLg, BsTelephone, BsThreeDots } from "react-icons/bs"
 import { AiOutlineMail } from "react-icons/ai"
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/components/store';
 import { animated, useSpring } from 'react-spring';
-import { collection, doc, setDoc } from 'firebase/firestore';
+import { collection, doc, onSnapshot, setDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebaseClient';
 import { FiEdit3, FiSave } from 'react-icons/fi';
+import axios from 'axios';
+import { updateSelectedLead } from '@/components/store/leadsSlice';
 
 const socials = [
     {
@@ -29,10 +31,12 @@ const socials = [
 
 const LeadDetails = () => {
     const [activeTab, setActiveTab] = useState('leads');
+    const dispatch = useDispatch();
     const [isEditing, setIsEditing] = useState(false);
     const [editLeadData, setEditLeadData] = useState<any | null>(null);
     const selectedLead: any = useSelector((state: RootState) => state.leads.selectedLead);
     const getDetail = (value: string | null) => value ? value : <span className="text-gray-900">unknown</span>;
+    const [linkedInStatus, setLinkedInStatus] = useState<'valid' | 'invalid' | null>(null);
     const springProps = useSpring({
         borderBottom: activeTab === 'leads' ? '2px solid white' : '2px solid white',
         left: activeTab === 'leads' ? '0%' : '50%',
@@ -46,16 +50,66 @@ const LeadDetails = () => {
         setEditLeadData(selectedLead);
     }, [selectedLead]);
 
+    const LinkedInRegex = /^((http|https):\/\/)?(www[.])?linkedin.com\/(in|pub)\/.+/;
+
     const handleSave = async () => {
         if (editLeadData) {
             try {
-                await setDoc(doc(collection(db, 'leads'), "leadId"), editLeadData);
+                const isLinkedInURLValid = LinkedInRegex.test(editLeadData?.linkedIn);
+                if (!isLinkedInURLValid) {
+                    setLinkedInStatus('invalid');
+                    return;
+                }
+
+                const leadRef = doc(collection(doc(db, 'users', 'jOgfvrI7EfqjqcH2Gfeo'), 'leads'), selectedLead.id);
+                await setDoc(leadRef, editLeadData);
+                dispatch(updateSelectedLead(editLeadData));
+
                 setIsEditing(false);
+                setLinkedInStatus('valid');
             } catch (error) {
                 console.error("Error updating lead data: ", error);
             }
         }
     };
+
+
+    useEffect(() => {
+        if (selectedLead?.id) {
+            const leadRef = doc(collection(doc(db, 'users', 'jOgfvrI7EfqjqcH2Gfeo'), 'leads'), selectedLead.id);
+
+            const unsubscribe = onSnapshot(leadRef, (docSnapshot) => {
+                const newLeadData = docSnapshot.data();
+                // Check if the data has changed before updating the state
+                if (JSON.stringify(newLeadData) !== JSON.stringify(editLeadData)) {
+                    setEditLeadData(newLeadData);
+                }
+            });
+
+            return unsubscribe; // Return the unsubscribe function to clean up on component unmount
+        }
+    }, [selectedLead?.id]);
+
+
+    useEffect(() => {
+        setEditLeadData(selectedLead);
+
+        // Verify LinkedIn URL when a new lead is selected
+        if (selectedLead?.linkedIn) {
+            const isLinkedInURLValid = LinkedInRegex.test(selectedLead?.linkedIn);
+            setLinkedInStatus(isLinkedInURLValid ? 'valid' : 'invalid');
+        } else {
+            setLinkedInStatus(null);
+        }
+    }, [selectedLead]);
+    useEffect(() => {
+        if (editLeadData?.linkedIn && isEditing) {
+            // Verify LinkedIn URL when it is edited
+            const isLinkedInURLValid = LinkedInRegex.test(editLeadData?.linkedIn);
+            setLinkedInStatus(isLinkedInURLValid ? 'valid' : 'invalid');
+        }
+    }, [isEditing, editLeadData?.linkedIn]);
+
 
     return (
         <div className="border-r-[1px] h-screen flex flex-col">
@@ -149,11 +203,19 @@ const LeadDetails = () => {
                             )}
                         </div>
                         <div>
-                            <h1 className="text-gray-400">Linkedin</h1>
+                            <h1 className="text-gray-400">LinkedIn</h1>
                             {isEditing ? (
-                                <input type="text" className="text-black" value={editLeadData?.linkedIn} onChange={(e) => editLeadData && setEditLeadData({ ...editLeadData, linkedIn: e.target.value })} />
+                                <div>
+                                    <input type="text" className="text-black" value={editLeadData?.linkedIn} onChange={(e) => editLeadData && setEditLeadData({ ...editLeadData, linkedIn: e.target.value })} />
+                                    {linkedInStatus === 'invalid' && <BsExclamationCircleFill color="red" />}
+                                    {linkedInStatus === 'valid' && <BsCheckCircleFill color="green" />}
+                                </div>
                             ) : (
-                                <p style={{ wordWrap: 'break-word' }}>{selectedLead?.linkedIn}</p>
+                                    <div className="flex items-center">
+                                        <p style={{ wordWrap: 'break-word' }}>{selectedLead?.linkedIn}</p>
+                                        {linkedInStatus === 'invalid' && <BsExclamationCircleFill color="red" />}
+                                        {linkedInStatus === 'valid' && <BsCheckCircleFill color="green" />}
+                                    </div>
                             )}
                         </div>
                     </div>

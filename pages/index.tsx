@@ -8,7 +8,7 @@ export default function Home() {
 	useEffect(() => {
     const authStorage = localStorage.getItem('auth');
 		if(!authStorage) {
-			router.push('/login');
+			router.push('/register');
 			return;
 		}
 

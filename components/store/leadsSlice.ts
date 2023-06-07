@@ -44,6 +44,11 @@ const leadsSlice = createSlice({
     updateLeads: (state, action: PayloadAction<Lead[]>) => {
       state.leads = action.payload;
     },
+    updateSelectedLead: (state, action: PayloadAction<Lead>) => {
+      if (state.selectedLead && state.selectedLead.id === action.payload.id) {
+        state.selectedLead = action.payload;
+      }
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(fetchLeads.fulfilled, (state, action) => {
@@ -58,6 +63,7 @@ export const {
   removeLead,
   setSelectedLead,
   updateLeads,
+  updateSelectedLead, 
 } = leadsSlice.actions;
 
 export default leadsSlice.reducer;

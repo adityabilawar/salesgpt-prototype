@@ -25,11 +25,11 @@ export default async function handler(
     linkedInDescription = diffbotResponse?.data?.[0]?.entity?.description || '';
   }
 
-  const aboutInput = `Make sure you write an engaging personalized hook and introduce yourself. Your word limit is 150 words, do not exceed this. Make sure to take note of every rule listed. Do not include the subject line. Never forget your name is ${user.firstName} ${user.lastName} & you work as a ${user.jobTitle}. You work at a company named ${user.companyName}. ${user.companyName}'s business is the following  ${user.companyInfo}. The company values are the following  ${user.companyValues}. The problems the company helps solve are  ${user.problem}.  You are contacting a potential customer for the purpose of ${campaign.purpose}. The person to connect with is ${lead.firstName} ${lead.lastName}, who works at ${lead.companyName} as a ${lead.jobTitle}. The tone of the email is going to be  ${campaign.toneOfVoice}. ${campaign.generatedPrompt}. ALWAYS BE CONCISE AND SPECIFIC. You have the following personalized info on the customer: ${linkedInDescription}. Make sure to add bits of their previous work experiences and make it relevant to your company values, and include light bits of humor. Make your message solution oriented, identify pain points if any and be respectful, and ask for a call or meeting at the end.`;
+  const aboutInput = `Make sure you write an engaging personalized hook and introduce yourself. Your word limit is 125 words, do not exceed this. Make sure to take note of every rule listed. Do not include the subject line. Never forget your name is ${user.firstName} ${user.lastName} & you work as a ${user.jobTitle}. You work at a company named ${user.companyName}. ${user.companyName}'s business is the following  ${user.companyInfo}. The company values are the following  ${user.companyValue}. The problems the company helps solve are  ${user.problem}.  You are contacting a potential customer for the purpose of ${campaign.purpose}. The person to connect with is ${lead.firstName} ${lead.lastName}, who works at ${lead.companyName} as a ${lead.jobTitle}. The tone of the email is going to be  ${campaign.toneOfVoice}. ${campaign.generatedPrompt}. ALWAYS BE CONCISE AND SPECIFIC. You have the following personalized info on the customer: ${linkedInDescription}. Make sure to add bits of their previous work experiences and make it relevant to your company values, and include light bits of humor. Make your message solution oriented, identify pain points if any and be respectful, and ask for a call or meeting at the end.`;
   console.log(aboutInput);
   try {
     const response = await openai.createChatCompletion({
-      model: "gpt-3.5-turbo",
+      model: "gpt-4",
       messages: [
         {
           role: 'user',
@@ -37,7 +37,7 @@ export default async function handler(
         },
       ],
       max_tokens: 600,
-      temperature: 0.8,
+      temperature: 0,
       n: 1
     });
 
