@@ -35,12 +35,11 @@ const CampaignPage = () => {
         <div>
             {campaign && (
                 <div className="text-white">
-                    <div className="border-b-[1px] p-10">
-                        <Navbar />
-                    </div>
-                    <div className="grid grid-cols-5">
+                    <div className="grid grid-cols-5 overflow-hidden">
                         <LeadsSidebar />
-                        <div className="col-span-4"><MessagePanel /></div>
+                        <div className="col-span-4 overflow-y-auto">
+                            <MessagePanel />
+                        </div>
                     </div>
                 </div>
             )}

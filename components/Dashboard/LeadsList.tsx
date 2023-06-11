@@ -231,69 +231,70 @@ const Center = () => {
           </div>
         </div>
         <div className="p-10 space-y-4 overflow-y-auto">
-          {isLoading ? (
-            <div className="animate-pulse flex space-x-4">
-              <div className="flex-1 space-y-6 py-1">
-                <div className="h-2 bg-slate-700 rounded"></div>
-                <div className="space-y-3">
-                  <div className="grid grid-cols-3 gap-4">
-                    <div className="h-2 bg-slate-700 rounded col-span-2"></div>
-                    <div className="h-2 bg-slate-700 rounded col-span-1"></div>
-                  </div>
+          <div className="h-full space-y-4">
+            {isLoading ? (
+              <div className="animate-pulse flex space-x-4">
+                <div className="flex-1 space-y-6 py-1">
                   <div className="h-2 bg-slate-700 rounded"></div>
+                  <div className="space-y-3">
+                    <div className="grid grid-cols-3 gap-4">
+                      <div className="h-2 bg-slate-700 rounded col-span-2"></div>
+                      <div className="h-2 bg-slate-700 rounded col-span-1"></div>
+                    </div>
+                    <div className="h-2 bg-slate-700 rounded"></div>
+                  </div>
                 </div>
               </div>
-            </div>
-          ) : (leads
-            .filter((lead: Lead) => {
-              const searchString = `${lead.firstName} ${lead.lastName} ${lead.companyName}`.toLowerCase();
-              return searchString.includes(searchTerm.toLowerCase());
-            })
-            .map((lead: Lead) => {
-              const id = lead.id;
+            ) : (leads
+              .filter((lead: Lead) => {
+                const searchString = `${lead.firstName} ${lead.lastName} ${lead.companyName}`.toLowerCase();
+                return searchString.includes(searchTerm.toLowerCase());
+              })
+              .map((lead: Lead) => {
+                const id = lead.id;
 
-              return (
-                <div className="flex flex-col border border-white w-full select-none" key={id}>
-                  <div className="grid grid-cols-3 items-center cursor-pointer">
-                    <div className="flex items-center p-4 col-span-1" onClick={() => handleCircleClick(id, lead)}>
-                      <FiCircle
-                        size={24}
-                        className={isSelected[id] ? 'fill-current text-white' : ''}
-                      />
-                      <p className="ml-2">{lead.firstName} {lead.lastName}, {lead.companyName}</p>
+                return (
+                  <div className="flex flex-col border border-white w-full select-none" key={id}>
+                    <div className="grid grid-cols-3 items-center cursor-pointer">
+                      <div className="flex items-center p-4 col-span-1" onClick={() => handleCircleClick(id, lead)}>
+                        <FiCircle
+                          size={24}
+                          className={isSelected[id] ? 'fill-current text-white' : ''}
+                        />
+                        <p className="ml-2">{lead.firstName} {lead.lastName}, {lead.companyName}</p>
+                      </div>
+                      <div className="flex items-end justify-end p-4 col-span-2" onClick={() => toggleOpen(id)}>
+                        {isSelected[id] && <p className="text-gray-500 mr-2">Selected</p>}
+                        <animated.div style={springs[parseInt(lead.id)]}>
+                          <FiChevronDown size={24} />
+                        </animated.div>
+                      </div>
                     </div>
-                    <div className="flex items-end justify-end p-4 col-span-2" onClick={() => toggleOpen(id)}>
-                      {isSelected[id] && <p className="text-gray-500 mr-2">Selected</p>}
-                      <animated.div style={springs[parseInt(lead.id)]}>
-                        <FiChevronDown size={24} />
-                      </animated.div>
-                    </div>
+                    {isOpen[id] && (
+                      <div className="flex space-x-6 items-center p-4 border-t border-white">
+                        <button
+                          className={`flex items-center border-[1px] px-6 py-2 ${selectedDetail === id ? 'bg-white text-black' : ''}`}
+                          onClick={() => {
+                            setSelectedDetail(id);
+                            const foundLead = leads.find((lead: Lead) => lead.id === id);
+                            if (foundLead) {
+                              dispatch(setSelectedLead(foundLead));
+                            }
+                            dispatch(setView('LEAD_DETAILS'));
+                          }}
+                        >
+                          <FiMoreHorizontal size={24} />
+                          <p className="ml-2">Details</p>
+                        </button>
+                        <button className="flex items-center" onClick={() => handleDeleteLead(id)}>
+                          <FiTrash size={24} />
+                        </button>
+                      </div>
+                    )}
                   </div>
-                  {isOpen[id] && (
-                    <div className="flex space-x-6 items-center p-4 border-t border-white">
-                      <button
-                        className={`flex items-center border-[1px] px-6 py-2 ${selectedDetail === id ? 'bg-white text-black' : ''}`}
-                        onClick={() => {
-                          setSelectedDetail(id);
-                          const foundLead = leads.find((lead: Lead) => lead.id === id);
-                          if (foundLead) {
-                            dispatch(setSelectedLead(foundLead));
-                          }
-                          dispatch(setView('LEAD_DETAILS'));
-                        }}
-                      >
-                        <FiMoreHorizontal size={24} />
-                        <p className="ml-2">Details</p>
-                      </button>
-                      <button className="flex items-center" onClick={() => handleDeleteLead(id)}>
-                        <FiTrash size={24} />
-                      </button>
-                    </div>
-                  )}
-                </div>
-              );
-            }))}
-        </div>
+                );
+              }))}
+          </div></div>
       </div>
       {modalOpen && (
         <div className="absolute inset-0 bg-gray-800 bg-opacity-60 z-10 flex justify-center items-center">

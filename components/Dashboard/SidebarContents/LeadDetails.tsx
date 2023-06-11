@@ -183,7 +183,7 @@ const LeadDetails = () => {
                             {isEditing ? (
                                 <input type="text" className="text-black" value={editLeadData?.email} onChange={(e) => editLeadData && setEditLeadData({ ...editLeadData, email: e.target.value })} />
                             ) : (
-                                <p style={{ wordWrap: 'break-word' }}>{selectedLead?.email}</p>
+                                    <p className="break-words">{selectedLead?.email}</p>
                             )}
                         </div>
                         <div>
@@ -191,7 +191,7 @@ const LeadDetails = () => {
                             {isEditing ? (
                                 <input type="text" className="text-black" value={editLeadData?.phone} onChange={(e) => editLeadData && setEditLeadData({ ...editLeadData, phone: e.target.value })} />
                             ) : (
-                                <p style={{ wordWrap: 'break-word' }}>{selectedLead?.phone}</p>
+                                    <p className="break-words">{selectedLead?.phone}</p>
                             )}
                         </div>
                         <div>
@@ -199,7 +199,7 @@ const LeadDetails = () => {
                             {isEditing ? (
                                 <input type="text" className="text-black" value={editLeadData?.jobTitle} onChange={(e) => editLeadData && setEditLeadData({ ...editLeadData, jobTitle: e.target.value })} />
                             ) : (
-                                <p style={{ wordWrap: 'break-word' }}>{selectedLead?.jobTitle}</p>
+                                    <p className="break-words">{selectedLead?.jobTitle}</p>
                             )}
                         </div>
                         <div>
@@ -211,8 +211,8 @@ const LeadDetails = () => {
                                     {linkedInStatus === 'valid' && <BsCheckCircleFill color="green" />}
                                 </div>
                             ) : (
-                                    <div className="flex items-center">
-                                        <p style={{ wordWrap: 'break-word' }}>{selectedLead?.linkedIn}</p>
+                                    <div className="flex items-center break-words">
+                                        <p className="break-words">{selectedLead?.linkedIn}</p>
                                         {linkedInStatus === 'invalid' && <BsExclamationCircleFill color="red" />}
                                         {linkedInStatus === 'valid' && <BsCheckCircleFill color="green" />}
                                     </div>

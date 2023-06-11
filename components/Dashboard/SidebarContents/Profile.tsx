@@ -22,7 +22,7 @@ interface ProfileData {
   linkedInProfile: string;
   companyDetails: string;
   companyValue: string;
-  purpose: string;
+  problem: string;
 }
 
 const socials: Social[] = [
@@ -162,7 +162,7 @@ const Profile = () => {
           </button>
           {/* <animated.div style={springProps} /> */}
         </div>
-        <div className="flex-grow-0 px-10 py-5 overflow-x-auto">
+        <div className="scroll-section flex-grow-0 px-10 py-5 overflow-y-auto">
           {activeTab === 'leads' ? (
             <div className="flex-col space-y-5">
               <div>
@@ -170,7 +170,7 @@ const Profile = () => {
                 {isEditing ? (
                   <input type="text" className="text-black" value={editData?.email} onChange={(e) => editData && setEditData({ ...editData, email: e.target.value })} />
                 ) : (
-                  <p style={{ wordWrap: 'break-word' }}>{profileData?.email}</p>
+                    <p className="break-words">{profileData?.email}</p>
                 )}
               </div>
               <div>
@@ -178,7 +178,7 @@ const Profile = () => {
                 {isEditing ? (
                   <input type="text" className="text-black" value={editData?.phoneNumber} onChange={(e) => editData && setEditData({ ...editData, phoneNumber: e.target.value })} />
                 ) : (
-                  <p style={{ wordWrap: 'break-word' }}>{profileData?.phoneNumber}</p>
+                    <p className="break-words">{profileData?.phoneNumber}</p>
                 )}
               </div>
               <div>
@@ -186,7 +186,7 @@ const Profile = () => {
                 {isEditing ? (
                   <input type="text" className="text-black" value={editData?.jobTitle} onChange={(e) => editData && setEditData({ ...editData, jobTitle: e.target.value })} />
                 ) : (
-                  <p style={{ wordWrap: 'break-word' }}>{profileData?.jobTitle}</p>
+                    <p className="break-words">{profileData?.jobTitle}</p>
                 )}
               </div>
               <div>
@@ -194,18 +194,18 @@ const Profile = () => {
                 {isEditing ? (
                   <input type="text" className="text-black" value={editData?.linkedInProfile} onChange={(e) => editData && setEditData({ ...editData, linkedInProfile: e.target.value })} />
                 ) : (
-                  <p style={{ wordWrap: 'break-word' }}>{profileData?.linkedInProfile}</p>
+                    <p className="break-words">{profileData?.linkedInProfile}</p>
                 )}
               </div>
             </div>
           ) : (
-            <div className="flex flex-col space-y-5">
+              <div className="flex flex-col space-y-5 overflow-y-auto">
               <div>
                 <h1 className="text-gray-400">Company Information</h1>
                 {isEditing ? (
                   <textarea className="text-black w-full" value={editData?.companyDetails} onChange={(e) => editData && setEditData({ ...editData, companyDetails: e.target.value })} />
                 ) : (
-                  <p style={{ wordWrap: 'break-word' }}>{profileData?.companyDetails}</p>
+                      <p className="break-words">{profileData?.companyDetails}</p>
                 )}
               </div>
               <div>
@@ -213,9 +213,17 @@ const Profile = () => {
                 {isEditing ? (
                   <textarea className="text-black w-full" value={editData?.companyValue} onChange={(e) => editData && setEditData({ ...editData, companyValue: e.target.value })} />
                 ) : (
-                  <p style={{ wordWrap: 'break-word' }}>{profileData?.companyValue}</p>
-                )}
-              </div>
+                    <p className="break-words">{profileData?.companyValue}</p>
+                  )}
+                </div>
+                <div>
+                  <h1 className="text-gray-400">Problem You Solve</h1>
+                  {isEditing ? (
+                    <textarea className="text-black w-full" value={editData?.problem} onChange={(e) => editData && setEditData({ ...editData, problem: e.target.value })} />
+                  ) : (
+                    <p className="break-words">{profileData?.problem}</p>
+                  )}
+                </div>
             </div>
           )}
         </div>

@@ -33,6 +33,9 @@ const leadsSlice = createSlice({
     clearSelectedLeads: (state) => {
       state.selectedLeads = [];
     },
+    clearSelectedLead: (state) => {
+      state.selectedLead = null;
+    },
     removeLead: (state, action: PayloadAction<Lead>) => {
       state.selectedLeads = state.selectedLeads.filter(
         (lead: Lead) => lead.id !== action.payload.id
@@ -60,6 +63,7 @@ const leadsSlice = createSlice({
 export const {
   addSelectedLead,
   clearSelectedLeads,
+  clearSelectedLead,
   removeLead,
   setSelectedLead,
   updateLeads,

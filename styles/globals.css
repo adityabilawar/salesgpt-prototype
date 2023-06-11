@@ -92,3 +92,30 @@ input:focus {
   -o-background-size: cover;
   background-size: 100% 120%;
 }
+
+.scroll-section {
+  position: absolute;
+  top: 450px; 
+  bottom: 0; 
+  left: 0; 
+  right: 0;
+  overflow-y: auto;
+}
+
+  * {
+    scrollbar-width: auto;
+    scrollbar-color: #dedede #ffffff;
+  }
+  *::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: none;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background-color: #dedede;
+    border-radius: 10px;
+    border: none;
+  }

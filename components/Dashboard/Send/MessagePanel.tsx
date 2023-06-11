@@ -97,14 +97,12 @@ const MessagePanel = () => {
     fetchData();
   }, [selectedLead]);
   const saveGeneratedMessage = async () => {
-    console.log(finalMessage);
     if (finalMessage.trim() === '') {
       alert('The message is empty. Please generate a message before saving.');
       return;
     }
   
     if (!user || !selectedLead || !campaignId) return;
-    console.log(selectedLead.id)
     const campaignRef = doc(db, 'users', user.id, 'campaigns', campaignId as string);
     const campaignDoc = await getDoc(campaignRef);
   

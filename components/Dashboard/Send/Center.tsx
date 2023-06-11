@@ -5,13 +5,15 @@ import Link from 'next/link';
 import { collection, getDocs, onSnapshot } from 'firebase/firestore';
 import { db } from '@/lib/firebaseClient';
 import { useSelector, useDispatch } from 'react-redux';
-import { addSelectedLead, clearSelectedLeads } from '@/components/store/leadsSlice';
+import { addSelectedLead, clearSelectedLead, clearSelectedLeads } from '@/components/store/leadsSlice';
 import { doc, setDoc } from 'firebase/firestore';
 import EditCampaign from './Campaign/EditCampaign';
 import { RootState } from '@/components/store';
+import { useRouter } from 'next/router';
 
 
 const Center = () => {
+    const router = useRouter();
     const dispatch = useDispatch();
     const [campaigns, setCampaigns] = useState<Campaign[]>([]);
     const [editingCampaign, setEditingCampaign] = useState<Campaign | null>(null);
@@ -94,11 +96,12 @@ const Center = () => {
                                                         <FiUpload size={24} />
                                                         <p className="ml-2">Send Leads</p>
                                                     </button>
-                                                    <Link href={`/dashboard/generate/${campaign.id}`}>
-                                                        <button className="flex items-center border-[1px] px-6 py-2">
+                                                    <button className="flex items-center border-[1px] px-6 py-2" onClick={() => {
+                                                        router.push(`/dashboard/generate/${campaign.id}`);
+                                                        dispatch(clearSelectedLead());
+                                                    }}>
                                                             <p className="ml-2">Generate Emails</p>
-                                                        </button>
-                                                    </Link>
+                                                    </button>
 
                                                 </div>
                                             </div>
