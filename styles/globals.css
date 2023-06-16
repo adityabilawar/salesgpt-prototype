@@ -119,3 +119,9 @@ input:focus {
     border-radius: 10px;
     border: none;
   }
+
+  .loginContainer {
+    border: 5px solid;
+    border-image-slice: 1;
+    border-image-source: linear-gradient(to bottom right, #01B7C5, #C417E0);
+  }

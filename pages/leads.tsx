@@ -125,21 +125,21 @@ const LeadsPage = () => {
 
 	const router = useRouter();
 	useEffect(() => {
-		const authStorage = localStorage.getItem('auth');
-		if(!authStorage) {
-			router.push('/login');
-			return;
-		}
+		// const authStorage = localStorage.getItem('auth');
+		// if(!authStorage) {
+		// 	router.push('/login');
+		// 	return;
+		// }
 
-		const auth = JSON.parse(authStorage);
-		axios.post('/api/login', {user: auth.user, pass: auth.pass}).catch(err => router.push('/login'));
+		// const auth = JSON.parse(authStorage);
+		// axios.post('/api/login', {user: auth.user, pass: auth.pass}).catch(err => router.push('/login'));
 
-		const aboutStorage = localStorage.getItem('about');
-		if(!aboutStorage) {
-			router.push('/about');
-			return;
-		}
-		setAbout(JSON.parse(aboutStorage));
+		// const aboutStorage = localStorage.getItem('about');
+		// if(!aboutStorage) {
+		// 	router.push('/about');
+		// 	return;
+		// }
+		// setAbout(JSON.parse(aboutStorage));
 	}, []);
 
 	return (
