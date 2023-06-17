@@ -8,7 +8,7 @@ import withLayoutAndAuth from '@/components/withLayoutAndAuth';
 function App({ Component, pageProps, router }: AppProps) {
   const { route } = router;
   let Layout = Component;
-  if (!['/login', '/register'].includes(route)) {
+  if (!['/login', '/sign-up'].includes(route)) {
     Layout = withLayoutAndAuth(Layout);
   }
 
