@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { FiTrash2, FiEdit, FiCheck } from "react-icons/fi";
+import { FiTrash2, FiEdit, FiCheck, FiRefreshCw } from "react-icons/fi";
 import { db } from '@/lib/firebaseClient';
 import { doc, updateDoc, arrayRemove, getDoc, setDoc, arrayUnion, collection, getDocs, where, query } from 'firebase/firestore';
 import { useRouter } from 'next/router';
 import { BsPlay } from 'react-icons/bs';
 import { useDispatch } from 'react-redux';
 import { setSelectedLead } from '@/components/store/leadsSlice';
+
 
 interface Campaign {
   id: string;
@@ -29,6 +30,9 @@ const LeadsSidebar = () => {
   const [linkedInLeads, setLinkedInLeads] = useState<LinkedInLead[]>([]);
   const [editingUrl, setEditingUrl] = useState<string>('');
   const [editingId, setEditingId] = useState<string>('');
+  const [currentLead, setCurrentLead] = useState<Lead | LinkedInLead | null>(null);
+  const [refresh, setRefresh] = useState(false);
+
 
   const linkedinPattern = /^https:\/\/www\.linkedin\.com\/in\/[^\/]+\/$/; // Regex for LinkedIn URL pattern
 
@@ -54,6 +58,7 @@ const LeadsSidebar = () => {
     setLinkedinError('');
   };
 
+
   useEffect(() => {
     const fetchLinkedInLeads = async () => {
       const userId = 'jOgfvrI7EfqjqcH2Gfeo';
@@ -78,12 +83,20 @@ const LeadsSidebar = () => {
     if (campaignId) {
       fetchLeads();
     }
-  }, [campaignId]);
+  }, [campaignId, refresh]);
 
-  const playLeadHandler = async (lead: Lead) => {
+  const playLeadHandler = (lead: Lead | LinkedInLead) => async (event: React.MouseEvent<SVGElement, MouseEvent>) => {
+    if (!lead) return;
     console.log("Play button clicked for lead:", lead);
     dispatch(setSelectedLead(lead));
   }
+
+  const refreshLeadHandler = (lead: Lead | LinkedInLead) => async (event: React.MouseEvent<SVGElement, MouseEvent>) => {
+    console.log("Refresh button clicked for lead:", lead);
+    setCurrentLead(lead);
+    setRefresh(!refresh);
+  }
+
   const getLinkedInUsername = (url: string | undefined) => {
     return url ? url.replace('https://www.linkedin.com/in/', '') : '';
   }
@@ -171,7 +184,7 @@ const LeadsSidebar = () => {
       </div>
       <div>
         <h2 className="text-xl p-5">LinkedIn Profiles</h2>
-        {linkedInLeads.length === 0 && <p>No LinkedIn profiles found</p>}
+        {linkedInLeads.length === 0 && <p className="px-5">No LinkedIn profiles found</p>}
         {linkedInLeads.map((lead: LinkedInLead) => (
           <div key={lead.id} className="flex w-full justify-between p-5">
             {editingId === lead.id ? (
@@ -186,7 +199,9 @@ const LeadsSidebar = () => {
               <a href={lead.url} target="_blank">{getLinkedInUsername(lead.url)}</a>
             )}
             <div className="flex space-x-2 text-xl">
-              <BsPlay className="cursor-pointer" onClick={() => console.log('Playing LinkedIn lead:', lead)} />
+              <BsPlay className="cursor-pointer" onClick={playLeadHandler(lead)} />
+              <FiRefreshCw className="cursor-pointer" onClick={refreshLeadHandler(lead)} />
+
               {editingId === lead.id ? (
                 <FiCheck className="cursor-pointer" onClick={() => editLinkedInLeadHandler(lead.id, editingUrl)} />
               ) : (

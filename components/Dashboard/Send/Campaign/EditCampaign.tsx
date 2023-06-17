@@ -49,7 +49,7 @@ const EditCampaign: React.FC<EditCampaignProps> = ({ campaign, onBack }) => {
     
 
     const generatePrompt = (campaign: Campaign) => {
-        const generatedPrompt = `Craft a ${campaign.campaignTitle} for ${campaign.platform}. The message should include a call to action for ${campaign.callToAction} and should be written in a ${campaign.toneOfVoice} tone. The purpose of this message is ${campaign.purpose}`;
+        const generatedPrompt = `Craft a ${campaign.campaignTitle} for ${campaign.platform} with a maximum of ${campaign.wordLimit} words. The message should include a call to action for ${campaign.callToAction} and should be written in a ${campaign.toneOfVoice} tone. The purpose of this message is ${campaign.purpose}`;
         return generatedPrompt;
     };
 
@@ -89,6 +89,10 @@ const EditCampaign: React.FC<EditCampaignProps> = ({ campaign, onBack }) => {
                         <div className="mb-4">
                             <label htmlFor="purpose" className="block text-sm">Purpose/goal for message</label>
                             <input id="purpose" name="purpose" value={editedCampaign.purpose} onChange={handleChange} className="w-full p-2 border-[1px]" />
+                        </div>
+                        <div className="mb-4">
+                            <label htmlFor="word-limit" className="block text-sm">Word Limit</label>
+                            <input id="word-limit" placeholder="150" value={editedCampaign.wordLimit} onChange={handleChange} name="wordLimit" className="w-full p-2 border-[1px]" />
                         </div>
                         <button type="button" onClick={handleGeneratePrompt} className="border-[1px] mr-5 px-4 py-2">Generate Prompt</button>
                         <button type="submit" className="border-[1px] px-4 py-2">Save</button>

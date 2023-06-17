@@ -7,5 +7,6 @@ interface Campaign {
     toneOfVoice?: string; 
     purpose?: string; 
     leads?: Lead[]; 
+    wordLimit?: string;
     [key: string]: any;
 }

@@ -43,8 +43,9 @@ const index = () => {
         const callToAction = form.elements.namedItem('callToAction') as HTMLInputElement;
         const toneOfVoice = form.elements.namedItem('toneOfVoice') as HTMLInputElement;
         const purpose = form.elements.namedItem('purpose') as HTMLInputElement;
+        const wordLimit = form.elements.namedItem('wordLimit') as HTMLInputElement;
     
-        const generatedPrompt = generatePrompt(campaignTitle.value, platform.value, callToAction.value, toneOfVoice.value, purpose.value);
+        const generatedPrompt = generatePrompt(campaignTitle.value, platform.value, callToAction.value, toneOfVoice.value, purpose.value, wordLimit.value);
         setPrompt(generatedPrompt);
     
         try {
@@ -55,6 +56,7 @@ const index = () => {
                 toneOfVoice: toneOfVoice.value,
                 purpose: purpose.value,
                 generatedPrompt: generatedPrompt,
+                wordLimit: wordLimit.value
             });
     
             console.log('Campaign saved successfully');
@@ -64,8 +66,8 @@ const index = () => {
     };
     
 
-    const generatePrompt = (campaignTitle: string = '', platform: string = '', callToAction: string = '', toneOfVoice: string = '', purpose: string = '') => {
-        const generatedPrompt = `Craft a ${campaignTitle} for ${platform}. The message should include a call to action for ${callToAction} and should be written in a ${toneOfVoice} tone. The purpose of this message is ${purpose}`;
+    const generatePrompt = (campaignTitle: string = '', platform: string = '', callToAction: string = '', toneOfVoice: string = '', purpose: string = '', wordLimit: string = '500') => {
+        const generatedPrompt = `Craft a ${campaignTitle} for ${platform} in a maximum of ${wordLimit} words. The message should include a call to action for ${callToAction} and should be written in a ${toneOfVoice} tone. The purpose of this message is ${purpose}`;
         return generatedPrompt;
     };
 
@@ -141,6 +143,10 @@ const index = () => {
                         <div className="mb-4">
                             <label htmlFor="purpose" className="block text-sm">Purpose/goal for message</label>
                             <input required placeholder="To introduce our services to potential clients" id="purpose" name="purpose" className="w-full p-2 border-[1px]" />
+                        </div>
+                        <div className="mb-4">
+                            <label htmlFor="word-limit" className="block text-sm">Word Limit</label>
+                            <input required placeholder="150" name="wordLimit" className="w-full p-2 border-[1px]" />
                         </div>
                         <button type="submit" className="border-[1px] px-4 py-2">Save and Generate Prompt</button>
                     </form>
