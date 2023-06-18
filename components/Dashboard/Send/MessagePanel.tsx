@@ -138,6 +138,7 @@ const MessagePanel = () => {
 
     try {
       const response = await axios.post('/api/openai', { user, lead, campaign });
+      // console.log(response.data);
       if (response.data && response.data.message) {
         const message = response.data.message;
 
