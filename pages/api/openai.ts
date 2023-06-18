@@ -42,16 +42,22 @@ export default async function handler(
   const { user, lead, campaign } = req.body;
   let linkedInDescription = '';
   let jobDescription = '';
-  if (lead.linkedIn) {
-    console.log("Accessing linkedin");
-    const linkedInData = await scrape(lead.linkedIn);
-    console.log(linkedInData);
-    linkedInDescription = linkedInData?.description || '';
-    jobDescription = linkedInData?.jobDescription || '';
-    console.log(linkedInData);
-  }
+  let linkedInData;
+  console.log(lead);
 
-  const aboutInput = `Make sure you write an engaging personalized hook and introduce yourself. Your word limit is 125 words, do not exceed this. Make sure to take note of every rule listed. Do not include the subject line. Never forget your name is ${user.firstName} ${user.lastName} & you work as a ${user.jobTitle}. You work at a company named ${user.companyName}. ${user.companyName}'s business is the following  ${user.companyInfo}. The company values are the following  ${user.companyValue}. The problems the company helps solve are  ${user.problem}. You are contacting a potential customer for the purpose of ${campaign.purpose}. The person to connect with is ${lead.firstName} ${lead.lastName}, who works at ${lead.companyName} as a ${lead.jobTitle}. The tone of the email is going to be  ${campaign.toneOfVoice}. ${campaign.generatedPrompt}. ALWAYS BE CONCISE AND SPECIFIC. You have the following personalized info on the customer: ${linkedInDescription}. You also have their job description: $(jobDescription}. Make sure to add bits of their previous work experiences and make it relevant to your company values, and include light bits of humor. Try to connect our companies features with either their company's work's or the person themselves. Make your message solution oriented, identify pain points if any and be respectful, and ask for a call or meeting at the end.`;
+  // if (lead.url) {
+  //   console.log("Accessing linkedin");
+  //   const linkedInId = new URL(lead.url).pathname.split('in/')[1].split('/')[0]; // parsing through the URL link to get the linkedin user id
+  //   // console.log(linkedInId);
+  //   linkedInData = await scrape(linkedInId);
+  //   console.log(linkedInData);
+  //   linkedInDescription = linkedInData?.headline || '';
+  //   console.log(linkedInData.description, linkedInData.jobDescription);
+  //   jobDescription = linkedInData?.jobDescription || '';
+  //   console.log(linkedInData);
+  // }
+
+  const aboutInput = `Make sure you write an engaging personalized hook and introduce yourself. Your word limit is 125 words, do not exceed this. Make sure to take note of every rule listed. Do not include the subject line. Never forget your name is ${user.firstName} ${user.lastName} & you work as a ${user.jobTitle}. You work at a company named ${user.companyName}. ${user.companyName}'s business is the following  ${user.companyInfo}. The company values are the following  ${user.companyValue}. The problems the company helps solve are  ${user.problem}. You are contacting a potential customer for the purpose of ${campaign.purpose}. The person to connect with is ${lead.firstName} ${lead.lastName}, who works at ${lead.companyName} as a ${lead.jobTitle}. The tone of the email is going to be  ${campaign.toneOfVoice}. ${campaign.generatedPrompt}. ALWAYS BE CONCISE AND SPECIFIC. You have the following personalized info on the customer: ${linkedInDescription}. You also have their job description: ${jobDescription}. Make sure to add bits of their previous work experiences and make it relevant to your company values, and include light bits of humor. Try to connect our companies features with either their company's work's or the person themselves. Make your message solution oriented, identify pain points if any and be respectful, and ask for a call or meeting at the end.`;
   try {
     const response = await openai.createChatCompletion({
       model: "gpt-4",
@@ -61,11 +67,10 @@ export default async function handler(
           content: aboutInput
         },
       ],
-      max_tokens: 600,
+      max_tokens: 1000,
       temperature: 0.2,
       n: 1
     });
-
     if (response.data && response.data.choices && response.data.choices[0] && response.data.choices[0].message) {
       res.status(200).json({ message: `${response.data.choices[0].message.content}` });
     } else {
