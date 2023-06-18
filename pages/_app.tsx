@@ -15,7 +15,7 @@ function App({ Component, pageProps, router }: AppProps) {
   return (
     <>
       <Head>
-        <title>SalesGPT</title>
+        <title>Pipeline AI</title>
         <meta name="description" content="SalesGPT App" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
