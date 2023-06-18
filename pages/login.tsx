@@ -2,28 +2,31 @@ import { useEffect, useState } from "react";
 import styles from "@/styles/Login.module.css";
 import graphic from "@/public/graphic.png";
 import { useRouter } from "next/router";
-import { onAuthStateChanged } from "firebase/auth";
+import { onAuthStateChanged, User } from "firebase/auth";
 import { signInWithEmailAndPassword, auth } from "@/lib/firebaseClient";
 import { LockClosedIcon } from "@heroicons/react/solid";
+import { FormEvent } from "react";
 
 const LoginPage = () => {
   const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [error, setError] = useState<string>("");
 
-  const submitLogin = async () => {
-    try {
-      await signInWithEmailAndPassword(email, password);
-      router.push("/leads");
-    } catch (error) {
-      console.error(error);
+  const submitLogin = async (event: FormEvent) => {
+    event.preventDefault();
+    const { user, error } = await signInWithEmailAndPassword(email, password);
+    if (user) {
+      router.push("/dashboard");
+    } else {
+      setError(error);
     }
   };
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, user => {
+    const unsubscribe = onAuthStateChanged(auth, (user: User | null) => {
       if (user) {
-        router.push("/leads");
+        router.push("/dashboard");
       }
     });
     return unsubscribe;
@@ -87,11 +90,7 @@ const LoginPage = () => {
             className="mt-8 space-y-6"
             action=""
             method="POST"
-            onSubmit={() => {
-              submitLogin();
-              console.log(email);
-              console.log(password);
-            }}
+            onSubmit={submitLogin}
           >
             <input type="hidden" name="remember" defaultValue="true" />
             <div className="rounded-md shadow-sm -space-y-px">
@@ -156,12 +155,9 @@ const LoginPage = () => {
               </div>
             </div>
 
+            {error && <p className="text-red-500">{error}</p>}
             <div>
               <button
-                onSubmit={() => {
-                  submitLogin();
-                  router.push("/leads");
-                }}
                 type="submit"
                 className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-500 hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
               >

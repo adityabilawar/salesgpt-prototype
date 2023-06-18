@@ -24,9 +24,9 @@ export const auth = getAuth(app);
 export const signInWithEmailAndPassword = async (email: string, password: string) => {
   try {
     const userCredential = await _signInWithEmailAndPassword(auth, email, password);
-    return userCredential.user;
-  } catch (error) {
-    throw error;
+    return { user: userCredential.user, error: null };
+  } catch (error: any) {
+    return { user: null, error: error.message };
   }
 };
 
@@ -39,13 +39,12 @@ export const createUserWithEmailAndPassword = async (email: string, password: st
       const docRef = doc(db, 'users', user.uid);
       await setDoc(docRef, { uid: user.uid, firstName, lastName, email });
       console.log("Document written with ID: ", user.uid);
-      return user;
+      return { user, error: null };
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error adding document: ", error);
-    throw error;
+    return { user: null, error: error.message };
   }
 };
-
 
 export const db = getFirestore(app);
