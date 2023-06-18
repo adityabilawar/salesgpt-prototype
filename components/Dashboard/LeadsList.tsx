@@ -273,7 +273,7 @@ const Center = () => {
                             <tr>
                               <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6">
                                 <div
-                                  className={`h-5 w-5 border-2 ml-3 rounded-full cursor-pointer ${Object.keys(isSelected).length === leads.length && !Object.values(isSelected).includes(false) ? 'bg-blue-500' : ''}`}
+                                  className={`h-5 w-5 border-2 ml-3 rounded-md cursor-pointer ${Object.keys(isSelected).length === leads.length && !Object.values(isSelected).includes(false) ? 'bg-blue-500' : ''}`}
                                   onClick={handleSelectAll}
                                 ></div>
                               </th>
@@ -325,7 +325,7 @@ const Center = () => {
                                     <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-6">
                                       <div className="flex items-center space-x-3">
                                         <div
-                                          className={`h-5 w-5 border-2 rounded-full cursor-pointer ${isSelected[id] ? 'bg-blue-500' : ''}`}
+                                          className={`h-5 w-5 border-2 rounded-md cursor-pointer ${isSelected[id] ? 'bg-blue-500' : ''}`}
                                         ></div>
                                       </div>
                                     </td>
