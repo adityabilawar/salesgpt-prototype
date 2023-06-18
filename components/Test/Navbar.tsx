@@ -24,19 +24,8 @@ const Navbar = () => {
             <Disclosure as="nav" className="flex-shrink-0 bg-indigo-600">
             {({ open }) => (
                 <>
-                    <div className="mx-auto max-w-7xl px-2 sm:px-4 lg:px-8">
+                    <div className="mx-auto max-w-7xl pr-2 sm:pr-4 lg:pr-8">
                         <div className="relative flex h-16 items-center justify-between">
-                            {/* Logo section */}
-                            <div className="flex items-center px-2 lg:px-0 xl:w-64">
-                                <div className="flex-shrink-0">
-                                    <img
-                                        className="h-8 w-auto"
-                                        src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=300"
-                                        alt="Your Company"
-                                    />
-                                </div>
-                            </div>
-
                             {/* Search section */}
                             <div className="flex flex-1 justify-center lg:justify-end">
                                 <div className="w-full px-2 lg:px-6">
@@ -59,7 +48,7 @@ const Navbar = () => {
                             </div>
                             <div className="flex lg:hidden">
                                 {/* Mobile menu button */}
-                                <Disclosure.Button className="inline-flex items-center justify-center rounded-md bg-indigo-600 p-2 text-indigo-400 hover:bg-indigo-600 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigo-600">
+                                <Disclosure.Button className="inline-flex items-center justify-center rounded-md bg-indigo-600 p-2 text-indigo-400 hover:bg-indigo-600 hover:text-black focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigo-600">
                                     <span className="sr-only">Open main menu</span>
                                     {open ? (
                                         <FiX className="block h-6 w-6" aria-hidden="true" />
@@ -76,7 +65,7 @@ const Navbar = () => {
                                             <a
                                                 key={item.name}
                                                 href={item.href}
-                                                className="rounded-md px-3 py-2 text-sm font-medium text-indigo-200 hover:text-white"
+                                                className="rounded-md px-3 py-2 text-sm font-medium text-indigo-200 hover:text-black"
                                                 aria-current={item.current ? 'page' : undefined}
                                             >
                                                 {item.name}
@@ -86,7 +75,7 @@ const Navbar = () => {
                                     {/* Profile dropdown */}
                                     <Menu as="div" className="relative ml-4 flex-shrink-0">
                                         <div>
-                                            <Menu.Button className="flex rounded-full bg-indigo-700 text-sm text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigo-700">
+                                            <Menu.Button className="flex rounded-full bg-indigo-700 text-sm text-black focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigo-700">
                                                 <span className="sr-only">Open user menu</span>
                                                 <img
                                                     className="h-8 w-8 rounded-full"
@@ -137,7 +126,7 @@ const Navbar = () => {
                                     href={item.href}
                                     className={classNames(
                                         item.current
-                                            ? 'text-white bg-indigo-800'
+                                            ? 'text-black bg-indigo-800'
                                             : 'text-indigo-200 hover:text-indigo-100 hover:bg-indigo-600',
                                         'block px-3 py-2 rounded-md text-base font-medium'
                                     )}

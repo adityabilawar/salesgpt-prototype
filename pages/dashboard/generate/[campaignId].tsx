@@ -34,7 +34,7 @@ const CampaignPage = () => {
     return (
         <div>
             {campaign && (
-                <div className="text-white">
+                <div className="text-black">
                     <div className="grid grid-cols-5 overflow-hidden">
                         <LeadsSidebar />
                         <div className="col-span-4 overflow-y-auto">

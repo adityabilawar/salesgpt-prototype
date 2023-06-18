@@ -35,7 +35,7 @@ const RightColumn = () => {
                 return (
                     <div key={i}>
                         <button 
-                            className="flex justify-between items-center w-full py-2 text-white"
+                            className="flex justify-between items-center w-full py-2 text-black"
                             onClick={() => toggleSection(section.title)}
                         >
                             <span>{section.title}</span>

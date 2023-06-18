@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store';
-import { fetchLeads, addSelectedLead, setSelectedLead, clearSelectedLeads, removeLead, updateLeads } from '@/components/store/leadsSlice';
+import { fetchLeads, addSelectedLead, setSelectedLead, clearSelectedLeads, removeLead, updateLeads, toggleLeadSelection } from '@/components/store/leadsSlice';
 import { setView } from '@/components/store/sidebarSlice';
 import { FiChevronDown, FiCircle, FiMail, FiSearch, FiEdit3, FiMoreHorizontal, FiTrash, FiUpload } from 'react-icons/fi';
 import Link from 'next/link';
@@ -26,6 +26,8 @@ const Center = () => {
   const [linkedinInput, setLinkedinInput] = useState<string>('');
   const fileInput = useRef<HTMLInputElement>(null);
   const [createModalOpen, setCreateModalOpen] = useState<boolean>(false);
+  const selectedLeadsCount = useSelector((state) => state.leads.selectedLeads.length);
+  
   const [newLead, setNewLead] = useState({
     firstName: '',
     lastName: '',
@@ -36,11 +38,14 @@ const Center = () => {
     linkedIn: '',
   });
 
+  const onRowClick = (lead: Lead) => {
+    dispatch(toggleLeadSelection(lead));
+  };
+
   const toggleOpen = (id: string) => {
     setIsOpen((prev) => ({ ...prev, [id]: !prev[id] }));
   };
-
-  const handleCircleClick = (id: string, lead: Lead) => {
+  const handleRowClick = (id: string, lead: Lead) => {
     setIsSelected((prev) => {
       const updatedIsSelected = { ...prev, [id]: !prev[id] };
       if (updatedIsSelected[id]) {
@@ -89,6 +94,7 @@ const Center = () => {
     console.log(diffreq);
     return (url && diffreq.data.length !== 0) ? diffreq.data[0].entity.description : '';
   };
+
 
 
   const handleLinkedInInput = async () => {
@@ -162,7 +168,6 @@ const Center = () => {
       Papa.parse(event.target.files[0], {
         header: true,
         complete: async function (results) {
-          // Create batches of 500 items to conform with Firebase's limit
           for (let i = 0; i < results.data.length; i += 500) {
             const batch = results.data.slice(i, i + 500);
             const batchPromises = batch.map(async (lead) => {
@@ -201,105 +206,219 @@ const Center = () => {
     }
   };
 
+  const handleSelectAll = () => {
+    const allSelected = Object.keys(isSelected).length === leads.length && !Object.values(isSelected).includes(false);
+
+    // If all leads are already selected, unselect them. Otherwise, select all.
+    if (allSelected) {
+      dispatch(clearSelectedLeads());
+      setIsSelected({});
+    } else {
+      dispatch(clearSelectedLeads());
+      let newSelected: Record<string, boolean> = {};  // Defining the type for newSelected
+      leads.forEach(lead => {
+        newSelected[lead.id] = true;
+        dispatch(addSelectedLead(lead));
+      });
+      setIsSelected(newSelected);
+    }
+  };
+
   return (
     <div className="border-r-[1px] flex flex-col h-full">
+      {selectedLeadsCount > 0 && (
+        <div className="top-0 fixed w-full bg-gray-200 py-1 px-5">
+          {selectedLeadsCount} lead(s) selected
+        </div>
+      )}
       <div className="flex-grow">
-        <div className="flex flex-col border-b-[1px] px-10 py-5 sticky top-0 bg-[#1D203E]">
+        <div className="flex flex-col border-b-[1px] px-10 py-5 sticky top-0">
           <h1 className="text-2xl">Leads</h1>
-          <div className="flex-grow-0 py-5 flex space-x-5 bg-[#1D203E]">
-            <div className="bg-white text-black px-5 flex justify-center items-center cursor-pointer" onClick={() => setModalOpen(true)}>
+          <div className="flex-grow-0 py-5 flex space-x-5">
+            <div className="bg-blue-500 rounded-md text-white px-5 flex justify-center items-center cursor-pointer" onClick={() => setModalOpen(true)}>
               Upload Leads
             </div>
-            <div className="bg-white text-black px-5 flex justify-center items-center cursor-pointer" onClick={() => setCreateModalOpen(true)}>
+            <div className="bg-blue-500 rounded-md text-white px-5 flex justify-center items-center cursor-pointer" onClick={() => setCreateModalOpen(true)}>
               Create Lead
             </div>
-            <div className="relative border border-white flex justify-center items-center space-x-2">
+            <div className="relative border border-gray-200 border-md flex justify-center items-center space-x-2">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <FiSearch size={24} />
               </div>
               <input
-                className="py-2 pl-10 pr-4 w-full text-white rounded-md bg-transparent focus:outline-none"
+                className="py-2 pl-10 pr-4 w-full text-black rounded-md bg-transparent focus:outline-none"
                 placeholder="Search..."
                 onChange={handleSearchChange}
               />
             </div>
             <Link href="/dashboard/send">
-              <button className="border-[1px] px-6 py-3" onClick={handleContactAll}>
+              <button className="border-[1px] rounded-md px-6 py-3" onClick={handleContactAll}>
                 Contact All
               </button>
             </Link>
           </div>
         </div>
         <div className="p-10 space-y-4 overflow-y-auto">
-          <div className="h-full space-y-4">
-            {isLoading ? (
-              <div className="animate-pulse flex space-x-4">
-                <div className="flex-1 space-y-6 py-1">
-                  <div className="h-2 bg-slate-700 rounded"></div>
-                  <div className="space-y-3">
-                    <div className="grid grid-cols-3 gap-4">
-                      <div className="h-2 bg-slate-700 rounded col-span-2"></div>
-                      <div className="h-2 bg-slate-700 rounded col-span-1"></div>
+          <div className="h-full space-y-4 border rounded-md">
+            <div>
+              <div className="p-4 border-b">
+                Hello
+              </div>
+              <div>
+                <div className="flex flex-col">
+                  <div className="overflow-x-auto">
+                    <div className="inline-block min-w-full">
+                      <div className="overflow-hidden">
+                        <table className="min-w-full divide-y divide-gray-300">
+                          <thead className="bg-gray-50">
+                            <tr>
+                              <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6">
+                                <div
+                                  className={`h-5 w-5 border-2 ml-3 rounded-full cursor-pointer ${Object.keys(isSelected).length === leads.length && !Object.values(isSelected).includes(false) ? 'bg-blue-500' : ''}`}
+                                  onClick={handleSelectAll}
+                                ></div>
+                              </th>
+                              <th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">
+                                LEAD NAME
+                              </th>
+                              <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                                COMPANY INFO
+                              </th>
+                              <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                                PERSONAL INFO
+                              </th>
+                              <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                                LINKEDIN
+                              </th>
+                              <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6">
+                                <span className="sr-only">Edit</span>
+                              </th>
+                            </tr>
+                          </thead>
+                          {isLoading ? (
+                            <div className="animate-pulse flex space-x-4">
+                              <div className="flex-1 space-y-6 py-1">
+                                <div className="h-2 bg-slate-700 rounded"></div>
+                                <div className="space-y-3">
+                                  <div className="grid grid-cols-3 gap-4">
+                                    <div className="h-2 bg-slate-700 rounded col-span-2"></div>
+                                    <div className="h-2 bg-slate-700 rounded col-span-1"></div>
+                                  </div>
+                                  <div className="h-2 bg-slate-700 rounded"></div>
+                                </div>
+                              </div>
+                            </div>
+                          ) : (leads
+                            .filter((lead: Lead) => {
+                              const searchString = `${lead.firstName} ${lead.lastName} ${lead.companyName}`.toLowerCase();
+                              return searchString.includes(searchTerm.toLowerCase());
+                            })
+                            .map((lead: Lead) => {
+                              const id = lead.id;
+
+                              return (
+                                // <div className="flex flex-col border-b w-full select-none" key={id}>
+                                //   <div className="grid grid-cols-3 items-center cursor-pointer">
+                                //     <div className="flex items-center p-4 col-span-1" onClick={() => handleCircleClick(id, lead)}>
+                                //       <FiCircle
+                                //         size={24}
+                                //         className={isSelected[id] ? 'fill-current text-black' : ''}
+                                //       />
+                                //       <p className="ml-2">{lead.firstName} {lead.lastName}, {lead.companyName}</p>
+                                //     </div>
+                                //     <div className="flex items-end justify-end p-4 col-span-2" onClick={() => toggleOpen(id)}>
+                                //       {isSelected[id] && <p className="text-gray-500 mr-2">Selected</p>}
+                                //       <animated.div style={springs[parseInt(lead.id)]}>
+                                //         <FiChevronDown size={24} />
+                                //       </animated.div>
+                                //     </div>
+                                //   </div>
+                                //   {isOpen[id] && (
+                                //     <div className="flex space-x-6 items-center p-4 border-t border-white">
+                                //       <button
+                                //         className={`flex items-center border-[1px] px-6 py-2 ${selectedDetail === id ? 'bg-white text-black' : ''}`}
+                                //         onClick={() => {
+                                //           setSelectedDetail(id);
+                                //           const foundLead = leads.find((lead: Lead) => lead.id === id);
+                                //           if (foundLead) {
+                                //             dispatch(setSelectedLead(foundLead));
+                                //           }
+                                //           dispatch(setView('LEAD_DETAILS'));
+                                //         }}
+                                //       >
+                                //         <FiMoreHorizontal size={24} />
+                                //         <p className="ml-2">Details</p>
+                                //       </button>
+                                //       <button className="flex items-center" onClick={() => handleDeleteLead(id)}>
+                                //         <FiTrash size={24} />
+                                //       </button>
+                                //     </div>
+                                //   )}
+                                // </div>
+                                <tbody className="divide-y divide-gray-200 bg-white">
+                                  <tr
+                                    key={lead.email}
+                                    className={`${isSelected[id] ? 'bg-gray-100' : ''}`}
+                                    onClick={() => handleRowClick(id, lead)}
+                                  >
+                                    <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-6">
+                                      <div className="flex items-center space-x-3">
+                                        <div
+                                          className={`h-5 w-5 border-2 rounded-full cursor-pointer ${isSelected[id] ? 'bg-blue-500' : ''}`}
+                                        ></div>
+                                      </div>
+                                    </td>
+                                    <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-6">
+                                      <div className="flex items-center">
+                                        <div>
+                                          <div className="font-medium text-gray-900">{lead.firstName} {lead.lastName}</div>
+                                        </div>
+                                      </div>
+                                    </td>
+                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                      <div className="text-gray-900">{lead.jobTitle}</div>
+                                      <div className="text-gray-500">{lead.companyName}</div>
+                                    </td>
+                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                      <div className="flex items-center space-x-2">
+                                        <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                                        <div className="text-gray-500">{lead.email}</div>
+                                      </div>
+                                      <div className="flex items-center space-x-2">
+                                        <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                                        <div className="text-gray-900">{lead.phone}</div>
+                                      </div>
+
+                                    </td>
+                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{lead.linkedIn}</td>
+                                    <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
+                                      <a
+                                        href="#"
+                                        className="text-indigo-600 hover:text-indigo-900"
+                                        onClick={(event) => event.stopPropagation()}
+                                      >
+                                        Edit
+                                      </a>
+                                    </td>
+                                  </tr>
+
+                                </tbody>
+                              );
+                            }))}
+                        </table>
+                      </div>
                     </div>
-                    <div className="h-2 bg-slate-700 rounded"></div>
                   </div>
                 </div>
               </div>
-            ) : (leads
-              .filter((lead: Lead) => {
-                const searchString = `${lead.firstName} ${lead.lastName} ${lead.companyName}`.toLowerCase();
-                return searchString.includes(searchTerm.toLowerCase());
-              })
-              .map((lead: Lead) => {
-                const id = lead.id;
-
-                return (
-                  <div className="flex flex-col border border-white w-full select-none" key={id}>
-                    <div className="grid grid-cols-3 items-center cursor-pointer">
-                      <div className="flex items-center p-4 col-span-1" onClick={() => handleCircleClick(id, lead)}>
-                        <FiCircle
-                          size={24}
-                          className={isSelected[id] ? 'fill-current text-white' : ''}
-                        />
-                        <p className="ml-2">{lead.firstName} {lead.lastName}, {lead.companyName}</p>
-                      </div>
-                      <div className="flex items-end justify-end p-4 col-span-2" onClick={() => toggleOpen(id)}>
-                        {isSelected[id] && <p className="text-gray-500 mr-2">Selected</p>}
-                        <animated.div style={springs[parseInt(lead.id)]}>
-                          <FiChevronDown size={24} />
-                        </animated.div>
-                      </div>
-                    </div>
-                    {isOpen[id] && (
-                      <div className="flex space-x-6 items-center p-4 border-t border-white">
-                        <button
-                          className={`flex items-center border-[1px] px-6 py-2 ${selectedDetail === id ? 'bg-white text-black' : ''}`}
-                          onClick={() => {
-                            setSelectedDetail(id);
-                            const foundLead = leads.find((lead: Lead) => lead.id === id);
-                            if (foundLead) {
-                              dispatch(setSelectedLead(foundLead));
-                            }
-                            dispatch(setView('LEAD_DETAILS'));
-                          }}
-                        >
-                          <FiMoreHorizontal size={24} />
-                          <p className="ml-2">Details</p>
-                        </button>
-                        <button className="flex items-center" onClick={() => handleDeleteLead(id)}>
-                          <FiTrash size={24} />
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                );
-              }))}
-          </div></div>
+            </div>
+          </div>
+        </div>
       </div>
       {modalOpen && (
         <div className="absolute inset-0 bg-gray-800 bg-opacity-60 z-10 flex justify-center items-center">
           <div className="bg-[#2C2F48] rounded-lg w-2/3 p-8">
-            <h2 className="text-2xl text-white mb-8">Upload Leads</h2>
+            <h2 className="text-2xl text-black mb-8">Upload Leads</h2>
             <div className="flex">
               <div
                 className={`cursor-pointer rounded-t-md py-2 px-4 ${activeTab === 'linkedin' ? 'bg-[#383B59]' : ''}`}
@@ -317,12 +436,12 @@ const Center = () => {
             {activeTab === 'linkedin' && (
               <div>
                 <textarea
-                  className="mt-8 w-full h-48 bg-[#383B59] text-white p-2 rounded-md"
+                  className="mt-8 w-full h-48 bg-[#383B59] text-black p-2 rounded-md"
                   placeholder="Paste LinkedIn URLs here..."
                   value={linkedinInput}
                   onChange={(e) => setLinkedinInput(e.target.value)}
                 />
-                <button className="mt-4 bg-[#383B59] text-white py-2 px-4 rounded-md" onClick={handleLinkedInInput}>
+                <button className="mt-4 bg-[#383B59] text-black py-2 px-4 rounded-md" onClick={handleLinkedInInput}>
                   Import
                 </button>
               </div>
@@ -347,7 +466,7 @@ const Center = () => {
               </div>
             )}
             <div className="mt-8 text-right">
-              <button className="text-white" onClick={() => setModalOpen(false)}>
+              <button className="text-black" onClick={() => setModalOpen(false)}>
                 Close
               </button>
             </div>
@@ -357,7 +476,7 @@ const Center = () => {
       {createModalOpen && (
         <div className="absolute inset-0 bg-gray-800 bg-opacity-60 z-10 flex justify-center items-center">
           <div className="bg-[#2C2F48] rounded-lg w-2/3 p-8">
-            <h2 className="text-2xl text-white mb-8">Create Lead</h2>
+            <h2 className="text-2xl text-black mb-8">Create Lead</h2>
             <form className="flex flex-col text-black">
               <input
                 type="text"
@@ -408,12 +527,12 @@ const Center = () => {
                 value={newLead.linkedIn}
                 onChange={handleInputChange}
               />
-              <button type="button" className="mt-4 bg-[#383B59] text-white py-2 px-4 rounded-md" onClick={handleCreateLead}>
+              <button type="button" className="mt-4 bg-[#383B59] text-black py-2 px-4 rounded-md" onClick={handleCreateLead}>
                 Create
               </button>
             </form>
             <div className="mt-8 text-right">
-              <button className="text-white" onClick={() => setCreateModalOpen(false)}>
+              <button className="text-black" onClick={() => setCreateModalOpen(false)}>
                 Close
               </button>
             </div>

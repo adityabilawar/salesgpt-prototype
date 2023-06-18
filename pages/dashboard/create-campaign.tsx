@@ -77,7 +77,7 @@ const index = () => {
 
 
     return (
-        <div className=" text-white h-full min-h-screen">
+        <div className=" text-black h-full min-h-screen">
             <nav className="px-6 py-10 flex items-center justify-between">
                 <div className="flex items-center space-x-4">
                     <button onClick={handleGoBack} className="-full p-2">

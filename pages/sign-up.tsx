@@ -80,7 +80,7 @@ const RegisterPage = () => {
               src={"/templogo.svg"}
               alt="Workflow"
             />
-            <h2 className="mt-6 text-center text-3xl font-extrabold text-white">
+            <h2 className="mt-6 text-center text-3xl font-extrabold text-black">
               Sign up for Pipeline
             </h2>
             <p className="mt-2 text-center text-sm text-gray-50">
@@ -178,7 +178,7 @@ const RegisterPage = () => {
                   router.push("/leads");
                 }}
                 type="submit"
-                className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-500 hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-black bg-indigo-500 hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
               >
                 Sign up
               </button>

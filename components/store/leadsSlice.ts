@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { doc, collection, getDocs } from 'firebase/firestore';
+import { REMOVE_SELECTED_LEAD } from '../redux/actions/leadActions';
 import { db } from '@/lib/firebaseClient';
 
 interface LeadsState {
@@ -52,6 +53,15 @@ const leadsSlice = createSlice({
         state.selectedLead = action.payload;
       }
     },
+    toggleLeadSelection: (state, action: PayloadAction<Lead>) => {
+      const exists = state.selectedLeads.find((lead: Lead) => lead.id === action.payload.id);
+    
+      if (exists) {
+        state.selectedLeads = state.selectedLeads.filter((lead: Lead) => lead.id !== action.payload.id);
+      } else {
+        state.selectedLeads.push(action.payload);
+      }
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(fetchLeads.fulfilled, (state, action) => {
@@ -68,6 +78,7 @@ export const {
   setSelectedLead,
   updateLeads,
   updateSelectedLead, 
+  toggleLeadSelection,
 } = leadsSlice.actions;
 
 export default leadsSlice.reducer;

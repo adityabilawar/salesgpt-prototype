@@ -26,7 +26,7 @@ const Center = () => {
                 <div className="relative flex mt-5 border-b-[1px]">
                     {tabs.map((tab, i) => (
                         <button 
-                            className={`w-full py-2 ${activeTab === tab ? 'text-white' : 'text-gray-500'}`}
+                            className={`w-full py-2 ${activeTab === tab ? 'text-black' : 'text-gray-500'}`}
                             onClick={() => setActiveTab(tab)}
                             key={i}
                         >

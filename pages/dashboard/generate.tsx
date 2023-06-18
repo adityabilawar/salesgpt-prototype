@@ -13,7 +13,7 @@ const Generate = () => {
     }, [dispatch]);
 
     return (
-        <div className="text-white">
+        <div className="text-black">
             <div className="border-b-[1px] p-10">
                 <Navbar />
             </div>

@@ -149,13 +149,13 @@ const Profile = () => {
         </div>
         <div className="relative flex justify-between mt-5">
           <button
-            className={`w-full py-2 ${activeTab === 'leads' ? 'text-white' : 'text-gray-500'}`}
+            className={`w-full py-2 ${activeTab === 'leads' ? 'text-black' : 'text-gray-500'}`}
             onClick={() => setActiveTab('leads')}
           >
             Leads Info
           </button>
           <button
-            className={`w-full py-2 ${activeTab === 'address' ? 'text-white' : 'text-gray-500'}`}
+            className={`w-full py-2 ${activeTab === 'address' ? 'text-black' : 'text-gray-500'}`}
             onClick={() => setActiveTab('address')}
           >
             Company Info

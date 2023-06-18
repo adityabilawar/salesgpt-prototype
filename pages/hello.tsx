@@ -57,9 +57,9 @@ function classNames(...classes) {
 export default function Example() {
   return (
     <>
-      <div className="text-white h-screen flex flex-col overflow-hidden">
-      <div className="grid grid-cols-5 h-full overflow-hidden">
-        <div className="col-span-4 flex flex-col">
+      <div className="text-black h-screen flex flex-col overflow-hidden">
+      <div className="h-full overflow-hidden bg-white">
+        <div className="flex flex-col">
           <Navbar />
           <div className="overflow-auto">
               <Wrapper />

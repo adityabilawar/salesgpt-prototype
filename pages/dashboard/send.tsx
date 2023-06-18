@@ -13,7 +13,7 @@ const send = () => {
       dispatch(setView('SELECTED_LEADS'));
     }, [dispatch]);
     return (
-        <div className="text-white">
+        <div className="text-black">
             <div className="grid grid-cols-5">
                 <Sidebar />
                 <div className="col-span-4"><Center /></div>

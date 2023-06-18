@@ -150,7 +150,7 @@ const LeadsSidebar = () => {
       {modalOpen && (
         <div className="absolute inset-0 bg-gray-800 bg-opacity-60 z-10 flex justify-center items-center">
           <div className="bg-[#2C2F48] rounded-lg w-2/3 p-8">
-            <h2 className="text-2xl text-white mb-8">Upload Leads</h2>
+            <h2 className="text-2xl text-black mb-8">Upload Leads</h2>
             <div className="flex">
               <div
                 className={`cursor-pointer rounded-t-md py-2 px-4 ${activeTab === 'linkedin' ? 'bg-[#383B59]' : ''}`}
@@ -161,18 +161,18 @@ const LeadsSidebar = () => {
             </div>
             <div>
               <textarea
-                className="mt-8 w-full h-48 bg-[#383B59] text-white p-2 rounded-md"
+                className="mt-8 w-full h-48 bg-[#383B59] text-black p-2 rounded-md"
                 placeholder="Paste LinkedIn URLs here..."
                 value={linkedinInput}
                 onChange={(e) => setLinkedinInput(e.target.value)}
               />
               <div className="text-red-500">{linkedinError}</div>
-              <button className="mt-4 bg-[#383B59] text-white py-2 px-4 rounded-md" onClick={handleLinkedInInput}>
+              <button className="mt-4 bg-[#383B59] text-black py-2 px-4 rounded-md" onClick={handleLinkedInInput}>
                 Import
               </button>
             </div>
             <div className="mt-8 text-right">
-              <button className="text-white" onClick={() => setModalOpen(false)}>
+              <button className="text-black" onClick={() => setModalOpen(false)}>
                 Close
               </button>
             </div>

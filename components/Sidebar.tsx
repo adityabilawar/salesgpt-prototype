@@ -25,7 +25,7 @@ const Sidebar = () => {
           } bg-dark-purple h-screen p-5  pt-8 relative duration-300`}
       >
         <div
-          className={`absolute cursor-pointer -right-4 top-11 w-7 bg-[#1D203E]
+          className={`absolute cursor-pointer -right-4 top-11 w-7
            border-2 rounded-full  ${!open && "rotate-180"}`}
           onClick={() => setOpen(!open)}
         ><div className="h-4 w-4 bg-white rounded-full">
@@ -38,7 +38,7 @@ const Sidebar = () => {
               }`}
           />
           <h1
-            className={`text-white origin-left font-bold text-xl duration-200 ${!open && "scale-0"
+            className={`text-black origin-left font-bold text-xl duration-200 ${!open && "scale-0"
               }`}
           >
             Pipeline AI
@@ -49,7 +49,7 @@ const Sidebar = () => {
             <Link href={Menu.path} key={index}>
               <div
                 className={`flex justify-left rounded-md p-2 cursor-pointer duration-50 ease-in-out text-lg items-center gap-x-4 
-      text-white hover:bg-white hover:text-black ${asPath === Menu.path ? 'bg-[#292c50]' : ''}`}
+      text-black hover:bg-white hover:text-black ${asPath === Menu.path ? 'bg-[#292c50]' : ''}`}
               >
                 {Menu.src}
                 <span className={`${!open && "hidden"} origin-left duration-200`}>
@@ -61,7 +61,7 @@ const Sidebar = () => {
         </ul>
         <div className="w-full h-[1px] bg-white my-5" />
         <div
-          className={`flex justify-left rounded-md p-2 cursor-pointer duration-50 ease-in-out text-lg items-center gap-x-4 text-white hover:bg-white hover:text-black`}
+          className={`flex justify-left rounded-md p-2 cursor-pointer duration-50 ease-in-out text-lg items-center gap-x-4 text-black hover:bg-white hover:text-black`}
           onClick={() => signOut(auth)}
         >
           <span>Sign Out</span>

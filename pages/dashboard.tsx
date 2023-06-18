@@ -13,16 +13,16 @@ const dashboard = () => {
   }, [dispatch]);
 
   return (
-    <div className="text-white h-screen flex flex-col overflow-hidden">
+    <div className="text-black h-screen flex flex-col overflow-hidden">
       <div className="grid grid-cols-5 h-full overflow-hidden">
         <Sidebar />
         <div className="col-span-4 flex flex-col">
           <Navbar />
           <div className="overflow-auto">
-              <Center />
-            </div>
+            <Center />
           </div>
         </div>
+      </div>
     </div>
   )
 }
