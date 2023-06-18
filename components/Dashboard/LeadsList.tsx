@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store';
-import { fetchLeads, addSelectedLead, setSelectedLead, clearSelectedLeads, removeLead, updateLeads, toggleLeadSelection } from '@/components/store/leadsSlice';
+import { fetchLeads, addSelectedLead, setSelectedLead, clearSelectedLeads, removeLead, updateLeads, toggleLeadSelection, updateSelectedLead } from '@/components/store/leadsSlice';
 import { setView } from '@/components/store/sidebarSlice';
 import { FiChevronDown, FiCircle, FiMail, FiSearch, FiEdit3, FiMoreHorizontal, FiTrash, FiUpload } from 'react-icons/fi';
 import Link from 'next/link';
@@ -46,15 +46,14 @@ const Center = () => {
     setIsOpen((prev) => ({ ...prev, [id]: !prev[id] }));
   };
   const handleRowClick = (id: string, lead: Lead) => {
-    setIsSelected((prev) => {
-      const updatedIsSelected = { ...prev, [id]: !prev[id] };
-      if (updatedIsSelected[id]) {
-        dispatch(addSelectedLead(lead));
-      } else {
-        dispatch(removeLead(lead));
-      }
-      return updatedIsSelected;
-    });
+    const updatedIsSelected = { ...isSelected, [id]: !isSelected[id] };
+    setIsSelected(updatedIsSelected);
+  
+    if (updatedIsSelected[id]) {
+      dispatch(addSelectedLead(lead));
+    } else {
+      dispatch(removeLead(lead));
+    }
   };
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -208,18 +207,18 @@ const Center = () => {
 
   const handleSelectAll = () => {
     const allSelected = Object.keys(isSelected).length === leads.length && !Object.values(isSelected).includes(false);
-
+  
     // If all leads are already selected, unselect them. Otherwise, select all.
     if (allSelected) {
       dispatch(clearSelectedLeads());
       setIsSelected({});
     } else {
-      dispatch(clearSelectedLeads());
-      let newSelected: Record<string, boolean> = {};  // Defining the type for newSelected
-      leads.forEach(lead => {
+      const newSelected: Record<string, boolean> = {}; // Define the type for newSelected
+      leads.forEach((lead) => {
         newSelected[lead.id] = true;
         dispatch(addSelectedLead(lead));
       });
+      dispatch(updateSelectedLead(leads[leads.length - 1])); // Update the selected lead state
       setIsSelected(newSelected);
     }
   };
@@ -295,6 +294,7 @@ const Center = () => {
                               </th>
                             </tr>
                           </thead>
+                          <tbody className="divide-y divide-gray-200 bg-white">
                           {isLoading ? (
                             <div className="animate-pulse flex space-x-4">
                               <div className="flex-1 space-y-6 py-1">
@@ -317,47 +317,8 @@ const Center = () => {
                               const id = lead.id;
 
                               return (
-                                // <div className="flex flex-col border-b w-full select-none" key={id}>
-                                //   <div className="grid grid-cols-3 items-center cursor-pointer">
-                                //     <div className="flex items-center p-4 col-span-1" onClick={() => handleCircleClick(id, lead)}>
-                                //       <FiCircle
-                                //         size={24}
-                                //         className={isSelected[id] ? 'fill-current text-black' : ''}
-                                //       />
-                                //       <p className="ml-2">{lead.firstName} {lead.lastName}, {lead.companyName}</p>
-                                //     </div>
-                                //     <div className="flex items-end justify-end p-4 col-span-2" onClick={() => toggleOpen(id)}>
-                                //       {isSelected[id] && <p className="text-gray-500 mr-2">Selected</p>}
-                                //       <animated.div style={springs[parseInt(lead.id)]}>
-                                //         <FiChevronDown size={24} />
-                                //       </animated.div>
-                                //     </div>
-                                //   </div>
-                                //   {isOpen[id] && (
-                                //     <div className="flex space-x-6 items-center p-4 border-t border-white">
-                                //       <button
-                                //         className={`flex items-center border-[1px] px-6 py-2 ${selectedDetail === id ? 'bg-white text-black' : ''}`}
-                                //         onClick={() => {
-                                //           setSelectedDetail(id);
-                                //           const foundLead = leads.find((lead: Lead) => lead.id === id);
-                                //           if (foundLead) {
-                                //             dispatch(setSelectedLead(foundLead));
-                                //           }
-                                //           dispatch(setView('LEAD_DETAILS'));
-                                //         }}
-                                //       >
-                                //         <FiMoreHorizontal size={24} />
-                                //         <p className="ml-2">Details</p>
-                                //       </button>
-                                //       <button className="flex items-center" onClick={() => handleDeleteLead(id)}>
-                                //         <FiTrash size={24} />
-                                //       </button>
-                                //     </div>
-                                //   )}
-                                // </div>
-                                <tbody className="divide-y divide-gray-200 bg-white">
                                   <tr
-                                    key={lead.email}
+                                    key={lead.id}
                                     className={`${isSelected[id] ? 'bg-gray-100' : ''}`}
                                     onClick={() => handleRowClick(id, lead)}
                                   >
@@ -381,11 +342,11 @@ const Center = () => {
                                     </td>
                                     <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                                       <div className="flex items-center space-x-2">
-                                        <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                                        <svg stroke="currentColor" fill="none" strokeWidth="2" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
                                         <div className="text-gray-500">{lead.email}</div>
                                       </div>
                                       <div className="flex items-center space-x-2">
-                                        <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                                        <svg stroke="currentColor" fill="none" strokeWidth="2" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
                                         <div className="text-gray-900">{lead.phone}</div>
                                       </div>
 
@@ -402,9 +363,10 @@ const Center = () => {
                                     </td>
                                   </tr>
 
-                                </tbody>
+                                
                               );
                             }))}
+                            </tbody>
                         </table>
                       </div>
                     </div>

@@ -29,6 +29,7 @@ const leadsSlice = createSlice({
   initialState,
   reducers: {
     addSelectedLead: (state, action: PayloadAction<Lead>) => {
+      console.log('Adding selected lead: ', action.payload);
       state.selectedLeads.push(action.payload);
     },
     clearSelectedLeads: (state) => {
@@ -55,7 +56,7 @@ const leadsSlice = createSlice({
     },
     toggleLeadSelection: (state, action: PayloadAction<Lead>) => {
       const exists = state.selectedLeads.find((lead: Lead) => lead.id === action.payload.id);
-    
+      console.log('Toggling lead selection: ', action.payload);
       if (exists) {
         state.selectedLeads = state.selectedLeads.filter((lead: Lead) => lead.id !== action.payload.id);
       } else {
