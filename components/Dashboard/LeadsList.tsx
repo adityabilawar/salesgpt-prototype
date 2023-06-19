@@ -376,17 +376,17 @@ const Center = () => {
       </div>
       {modalOpen && (
         <div className="absolute inset-0 bg-gray-800 bg-opacity-60 z-10 flex justify-center items-center">
-          <div className="bg-[#2C2F48] rounded-lg w-2/3 p-8">
+          <div className="bg-white rounded-lg w-2/3 p-8">
             <h2 className="text-2xl  mb-8">Upload Leads</h2>
             <div className="flex">
               <div
-                className={`cursor-pointer rounded-t-md py-2 px-4 ${activeTab === 'linkedin' ? 'bg-[#383B59]' : ''}`}
+                className={`cursor-pointer rounded-t-md py-2 border px-4 ${activeTab === 'linkedin' ? 'bg-white' : ''}`}
                 onClick={() => setActiveTab('linkedin')}
               >
                 LinkedIn URLs
               </div>
               <div
-                className={`cursor-pointer rounded-t-md py-2 px-4 ${activeTab === 'csv' ? 'bg-[#383B59]' : ''}`}
+                className={`cursor-pointer rounded-t-md py-2 border px-4 ${activeTab === 'csv' ? 'bg-white' : ''}`}
                 onClick={() => setActiveTab('csv')}
               >
                 CSV File
@@ -395,20 +395,20 @@ const Center = () => {
             {activeTab === 'linkedin' && (
               <div>
                 <textarea
-                  className="mt-8 w-full h-48 bg-[#383B59]  p-2 rounded-md"
+                  className="mt-8 w-full h-48 bg-white  p-2 rounded-md"
                   placeholder="Paste LinkedIn URLs here..."
                   value={linkedinInput}
                   onChange={(e) => setLinkedinInput(e.target.value)}
                 />
-                <button className="mt-4 bg-[#383B59]  py-2 px-4 rounded-md" onClick={handleLinkedInInput}>
+                <button className="mt-4 bg-brand rounded-md text-white py-2 px-4 rounded-md" onClick={handleLinkedInInput}>
                   Import
                 </button>
               </div>
             )}
             {activeTab === 'csv' && (
-              <div className="py-5">
+              <div className="py-5 ">
                 CSV files must be formatted as firstName,lastName,jobTitle,companyName,email,phone,linkedIn
-                <div className="mt-8 flex flex-col items-center justify-center h-48 bg-[#383B59] rounded-md">
+                <div className="mt-8 flex flex-col items-center justify-center h-48 bg-white border rounded-md">
                   <label htmlFor="upload-button" className="cursor-pointer flex items-center space-x-2">
                     <FiUpload size={24} />
                     <span>{file ? `Uploaded ${file.name}` : 'Click here to upload a file'}</span>
@@ -434,7 +434,7 @@ const Center = () => {
       )}
       {createModalOpen && (
         <div className="absolute inset-0 bg-gray-800 bg-opacity-60 z-10 flex justify-center items-center">
-          <div className="bg-[#2C2F48] rounded-lg w-2/3 p-8">
+          <div className="bg-white rounded-lg w-2/3 p-8">
             <h2 className="text-2xl  mb-8">Create Lead</h2>
             <form className="flex flex-col ">
               <input
@@ -486,7 +486,7 @@ const Center = () => {
                 value={newLead.linkedIn}
                 onChange={handleInputChange}
               />
-              <button type="button" className="mt-4 bg-[#383B59]  py-2 px-4 rounded-md" onClick={handleCreateLead}>
+              <button type="button" className="mt-4 bg-white  py-2 px-4 rounded-md" onClick={handleCreateLead}>
                 Create
               </button>
             </form>
