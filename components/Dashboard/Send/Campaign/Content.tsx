@@ -3,22 +3,36 @@ import { animated, useSpring } from 'react-spring';
 import { FiChevronDown, FiCircle, FiMail, FiSearch, FiEdit3, FiMoreHorizontal, FiUpload } from 'react-icons/fi';
 import Link from 'next/link';
 import { collection, getDocs } from 'firebase/firestore';
-import { db } from '@/lib/firebaseClient';
+import { auth, db } from '@/lib/firebaseClient';
 import { useSelector, useDispatch } from 'react-redux';
 import { addSelectedLead, clearSelectedLeads } from '@/components/store/leadsSlice';
 import { doc, setDoc } from 'firebase/firestore';
 import { RootState } from '@/components/store';
+import { onAuthStateChanged } from 'firebase/auth';
 
 const Content = () => {
     const dispatch = useDispatch();
     const [campaigns, setCampaigns] = useState<Campaign[]>([]);
     const [isOpen, setIsOpen] = useState<Record<string, boolean>>({});
     const selectedLeads = useSelector((state: RootState) => state.leads.selectedLeads);
+    const [userId, setUserId] = useState<string | null>(null);
 
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+          if (user) {
+            setUserId(user.uid);
+          } else {
+            setUserId(null);
+          }
+        });
+        return () => {
+          unsubscribe();
+        };
+      }, []);
 
     const sendLeads = async (campaignId: string) => {
         try {
-            const docRef = doc(db, 'users', 'jOgfvrI7EfqjqcH2Gfeo', 'campaigns', campaignId);
+            const docRef = doc(db, 'users', userId as string, 'campaigns', campaignId);
             await setDoc(docRef, { leads: selectedLeads }, { merge: true });
             dispatch(clearSelectedLeads());
         } catch (error) {
@@ -29,7 +43,7 @@ const Content = () => {
 
     useEffect(() => {
         const fetchCampaigns = async () => {
-            const campaignCollection = collection(db, 'users', 'jOgfvrI7EfqjqcH2Gfeo', 'campaigns');
+            const campaignCollection = collection(db, 'users', userId as string, 'campaigns');
             const campaignSnapshot = await getDocs(campaignCollection);
             const campaignsData: Campaign[] = campaignSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Campaign));
             setCampaigns(campaignsData);
@@ -95,4 +109,4 @@ const Content = () => {
     )
 }
 
-export default Content
+export default Content;

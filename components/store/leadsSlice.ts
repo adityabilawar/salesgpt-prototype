@@ -15,14 +15,14 @@ const initialState: LeadsState = {
   selectedLead: null,
 };
 
-export const fetchLeads = createAsyncThunk('leads/fetchLeads', async () => {
-  const userId = "jOgfvrI7EfqjqcH2Gfeo";
+export const fetchLeads = createAsyncThunk('leads/fetchLeads', async (userId: string) => {
   const userDocRef = doc(db, 'users', userId);
   const leadsCol = collection(userDocRef, 'leads');
   const leadSnapshot = await getDocs(leadsCol);
   const leadsList: Lead[] = leadSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Lead));
   return leadsList;
 });
+
 
 const leadsSlice = createSlice({
   name: 'leads',

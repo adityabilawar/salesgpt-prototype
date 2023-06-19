@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { doc, setDoc, deleteDoc } from "firebase/firestore";
-import { db } from "@/lib/firebaseClient";
-import { FiArrowLeftCircle, FiTrash2 } from 'react-icons/fi';
+import { auth, db } from "@/lib/firebaseClient";
+import { FiArrowLeft, FiTrash2 } from 'react-icons/fi';
+import { RootState } from '@/components/store';
+import { onAuthStateChanged } from 'firebase/auth';
 
 interface EditCampaignProps {
     campaign: Campaign;
@@ -10,6 +12,20 @@ interface EditCampaignProps {
 
 const EditCampaign: React.FC<EditCampaignProps> = ({ campaign, onBack }) => {
     const [editedCampaign, setEditedCampaign] = useState<Campaign>(campaign);
+    const [userId, setUserId] = useState<string | null>(null);
+
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+          if (user) {
+            setUserId(user.uid);
+          } else {
+            setUserId(null);
+          }
+        });
+        return () => {
+          unsubscribe();
+        };
+      }, []);
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const updatedCampaign = { ...editedCampaign, [event.target.name]: event.target.value };
@@ -25,7 +41,7 @@ const EditCampaign: React.FC<EditCampaignProps> = ({ campaign, onBack }) => {
         event.preventDefault();
 
         try {
-            const docRef = doc(db, 'users', 'jOgfvrI7EfqjqcH2Gfeo', 'campaigns', campaign.id);
+            const docRef = doc(db, 'users', userId as string, 'campaigns', campaign.id);
             await setDoc(docRef, editedCampaign, { merge: true });
             console.log('Campaign updated successfully');
             onBack();
@@ -37,7 +53,7 @@ const EditCampaign: React.FC<EditCampaignProps> = ({ campaign, onBack }) => {
     const deleteCampaign = async (campaignId: string) => {
         if (window.confirm("Are you sure you want to delete this campaign?")) {
             try {
-                const docRef = doc(db, 'users', 'jOgfvrI7EfqjqcH2Gfeo', 'campaigns', campaignId);
+                const docRef = doc(db, 'users', userId as string, 'campaigns', campaignId);
                 await deleteDoc(docRef);
                 console.log('Campaign deleted successfully');
                 onBack();
@@ -58,7 +74,7 @@ const EditCampaign: React.FC<EditCampaignProps> = ({ campaign, onBack }) => {
             <nav className="px-6 py-5 flex items-center justify-between">
                 <div className="flex items-center space-x-4">
                     <button onClick={onBack} className="-full p-2">
-                        <FiArrowLeftCircle size={42} />
+                        <FiArrowLeft size={24} />
                     </button>
                     <span className="text-xl">Edit Campaign</span>
                     <button className="flex items-center" onClick={() => deleteCampaign(campaign.id)}>

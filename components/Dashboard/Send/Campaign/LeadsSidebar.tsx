@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { FiTrash2, FiEdit, FiCheck, FiRefreshCw } from "react-icons/fi";
-import { db } from '@/lib/firebaseClient';
+import { auth, db } from '@/lib/firebaseClient';
 import { doc, updateDoc, arrayRemove, getDoc, setDoc, arrayUnion, collection, getDocs, where, query } from 'firebase/firestore';
 import { useRouter } from 'next/router';
 import { BsPlay } from 'react-icons/bs';
 import { useDispatch } from 'react-redux';
 import { setSelectedLead } from '@/components/store/leadsSlice';
+import { onAuthStateChanged } from 'firebase/auth';
 
 
 interface Campaign {
@@ -18,10 +19,14 @@ interface LinkedInLead {
   url: string;
 }
 
-const LeadsSidebar = () => {
+interface LeadsSidebarProps {
+  campaignId: string;
+  userId: string | null;
+}
+
+const LeadsSidebar = ({ campaignId, userId }: LeadsSidebarProps) => {
   const router = useRouter();
   const dispatch = useDispatch();
-  const { campaignId } = router.query;
   const [activeTab, setActiveTab] = useState('leads');
   const [leads, setLeads] = useState<Lead[]>([]);
   const [linkedinInput, setLinkedinInput] = useState<string>('');
@@ -42,8 +47,7 @@ const LeadsSidebar = () => {
       setLinkedinError('Please double check your link structures. They should be structured in https://www.linkedin.com/in/username');
       return;
     }
-    const userId = 'jOgfvrI7EfqjqcH2Gfeo';
-    const linkedinLeadsCollection = collection(db, 'users', userId, 'campaigns', campaignId as string, 'linkedinLeads');
+    const linkedinLeadsCollection = collection(db, 'users', userId as string, 'campaigns', campaignId as string, 'linkedinLeads');
 
     for (const url of linkedInUrls) {
       const q = query(linkedinLeadsCollection, where("url", "==", url));
@@ -58,23 +62,23 @@ const LeadsSidebar = () => {
     setLinkedinError('');
   };
 
-
   useEffect(() => {
     const fetchLinkedInLeads = async () => {
-      const userId = 'jOgfvrI7EfqjqcH2Gfeo';
+      if (!userId) {
+        console.error('userId is null');
+        return;
+      }
       const linkedinLeadsCollection = collection(db, 'users', userId, 'campaigns', campaignId as string, 'linkedinLeads');
       const linkedInLeadsSnap = await getDocs(linkedinLeadsCollection);
       setLinkedInLeads(linkedInLeadsSnap.docs.map(doc => ({ id: doc.id, url: doc.data().url })));
     }
-
-    if (campaignId) {
-      fetchLinkedInLeads();
-    }
-  }, [campaignId]);
+    fetchLinkedInLeads();
+  }, [campaignId, userId]);
+  
 
   useEffect(() => {
     const fetchLeads = async () => {
-      const campaignRef = doc(db, 'users', 'jOgfvrI7EfqjqcH2Gfeo', 'campaigns', campaignId as string);
+      const campaignRef = doc(db, 'users', userId as string, 'campaigns', campaignId as string);
       const campaignSnap = await getDoc(campaignRef);
       const campaignData = campaignSnap.data() as Campaign;
       setLeads(campaignData.leads);
@@ -104,8 +108,7 @@ const LeadsSidebar = () => {
 
   const editLinkedInLeadHandler = async (id: string, username: string) => {
     const url = `https://www.linkedin.com/in/${username}`;
-    const userId = 'jOgfvrI7EfqjqcH2Gfeo';
-    const linkedInLeadRef = doc(db, 'users', userId, 'campaigns', campaignId as string, 'linkedinLeads', id);
+    const linkedInLeadRef = doc(db, 'users', userId as string, 'campaigns', campaignId as string, 'linkedinLeads', id);
     await setDoc(linkedInLeadRef, { url: url });
     setLinkedInLeads(linkedInLeads.map(lead => lead.id === id ? { ...lead, url: url } : lead));
     setEditingUrl('');
@@ -114,8 +117,7 @@ const LeadsSidebar = () => {
 
   const removeLinkedInLeadHandler = async (id: string) => {
     if (window.confirm('Are you sure you want to remove this LinkedIn URL from the list?')) {
-      const userId = 'jOgfvrI7EfqjqcH2Gfeo';
-      const linkedInLeadRef = doc(db, 'users', userId, 'campaigns', campaignId as string, 'linkedinLeads', id);
+      const linkedInLeadRef = doc(db, 'users', userId as string, 'campaigns', campaignId as string, 'linkedinLeads', id);
       await updateDoc(linkedInLeadRef, { url: arrayRemove() });
       setLinkedInLeads(linkedInLeads.filter(lead => lead.id !== id));
     }
@@ -123,8 +125,7 @@ const LeadsSidebar = () => {
 
   const removeLeadHandler = async (lead: Lead) => {
     if (window.confirm(`Are you sure you want to remove ${lead.firstName} ${lead.lastName} from the list?`)) {
-      const userId = 'jOgfvrI7EfqjqcH2Gfeo';
-      const campaignRef = doc(db, 'users', userId, 'campaigns', campaignId as string);
+      const campaignRef = doc(db, 'users', userId as string, 'campaigns', campaignId as string);
       await updateDoc(campaignRef, {
         leads: arrayRemove(lead)
       });

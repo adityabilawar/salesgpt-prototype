@@ -4,7 +4,7 @@ import RightBar from '../../components/Profile/RightBar'
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { setView } from '@/components/store/sidebarSlice';
-import Center from '@/components/Dashboard/Send/CampaignsList'
+import CampaignsList from '@/components/Dashboard/Send/CampaignsList'
 
 const send = () => {
     const dispatch = useDispatch();
@@ -16,7 +16,7 @@ const send = () => {
         <div>
             <div className="grid grid-cols-5">
                 <Sidebar />
-                <div className="col-span-4"><Center /></div>
+                <div className="col-span-4"><CampaignsList /></div>
             </div>
         </div>
     )
