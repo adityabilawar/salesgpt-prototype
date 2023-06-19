@@ -250,11 +250,6 @@ const Center = () => {
                 onChange={handleSearchChange}
               />
             </div>
-            <Link href="/dashboard/send">
-              <button className="border-[1px] rounded-md px-6 py-3" onClick={handleContactAll}>
-                Contact All
-              </button>
-            </Link>
           </div>
         </div>
         <div className="p-10 space-y-4 overflow-y-auto">

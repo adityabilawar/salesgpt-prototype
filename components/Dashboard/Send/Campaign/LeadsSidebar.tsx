@@ -179,39 +179,6 @@ const LeadsSidebar = () => {
           </div>
         </div>
       )}
-      <div className="border-t-[1px] w-full">
-        <button className="py-3 m-5 px-10 rounded-md border-[1px]" onClick={() => setModalOpen(true)}>Upload LinkedIn URLS</button>
-      </div>
-      <div>
-        <h2 className="text-xl p-5">LinkedIn Profiles</h2>
-        {linkedInLeads.length === 0 && <p className="px-5">No LinkedIn profiles found</p>}
-        {linkedInLeads.map((lead: LinkedInLead) => (
-          <div key={lead.id} className="flex w-full justify-between p-5">
-            {editingId === lead.id ? (
-              <input
-                type="text"
-                className="text-black"
-                value={editingUrl}
-                onChange={(e) => setEditingUrl(e.target.value)}
-                onBlur={() => editLinkedInLeadHandler(lead.id, editingUrl)}
-              />
-            ) : (
-              <a href={lead.url} target="_blank">{getLinkedInUsername(lead.url)}</a>
-            )}
-            <div className="flex space-x-2 text-xl">
-              <BsPlay className="cursor-pointer" onClick={playLeadHandler(lead)} />
-              <FiRefreshCw className="cursor-pointer" onClick={refreshLeadHandler(lead)} />
-
-              {editingId === lead.id ? (
-                <FiCheck className="cursor-pointer" onClick={() => editLinkedInLeadHandler(lead.id, editingUrl)} />
-              ) : (
-                <FiEdit className="cursor-pointer" onClick={() => { setEditingUrl(getLinkedInUsername(lead.url)); setEditingId(lead.id); }} />
-              )}
-              <FiTrash2 className="cursor-pointer" onClick={() => removeLinkedInLeadHandler(lead.id)} />
-            </div>
-          </div>
-        ))}
-      </div>
 
     </div>
   )

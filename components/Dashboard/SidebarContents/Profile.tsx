@@ -200,7 +200,7 @@ const Profile = () => {
             </div>
           </div>
         </div>
-        {/* <div className="black">
+        <div className="black">
         <div className="flex">
           <div className="w-1/2 pr-4">
             <button
@@ -347,7 +347,7 @@ const Profile = () => {
             </div>
           )}
         </div>
-      </div> */}
+      </div>
       </div>
       <div className="flex justify-end mr-3">
         {!isEditing ? (
