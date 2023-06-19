@@ -25,7 +25,7 @@ function classNames(...classes) {
 
 export default function Navbar() {
   return (
-    <div className="border-b border-gray-200 pb-5 sm:pb-0 -mt-5">
+    <div className="border-b border-gray-200 pb-5 sm:pb-0">
       <div className="mt-3 sm:mt-4">
         <div className="sm:hidden">
           <label htmlFor="current-tab" className="sr-only">

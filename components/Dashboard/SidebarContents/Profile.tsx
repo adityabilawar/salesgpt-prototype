@@ -101,7 +101,7 @@ const Profile = () => {
   };
 
   return (
-    <div className="border-[1px] p-8 rounded-lg">
+    <div className="border-[1px] p-8 rounded-lg m-10">
       <div className=" grid grid-cols-2 space-y-4">
         <div className="flex gap-x-7">
           <img className="rounded-full w-28 h-28" src="/graphic.png"></img>
