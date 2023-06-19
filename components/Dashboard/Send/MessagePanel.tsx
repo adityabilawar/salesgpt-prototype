@@ -8,6 +8,7 @@ import { Configuration, OpenAIApi } from 'openai';
 import { fetchUserData, User } from '@/components/redux/userSlice';
 import { setDoc } from 'firebase/firestore';
 import { useRouter } from 'next/router';
+import { FiRotateCw } from 'react-icons/fi';
 
 const configuration = new Configuration({
   organization: "org-z7m6hqrQHuHbpI0K9pYlJiR0",
@@ -101,18 +102,18 @@ const MessagePanel = () => {
       alert('The message is empty. Please generate a message before saving.');
       return;
     }
-  
+
     if (!user || !selectedLead || !campaignId) return;
     const campaignRef = doc(db, 'users', user.id, 'campaigns', campaignId as string);
     const campaignDoc = await getDoc(campaignRef);
-  
+
     if (!campaignDoc.exists()) {
       console.error('Campaign does not exist');
       return;
     }
-  
+
     let campaignData = campaignDoc.data();
-  
+
     if (campaignData) {
       let leadIndex = campaignData.leads.findIndex((lead: Lead) => lead.id === selectedLead.id);
       if (leadIndex !== -1) {
@@ -126,7 +127,7 @@ const MessagePanel = () => {
       console.error('Invalid campaign data');
     }
   };
-  
+
 
   async function generatePersonalizedMessage(
     lead: Lead,
@@ -179,13 +180,18 @@ const MessagePanel = () => {
           value={finalMessage}
           onChange={(e) => setFinalMessage(e.target.value)}
         ></textarea>
-        <button
-          className="mt-5 px-4 py-2 border-[1px]"
-          onClick={saveGeneratedMessage}
-          disabled={loading}
-        >
-          Save
-        </button>
+        <div className="flex space-x-2 justify-center items-center h-full mt-5">
+          <button
+            className="px-4 py-2 border-[1px] rounded-md bg-brand text-white"
+            onClick={saveGeneratedMessage}
+            disabled={loading}
+          >
+            Save
+          </button>
+          <button className="h-full">
+            <FiRotateCw size={20} />
+          </button>
+        </div>
       </div>
     </div>
   );

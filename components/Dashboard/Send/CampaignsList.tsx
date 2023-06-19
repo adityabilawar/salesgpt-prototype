@@ -96,7 +96,7 @@ const Center = () => {
                                                         router.push(`/dashboard/generate/${campaign.id}`);
                                                         dispatch(clearSelectedLead());
                                                     }}>
-                                                            <p className="ml-2">Generate Emails</p>
+                                                            <p className="ml-2">View Campaign</p>
                                                     </button>
 
                                                 </div>
