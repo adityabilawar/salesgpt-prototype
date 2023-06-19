@@ -27,7 +27,7 @@ const Center = () => {
   const fileInput = useRef<HTMLInputElement>(null);
   const [createModalOpen, setCreateModalOpen] = useState<boolean>(false);
   const selectedLeadsCount = useSelector((state) => state.leads.selectedLeads.length);
-  
+
   const [newLead, setNewLead] = useState({
     firstName: '',
     lastName: '',
@@ -48,7 +48,7 @@ const Center = () => {
   const handleRowClick = (id: string, lead: Lead) => {
     const updatedIsSelected = { ...isSelected, [id]: !isSelected[id] };
     setIsSelected(updatedIsSelected);
-  
+
     if (updatedIsSelected[id]) {
       dispatch(addSelectedLead(lead));
     } else {
@@ -207,7 +207,7 @@ const Center = () => {
 
   const handleSelectAll = () => {
     const allSelected = Object.keys(isSelected).length === leads.length && !Object.values(isSelected).includes(false);
-  
+
     // If all leads are already selected, unselect them. Otherwise, select all.
     if (allSelected) {
       dispatch(clearSelectedLeads());
@@ -234,10 +234,10 @@ const Center = () => {
         <div className="flex flex-col border-b-[1px] px-10 py-5 sticky top-0">
           <h1 className="text-2xl">Leads</h1>
           <div className="flex-grow-0 py-5 flex space-x-5">
-            <div className="bg-blue-500 rounded-md text-white px-5 flex justify-center items-center cursor-pointer" onClick={() => setModalOpen(true)}>
+            <div className="bg-brand text-white rounded-md text-white text-sm px-5 flex justify-center items-center cursor-pointer" onClick={() => setModalOpen(true)}>
               Upload Leads
             </div>
-            <div className="bg-blue-500 rounded-md text-white px-5 flex justify-center items-center cursor-pointer" onClick={() => setCreateModalOpen(true)}>
+            <div className="bg-brand text-white rounded-md text-white text-sm px-5 flex justify-center items-center cursor-pointer" onClick={() => setCreateModalOpen(true)}>
               Create Lead
             </div>
             <div className="relative border border-gray-200 border-md flex justify-center items-center space-x-2">
@@ -245,7 +245,7 @@ const Center = () => {
                 <FiSearch size={24} />
               </div>
               <input
-                className="py-2 pl-10 pr-4 w-full text-black rounded-md bg-transparent focus:outline-none"
+                className="py-2 pl-10 pr-4 w-full  rounded-md bg-transparent focus:outline-none"
                 placeholder="Search..."
                 onChange={handleSearchChange}
               />
@@ -261,7 +261,11 @@ const Center = () => {
           <div className="h-full space-y-4 border rounded-md">
             <div>
               <div className="p-4 border-b">
-                Hello
+                <Link href="/dashboard/send">
+                  <button className="border-[1px] rounded-md px-6 py-3 bg-brand text-white text-white text-sm" onClick={handleContactAll}>
+                    Send selected leads to campaign
+                  </button>
+                </Link>
               </div>
               <div>
                 <div className="flex flex-col">
@@ -273,7 +277,7 @@ const Center = () => {
                             <tr>
                               <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6">
                                 <div
-                                  className={`h-5 w-5 border-2 ml-3 rounded-md cursor-pointer ${Object.keys(isSelected).length === leads.length && !Object.values(isSelected).includes(false) ? 'bg-blue-500' : ''}`}
+                                  className={`h-5 w-5 border-2 ml-3 rounded-md cursor-pointer ${Object.keys(isSelected).length === leads.length && !Object.values(isSelected).includes(false) ? 'bg-brand' : ''}`}
                                   onClick={handleSelectAll}
                                 ></div>
                               </th>
@@ -295,28 +299,28 @@ const Center = () => {
                             </tr>
                           </thead>
                           <tbody className="divide-y divide-gray-200 bg-white">
-                          {isLoading ? (
-                            <div className="animate-pulse flex space-x-4">
-                              <div className="flex-1 space-y-6 py-1">
-                                <div className="h-2 bg-slate-700 rounded"></div>
-                                <div className="space-y-3">
-                                  <div className="grid grid-cols-3 gap-4">
-                                    <div className="h-2 bg-slate-700 rounded col-span-2"></div>
-                                    <div className="h-2 bg-slate-700 rounded col-span-1"></div>
-                                  </div>
+                            {isLoading ? (
+                              <div className="animate-pulse flex space-x-4">
+                                <div className="flex-1 space-y-6 py-1">
                                   <div className="h-2 bg-slate-700 rounded"></div>
+                                  <div className="space-y-3">
+                                    <div className="grid grid-cols-3 gap-4">
+                                      <div className="h-2 bg-slate-700 rounded col-span-2"></div>
+                                      <div className="h-2 bg-slate-700 rounded col-span-1"></div>
+                                    </div>
+                                    <div className="h-2 bg-slate-700 rounded"></div>
+                                  </div>
                                 </div>
                               </div>
-                            </div>
-                          ) : (leads
-                            .filter((lead: Lead) => {
-                              const searchString = `${lead.firstName} ${lead.lastName} ${lead.companyName}`.toLowerCase();
-                              return searchString.includes(searchTerm.toLowerCase());
-                            })
-                            .map((lead: Lead) => {
-                              const id = lead.id;
+                            ) : (leads
+                              .filter((lead: Lead) => {
+                                const searchString = `${lead.firstName} ${lead.lastName} ${lead.companyName}`.toLowerCase();
+                                return searchString.includes(searchTerm.toLowerCase());
+                              })
+                              .map((lead: Lead) => {
+                                const id = lead.id;
 
-                              return (
+                                return (
                                   <tr
                                     key={lead.id}
                                     className={`${isSelected[id] ? 'bg-gray-100' : ''}`}
@@ -325,7 +329,7 @@ const Center = () => {
                                     <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-6">
                                       <div className="flex items-center space-x-3">
                                         <div
-                                          className={`h-5 w-5 border-2 rounded-md cursor-pointer ${isSelected[id] ? 'bg-blue-500' : ''}`}
+                                          className={`h-5 w-5 border-2 rounded-md cursor-pointer ${isSelected[id] ? 'bg-brand' : ''}`}
                                         ></div>
                                       </div>
                                     </td>
@@ -362,11 +366,9 @@ const Center = () => {
                                       </a>
                                     </td>
                                   </tr>
-
-                                
-                              );
-                            }))}
-                            </tbody>
+                                );
+                              }))}
+                          </tbody>
                         </table>
                       </div>
                     </div>
@@ -380,7 +382,7 @@ const Center = () => {
       {modalOpen && (
         <div className="absolute inset-0 bg-gray-800 bg-opacity-60 z-10 flex justify-center items-center">
           <div className="bg-[#2C2F48] rounded-lg w-2/3 p-8">
-            <h2 className="text-2xl text-black mb-8">Upload Leads</h2>
+            <h2 className="text-2xl  mb-8">Upload Leads</h2>
             <div className="flex">
               <div
                 className={`cursor-pointer rounded-t-md py-2 px-4 ${activeTab === 'linkedin' ? 'bg-[#383B59]' : ''}`}
@@ -398,12 +400,12 @@ const Center = () => {
             {activeTab === 'linkedin' && (
               <div>
                 <textarea
-                  className="mt-8 w-full h-48 bg-[#383B59] text-black p-2 rounded-md"
+                  className="mt-8 w-full h-48 bg-[#383B59]  p-2 rounded-md"
                   placeholder="Paste LinkedIn URLs here..."
                   value={linkedinInput}
                   onChange={(e) => setLinkedinInput(e.target.value)}
                 />
-                <button className="mt-4 bg-[#383B59] text-black py-2 px-4 rounded-md" onClick={handleLinkedInInput}>
+                <button className="mt-4 bg-[#383B59]  py-2 px-4 rounded-md" onClick={handleLinkedInInput}>
                   Import
                 </button>
               </div>
@@ -428,7 +430,7 @@ const Center = () => {
               </div>
             )}
             <div className="mt-8 text-right">
-              <button className="text-black" onClick={() => setModalOpen(false)}>
+              <button className="" onClick={() => setModalOpen(false)}>
                 Close
               </button>
             </div>
@@ -438,8 +440,8 @@ const Center = () => {
       {createModalOpen && (
         <div className="absolute inset-0 bg-gray-800 bg-opacity-60 z-10 flex justify-center items-center">
           <div className="bg-[#2C2F48] rounded-lg w-2/3 p-8">
-            <h2 className="text-2xl text-black mb-8">Create Lead</h2>
-            <form className="flex flex-col text-black">
+            <h2 className="text-2xl  mb-8">Create Lead</h2>
+            <form className="flex flex-col ">
               <input
                 type="text"
                 name="firstName"
@@ -489,12 +491,12 @@ const Center = () => {
                 value={newLead.linkedIn}
                 onChange={handleInputChange}
               />
-              <button type="button" className="mt-4 bg-[#383B59] text-black py-2 px-4 rounded-md" onClick={handleCreateLead}>
+              <button type="button" className="mt-4 bg-[#383B59]  py-2 px-4 rounded-md" onClick={handleCreateLead}>
                 Create
               </button>
             </form>
             <div className="mt-8 text-right">
-              <button className="text-black" onClick={() => setCreateModalOpen(false)}>
+              <button className="" onClick={() => setCreateModalOpen(false)}>
                 Close
               </button>
             </div>

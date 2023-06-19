@@ -38,7 +38,7 @@ const Sidebar = () => {
               }`}
           />
           <h1
-            className={`text-black origin-left font-bold text-xl duration-200 ${!open && "scale-0"
+            className={` origin-left font-bold text-xl duration-200 ${!open && "scale-0"
               }`}
           >
             Pipeline AI
@@ -61,7 +61,7 @@ const Sidebar = () => {
         </ul>
         <div className="w-full h-[1px] bg-white my-5" />
         <div
-          className={`flex justify-left rounded-md p-2 cursor-pointer duration-50 ease-in-out text-lg items-center gap-x-4 text-black hover:bg-white hover:text-black`}
+          className={`flex justify-left rounded-md p-2 cursor-pointer duration-50 ease-in-out text-lg items-center gap-x-4 hover:bg-white hover:text-black`}
           onClick={() => signOut(auth)}
         >
           <span>Sign Out</span>

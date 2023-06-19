@@ -15,9 +15,8 @@
   ```
 */
 const tabs = [
-    { name: 'Leads', href: '#', current: false },
+    { name: 'Leads', href: '#', current: true },
     { name: 'Campaigns', href: '#', current: false },
-    { name: 'Results', href: '#', current: true },
   ]
   
   function classNames(...classes) {

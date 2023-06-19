@@ -49,7 +49,7 @@ const EditModal = (props: { display: boolean, type: string, message: string, cus
 							</div>
 						</div>
 						<div className="bg-slate-700 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
-							<button type="button" className="inline-flex w-full justify-center rounded-md bg-pink-500 px-3 py-2 text-sm font-semibold text-black shadow-sm hover:bg-pink-600 sm:ml-3 sm:w-auto" onClick={() => props.savePrompt(promptInput, titleInput)}>Save</button>
+							<button type="button" className="inline-flex w-full justify-center rounded-md bg-pink-500 px-3 py-2 text-sm font-semibold shadow-sm hover:bg-pink-600 sm:ml-3 sm:w-auto" onClick={() => props.savePrompt(promptInput, titleInput)}>Save</button>
 							<button type="button" className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto" onClick={props.hideDisplay}>Cancel</button>
 						</div>
 					</div>

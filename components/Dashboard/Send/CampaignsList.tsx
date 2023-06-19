@@ -58,10 +58,12 @@ const Center = () => {
                 <div className="relative flex border-b-[1px] px-10 py-5 text-2xl">
                     Campaigns
                 </div>
+
+                <div className="m-10 border rounded-md">
                 {!editingCampaign &&
-                    <div className="flex-grow-0 px-10 py-5 flex space-x-5">
+                    <div className="flex-grow-0 px-5 py-5 flex space-x-5 border-b">
                         <Link href="/dashboard/create-campaign">
-                            <button className="border-[1px] px-6 py-3">Add Campaign</button>
+                            <button className="border-[1px] px-6 py-3 rounded-md bg-brand text-white">Add Campaign</button>
                         </Link>
                     </div>
                 }
@@ -72,31 +74,25 @@ const Center = () => {
                             onBack={() => setEditingCampaign(null)}
                         />
                     ) : (
-                        <div className="p-10 space-y-4">
+                        <div className="">
                             {campaigns.map((campaign, i) => {
                                 return (
-                                    <div className="flex flex-col border border-white w-full select-none" key={i}>
-                                        <div className="flex justify-between items-center w-full cursor-pointer" onClick={() => toggleOpen(i)}>
+                                    <div className="flex flex-col border-b w-full" key={i}>
+                                        <div className="flex justify-between items-center w-full" onClick={() => toggleOpen(i)}>
                                             <div className="flex items-center p-4">
                                                 <p className="ml-2">{campaign.campaignTitle}</p>
                                             </div>
                                             <div className="flex p-4">
-                                                <FiChevronDown size={24} />
-                                            </div>
-                                        </div>
-                                        {isOpen[i] && (
-                                            <div className="flex flex-col space-y-6 items-start p-4 border-t border-white">
-                                                <div className="">{campaign.generatedPrompt}</div>
-                                                <div className="flex space-x-5">
-                                                    <button className="flex items-center border-[1px] px-6 py-2" onClick={() => setEditingCampaign(campaign)}>
+                                            <div className="flex space-x-5">
+                                                    <button className="flex text-white bg-brand items-center rounded-md px-6 py-2" onClick={() => setEditingCampaign(campaign)}>
                                                         <FiEdit3 size={24} />
                                                         <p className="ml-2">Edit</p>
                                                     </button>
-                                                    <button className="flex items-center border-[1px] px-6 py-2" onClick={() => sendLeads(campaign.id)}>
+                                                    <button className="flex bg-brand text-white items-center rounded-md px-6 py-2" onClick={() => sendLeads(campaign.id)}>
                                                         <FiUpload size={24} />
                                                         <p className="ml-2">Send Leads</p>
                                                     </button>
-                                                    <button className="flex items-center border-[1px] px-6 py-2" onClick={() => {
+                                                    <button className="flex bg-brand text-white items-center rounded-md px-6 py-2" onClick={() => {
                                                         router.push(`/dashboard/generate/${campaign.id}`);
                                                         dispatch(clearSelectedLead());
                                                     }}>
@@ -105,14 +101,14 @@ const Center = () => {
 
                                                 </div>
                                             </div>
-                                        )}
+                                        </div>
                                     </div>
-
                                 )
                             })}
                         </div>
                     )
                 }
+                </div>
             </div>
         </div>
     )
