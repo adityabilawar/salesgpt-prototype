@@ -5,10 +5,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/components/store';
 import { animated, useSpring } from 'react-spring';
 import { collection, doc, onSnapshot, setDoc } from 'firebase/firestore';
-import { db } from '@/lib/firebaseClient';
+import { auth, db } from '@/lib/firebaseClient';
 import { FiEdit3, FiSave } from 'react-icons/fi';
 import axios from 'axios';
 import { updateSelectedLead } from '@/components/store/leadsSlice';
+import { onAuthStateChanged } from 'firebase/auth';
 
 const socials = [
     {
@@ -37,6 +38,7 @@ const LeadDetails = () => {
     const selectedLead: any = useSelector((state: RootState) => state.leads.selectedLead);
     const getDetail = (value: string | null) => value ? value : <span className="text-gray-900">unknown</span>;
     const [linkedInStatus, setLinkedInStatus] = useState<'valid' | 'invalid' | null>(null);
+    const [userId, setUserId] = useState<string | null>(null);
     const springProps = useSpring({
         borderBottom: activeTab === 'leads' ? '2px solid white' : '2px solid white',
         left: activeTab === 'leads' ? '0%' : '50%',
@@ -45,6 +47,19 @@ const LeadDetails = () => {
         bottom: 0,
         config: { friction: 30, tension: 180 },
     });
+
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+          if (user) {
+            setUserId(user.uid);
+          } else {
+            setUserId(null);
+          }
+        });
+        return () => {
+          unsubscribe();
+        };
+      }, []);
 
     useEffect(() => {
         setEditLeadData(selectedLead);
@@ -61,7 +76,7 @@ const LeadDetails = () => {
                     return;
                 }
 
-                const leadRef = doc(collection(doc(db, 'users', 'jOgfvrI7EfqjqcH2Gfeo'), 'leads'), selectedLead.id);
+                const leadRef = doc(collection(doc(db, 'users', userId as string), 'leads'), selectedLead.id);
                 await setDoc(leadRef, editLeadData);
                 dispatch(updateSelectedLead(editLeadData));
 
@@ -76,7 +91,7 @@ const LeadDetails = () => {
 
     useEffect(() => {
         if (selectedLead?.id) {
-            const leadRef = doc(collection(doc(db, 'users', 'jOgfvrI7EfqjqcH2Gfeo'), 'leads'), selectedLead.id);
+            const leadRef = doc(collection(doc(db, 'users', userId as string), 'leads'), selectedLead.id);
 
             const unsubscribe = onSnapshot(leadRef, (docSnapshot) => {
                 const newLeadData = docSnapshot.data();

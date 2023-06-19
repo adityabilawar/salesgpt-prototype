@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { doc, getDoc, addDoc, collection } from 'firebase/firestore';
-import { db } from '@/lib/firebaseClient';
+import { doc, getDoc, addDoc, collection, setDoc } from 'firebase/firestore';
+import { auth, db } from '@/lib/firebaseClient';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/components/store';
 import axios from 'axios';
 import { Configuration, OpenAIApi } from 'openai';
 import { fetchUserData, User } from '@/components/redux/userSlice';
-import { setDoc } from 'firebase/firestore';
 import { useRouter } from 'next/router';
 import { FiRotateCw } from 'react-icons/fi';
+import { onAuthStateChanged } from 'firebase/auth';
 
 const configuration = new Configuration({
   organization: "org-z7m6hqrQHuHbpI0K9pYlJiR0",
@@ -24,13 +24,28 @@ const MessagePanel = () => {
   const [messagesGenerated, setMessagesGenerated] = useState<number>(0);
   const [finalMessage, setFinalMessage] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
+  const [userId, setUserId] = useState<string | null>(null);
   const router = useRouter();
   const { campaignId } = router.query;
 
   useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setUserId(user.uid);
+      } else {
+        setUserId(null);
+      }
+    });
+    return () => {
+      unsubscribe();
+    };
+  }, []);
+
+  useEffect(() => {
     async function fetchData() {
-      if (!campaignId) return;
-      const campaignDocRef = doc(db, 'users', 'jOgfvrI7EfqjqcH2Gfeo', 'campaigns', campaignId as string);
+      if (!campaignId || !userId) return;
+
+      const campaignDocRef = doc(db, 'users', userId, 'campaigns', campaignId as string);
       const campaignSnapshot = await getDoc(campaignDocRef);
 
       if (!campaignSnapshot.exists()) {
@@ -56,7 +71,7 @@ const MessagePanel = () => {
         ...campaignData,
       };
 
-      const userDataRef = doc(db, 'users', 'jOgfvrI7EfqjqcH2Gfeo');
+      const userDataRef = doc(db, 'users', userId);
       const userSnapshot = await getDoc(userDataRef);
 
       if (!userSnapshot.exists()) {
@@ -91,20 +106,21 @@ const MessagePanel = () => {
           JSON.parse(JSON.stringify(user))
         );
         setFinalMessage(message);
-        setMessagesGenerated(prevCount => prevCount + 1);
+        setMessagesGenerated((prevCount) => prevCount + 1);
       }
     }
 
     fetchData();
-  }, [selectedLead]);
+  }, [selectedLead, campaignId, userId]);
+
   const saveGeneratedMessage = async () => {
     if (finalMessage.trim() === '') {
       alert('The message is empty. Please generate a message before saving.');
       return;
     }
 
-    if (!user || !selectedLead || !campaignId) return;
-    const campaignRef = doc(db, 'users', user.id, 'campaigns', campaignId as string);
+    if (!user || !selectedLead || !campaignId || !userId) return;
+    const campaignRef = doc(db, 'users', userId, 'campaigns', campaignId as string);
     const campaignDoc = await getDoc(campaignRef);
 
     if (!campaignDoc.exists()) {
@@ -128,12 +144,7 @@ const MessagePanel = () => {
     }
   };
 
-
-  async function generatePersonalizedMessage(
-    lead: Lead,
-    campaign: Campaign,
-    user: User
-  ): Promise<string> {
+  async function generatePersonalizedMessage(lead: Lead, campaign: Campaign, user: User): Promise<string> {
     setLoading(true);
     const aboutInput = `Never forget the recipient's name is ${lead.firstName} ${lead.lastName}. The company values are ${user.companyValues} and we are solving ${user.problem}. Never forget our name is ${user.firstName} ${user.lastName}.`;
 
@@ -143,7 +154,16 @@ const MessagePanel = () => {
       if (response.data && response.data.message) {
         const message = response.data.message;
 
-        const leadRef = doc(db, 'users', 'jOgfvrI7EfqjqcH2Gfeo', 'campaigns', campaign.id, 'leads', lead.id);
+        const leadsCollectionRef = collection(
+          db,
+          'users',
+          userId as string,
+          'campaigns',
+          campaign.id as string,
+          'leads'
+        );
+        const leadRef = doc(leadsCollectionRef, lead.id as string);
+        
         await setDoc(leadRef, { generatedMessage: message }, { merge: true });
         return message;
       } else {
@@ -161,7 +181,6 @@ const MessagePanel = () => {
       setLoading(false);
     }
   }
-
 
   return (
     <div className="flex-grow">
@@ -195,7 +214,6 @@ const MessagePanel = () => {
       </div>
     </div>
   );
-
-}
+};
 
 export default MessagePanel;

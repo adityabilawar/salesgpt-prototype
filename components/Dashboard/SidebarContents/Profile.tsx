@@ -3,7 +3,7 @@ import { BsPlusLg, BsTelephone, BsThreeDots } from "react-icons/bs";
 import { AiOutlineMail } from "react-icons/ai";
 import { FiEdit3, FiSave } from "react-icons/fi";
 import { animated, useSpring } from "react-spring";
-import { db } from "@/lib/firebaseClient";
+import { auth, db } from "@/lib/firebaseClient";
 import {
   doc,
   getDoc,
@@ -12,6 +12,7 @@ import {
   setDoc,
 } from "firebase/firestore";
 import Image from "next/image";
+import { onAuthStateChanged } from "firebase/auth";
 
 interface Social {
   icon: JSX.Element;
@@ -55,6 +56,7 @@ const Profile = () => {
   const [profileData, setProfileData] = useState<ProfileData | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [userId, setUserId] = useState<string | null>(null);
   const [editData, setEditData] = useState<ProfileData | null>(null);
   const springProps = useSpring({
     borderBottom: activeTab === "leads" ? "2px solid white" : "2px solid white",
@@ -66,10 +68,23 @@ const Profile = () => {
   });
 
   useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setUserId(user.uid);
+      } else {
+        setUserId(null);
+      }
+    });
+    return () => {
+      unsubscribe();
+    };
+  }, []);
+
+
+  useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const userId = "jOgfvrI7EfqjqcH2Gfeo";
-        const userDoc = await getDoc(doc(collection(db, "users"), userId));
+        const userDoc = await getDoc(doc(collection(db, "users"), userId as string));
         if (userDoc.exists()) {
           const userData = userDoc.data() as ProfileData;
           setProfileData(userData);
@@ -89,7 +104,7 @@ const Profile = () => {
     if (editData) {
       try {
         await setDoc(
-          doc(collection(db, "users"), "jOgfvrI7EfqjqcH2Gfeo"),
+          doc(collection(db, "users"), userId as string),
           editData
         );
         setProfileData(editData);

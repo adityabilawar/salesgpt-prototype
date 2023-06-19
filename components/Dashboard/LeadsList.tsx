@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { onAuthStateChanged } from 'firebase/auth';
+import { auth } from '@/lib/firebaseClient';
 import { RootState } from '../store';
 import { fetchLeads, addSelectedLead, setSelectedLead, clearSelectedLeads, removeLead, updateLeads, toggleLeadSelection, updateSelectedLead } from '@/components/store/leadsSlice';
 import { setView } from '@/components/store/sidebarSlice';
@@ -21,12 +23,14 @@ const Center = () => {
   const [isOpen, setIsOpen] = useState<Record<string, boolean>>({});
   const [isSelected, setIsSelected] = useState<Record<string, boolean>>({});
   const [file, setFile] = useState<File | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<string>('linkedin');
   const [linkedinInput, setLinkedinInput] = useState<string>('');
   const fileInput = useRef<HTMLInputElement>(null);
   const [createModalOpen, setCreateModalOpen] = useState<boolean>(false);
-  const selectedLeadsCount = useSelector((state) => state.leads.selectedLeads.length);
+  const selectedLeadsCount = useSelector((state: RootState) => state.leads.selectedLeads.length);
+
 
   const [newLead, setNewLead] = useState({
     firstName: '',
@@ -45,6 +49,20 @@ const Center = () => {
   const toggleOpen = (id: string) => {
     setIsOpen((prev) => ({ ...prev, [id]: !prev[id] }));
   };
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setUserId(user.uid);
+      } else {
+        setUserId(null);
+      }
+    });
+    return () => {
+      unsubscribe();
+    };
+  }, []);
+
   const handleRowClick = (id: string, lead: Lead) => {
     const updatedIsSelected = { ...isSelected, [id]: !isSelected[id] };
     setIsSelected(updatedIsSelected);
@@ -63,19 +81,23 @@ const Center = () => {
 
   const handleCreateLead = async (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     event.preventDefault();
-    const userId = 'jOgfvrI7EfqjqcH2Gfeo';
-    const leadsRef = collection(db, 'users', userId, 'leads');
-    await addDoc(leadsRef, newLead);
-    setNewLead({
-      firstName: '',
-      lastName: '',
-      jobTitle: '',
-      companyName: '',
-      email: '',
-      phone: '',
-      linkedIn: '',
-    });
-    setCreateModalOpen(false);
+    if (userId) {
+      console.log(userId);
+      const leadsRef = collection(db, 'users', userId, 'leads');
+      await addDoc(leadsRef, newLead);
+      setNewLead({
+        firstName: '',
+        lastName: '',
+        jobTitle: '',
+        companyName: '',
+        email: '',
+        phone: '',
+        linkedIn: '',
+      });
+      setCreateModalOpen(false);
+    } else {
+      console.error("No user is signed in");
+    }
   };
 
 
@@ -97,6 +119,11 @@ const Center = () => {
 
 
   const handleLinkedInInput = async () => {
+    if (!userId) {
+      console.error("No user is signed in");
+      return;
+    }
+
     const linkedInUrls = linkedinInput.split('\n');
 
     for (let url of linkedInUrls) {
@@ -113,13 +140,13 @@ const Center = () => {
           linkedIn: url,
         };
 
-        const userId = 'jOgfvrI7EfqjqcH2Gfeo';
         const leadsRef = collection(db, 'users', userId, 'leads');
         await addDoc(leadsRef, lead);
       }
     }
     setLinkedinInput('');
   }
+
   const handleContactAll = () => {
     dispatch(clearSelectedLeads());
     Object.keys(isSelected).forEach((id: string) => {
@@ -145,7 +172,11 @@ const Center = () => {
   );
 
   useEffect(() => {
-    const userId = 'jOgfvrI7EfqjqcH2Gfeo';
+    if (!userId) {
+      console.error("No user is signed in");
+      return;
+    }
+
     const leadsRef = collection(db, 'users', userId, 'leads');
     const unsubscribe = onSnapshot(leadsRef, (snapshot) => {
       const updatedLeads: Lead[] = [];
@@ -159,9 +190,14 @@ const Center = () => {
     return () => {
       unsubscribe();
     };
-  }, [dispatch]);
+  }, [dispatch, userId]);
 
   const handleUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (!userId) {
+      console.error("No user is signed in");
+      return;
+    }
+
     if (event.target.files && event.target.files.length > 0) {
       setFile(event.target.files[0]);
       Papa.parse(event.target.files[0], {
@@ -171,10 +207,10 @@ const Center = () => {
             const batch = results.data.slice(i, i + 500);
             const batchPromises = batch.map(async (lead) => {
               try {
-                const userRef = doc(db, 'users', 'jOgfvrI7EfqjqcH2Gfeo');
+                const userRef = doc(db, 'users', userId);
                 const userSnapshot = await getDoc(userRef);
                 if (userSnapshot.exists()) {
-                  const leadsRef = collection(db, 'users', 'jOgfvrI7EfqjqcH2Gfeo', 'leads');
+                  const leadsRef = collection(db, 'users', userId, 'leads');
                   await addDoc(leadsRef, lead);
                 }
               } catch (e) {
@@ -190,13 +226,24 @@ const Center = () => {
     }
   };
 
+
   const handleDeleteLead = async (id: string) => {
     const leadToDelete = leads.find((lead: Lead) => lead.id === id);
     if (leadToDelete) {
       dispatch(removeLead(leadToDelete));
     }
+
     try {
-      const userId = 'jOgfvrI7EfqjqcH2Gfeo';
+      if (!userId) {
+        console.error("No user is signed in");
+        return;
+      }
+
+      const confirmDelete = window.confirm("Are you sure you want to delete this lead?");
+      if (!confirmDelete) {
+        return;
+      }
+
       const leadRef = doc(db, 'users', userId, 'leads', id);
       await deleteDoc(leadRef);
       console.log('Lead removed from Firebase');
@@ -204,6 +251,8 @@ const Center = () => {
       console.error('Error removing lead: ', error);
     }
   };
+
+
 
   const handleSelectAll = () => {
     const allSelected = Object.keys(isSelected).length === leads.length && !Object.values(isSelected).includes(false);
@@ -291,24 +340,31 @@ const Center = () => {
                               <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6">
                                 <span className="sr-only">Edit</span>
                               </th>
+                              <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6">
+                                <span className="sr-only">Delete</span>
+                              </th>
                             </tr>
                           </thead>
                           <tbody className="divide-y divide-gray-200 bg-white">
                             {isLoading ? (
-                              <div className="animate-pulse flex space-x-4">
+                              <div className="animate-pulse flex space-x-4 w-full">
                                 <div className="flex-1 space-y-6 py-1">
-                                  <div className="h-2 bg-slate-700 rounded"></div>
                                   <div className="space-y-3">
-                                    <div className="grid grid-cols-3 gap-4">
-                                      <div className="h-2 bg-slate-700 rounded col-span-2"></div>
-                                      <div className="h-2 bg-slate-700 rounded col-span-1"></div>
+                                    <div className="grid grid-cols-7 gap-4">
+                                      <div className="h-2 bg-slate-700 rounded w-1/8"></div>
+                                      <div className="h-2 bg-slate-700 rounded w-2/8"></div>
+                                      <div className="h-2 bg-slate-700 rounded w-1/8"></div>
+                                      <div className="h-2 bg-slate-700 rounded w-1/8"></div>
+                                      <div className="h-2 bg-slate-700 rounded w-1/8"></div>
+                                      <div className="h-2 bg-slate-700 rounded w-1/8"></div>
+                                      <div className="h-2 bg-slate-700 rounded w-1/8"></div>
                                     </div>
                                     <div className="h-2 bg-slate-700 rounded"></div>
                                   </div>
                                 </div>
                               </div>
-                            ) : (leads
-                              .filter((lead: Lead) => {
+                            ) : (
+                              leads.filter((lead: Lead) => {
                                 const searchString = `${lead.firstName} ${lead.lastName} ${lead.companyName}`.toLowerCase();
                                 return searchString.includes(searchTerm.toLowerCase());
                               })
@@ -359,6 +415,16 @@ const Center = () => {
                                       >
                                         Edit
                                       </a>
+                                    </td>
+                                    <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
+                                      <FiTrash
+                                        size={20}
+                                        className="text-red-500 cursor-pointer"
+                                        onClick={(event) => {
+                                          event.stopPropagation();
+                                          handleDeleteLead(id);
+                                        }}
+                                      />
                                     </td>
                                   </tr>
                                 );

@@ -1,7 +1,7 @@
 interface Campaign {
     id: string;
     campaignTitle: string;
-    generatedPrompt: string;
+    generatedPrompt?: string;
     platform?: string; 
     callToAction?: string;
     toneOfVoice?: string; 
