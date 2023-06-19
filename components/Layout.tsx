@@ -11,7 +11,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     return (
         <div className="flex h-screen">
             <Sidebar2 />
-            <div className="flex flex-col flex-grow">
+            <div className="flex flex-col flex-grow m-12">
                 <div className="flex-grow">
                     {children}
                 </div>
