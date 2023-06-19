@@ -200,22 +200,26 @@ const Profile = () => {
             </div>
           </div>
         </div>
-        {/* <div className="black">
-        <div className="flex">
-          <div className="w-1/2 pr-4">
+      </div>
+
+      <div className="h-6" />
+
+      <div className="black ">
+        <div className="flex gap-x-6">
+          <div>
             <button
-              className={`w-full py-2 ${
-                activeTab === "leads" ? "text-black" : "text-gray-500"
+              className={`w-full py-2 bg-brand text-white p-5 rounded-md ${
+                activeTab === "leads" ? "text-black" : "text-gray-600"
               }`}
               onClick={() => setActiveTab("leads")}
             >
               Leads Info
             </button>
           </div>
-          <div className="w-1/2 pl-4">
+          <div>
             <button
-              className={`w-full py-2 ${
-                activeTab === "address" ? "text-black" : "text-gray-500"
+              className={`w-full py-2 bg-brand text-white p-5 rounded-md ${
+                activeTab === "address" ? "text-black" : "text-gray-600"
               }`}
               onClick={() => setActiveTab("address")}
             >
@@ -297,6 +301,7 @@ const Profile = () => {
           ) : (
             <div className="px-2 py-4">
               <div>
+                <div className="h-2"/>
                 <h1 className="text-gray-400">Company Information</h1>
                 {isEditing ? (
                   <textarea
@@ -311,7 +316,10 @@ const Profile = () => {
                     }
                   />
                 ) : (
-                  <p className="break-words">{profileData?.companyDetails}</p>
+                  <div>
+                    <p className="break-words">{profileData?.companyDetails}</p>
+                    <div className="h-3" />
+                  </div>
                 )}
               </div>
               <div>
@@ -326,7 +334,10 @@ const Profile = () => {
                     }
                   />
                 ) : (
-                  <p className="break-words">{profileData?.companyValue}</p>
+                  <div>
+                    <p className="break-words">{profileData?.companyValue}</p>
+                    <div className="h-3" />
+                  </div>
                 )}
               </div>
               <div>
@@ -341,14 +352,17 @@ const Profile = () => {
                     }
                   />
                 ) : (
-                  <p className="break-words">{profileData?.problem}</p>
+                  <div>
+                    <p className="break-words">{profileData?.problem}</p>
+                    <div className="h-3" />
+                  </div>
                 )}
               </div>
             </div>
           )}
         </div>
-      </div> */}
       </div>
+
       <div className="flex justify-end mr-3">
         {!isEditing ? (
           <button
