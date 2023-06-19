@@ -28,6 +28,7 @@ const Center = () => {
   const [activeTab, setActiveTab] = useState<string>('linkedin');
   const [linkedinInput, setLinkedinInput] = useState<string>('');
   const fileInput = useRef<HTMLInputElement>(null);
+  const [lastSelectedIndex, setLastSelectedIndex] = useState<number | null>(null);
   const [createModalOpen, setCreateModalOpen] = useState<boolean>(false);
   const selectedLeadsCount = useSelector((state: RootState) => state.leads.selectedLeads.length);
 
@@ -62,17 +63,36 @@ const Center = () => {
       unsubscribe();
     };
   }, []);
-
-  const handleRowClick = (id: string, lead: Lead) => {
-    const updatedIsSelected = { ...isSelected, [id]: !isSelected[id] };
-    setIsSelected(updatedIsSelected);
-
-    if (updatedIsSelected[id]) {
-      dispatch(addSelectedLead(lead));
+  const handleRowClick = (index: number, id: string, lead: Lead, event: React.MouseEvent) => {
+    let updatedIsSelected = { ...isSelected };
+  
+    if (event.shiftKey && lastSelectedIndex !== null) {
+      const start = Math.min(index, lastSelectedIndex);
+      const end = Math.max(index, lastSelectedIndex);
+  
+      for (let i = start; i <= end; i++) {
+        const leadId = leads[i].id;
+        updatedIsSelected[leadId] = true;
+        dispatch(addSelectedLead(leads[i]));
+      }
+    } else if (event.ctrlKey) {
+      updatedIsSelected[id] = !isSelected[id];
+      updatedIsSelected[id] ? dispatch(addSelectedLead(lead)) : dispatch(removeLead(lead));
     } else {
-      dispatch(removeLead(lead));
+      if (isSelected[id]) {
+        updatedIsSelected[id] = false;
+        dispatch(removeLead(lead));
+      } else {
+        updatedIsSelected[id] = true;
+        dispatch(addSelectedLead(lead));
+      }
     }
+  
+    setIsSelected(updatedIsSelected);
+    setLastSelectedIndex(index);
   };
+  
+
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
@@ -226,30 +246,38 @@ const Center = () => {
     }
   };
 
-
-  const handleDeleteLead = async (id: string) => {
-    const leadToDelete = leads.find((lead: Lead) => lead.id === id);
-    if (leadToDelete) {
-      dispatch(removeLead(leadToDelete));
+  const handleDeleteLead = async () => {
+    const confirmDelete = window.confirm("Are you sure you want to delete the selected lead(s)?");
+    if (!confirmDelete) {
+      return;
     }
-
-    try {
-      if (!userId) {
-        console.error("No user is signed in");
-        return;
-      }
-
-      const confirmDelete = window.confirm("Are you sure you want to delete this lead?");
-      if (!confirmDelete) {
-        return;
-      }
-
-      const leadRef = doc(db, 'users', userId, 'leads', id);
-      await deleteDoc(leadRef);
-      console.log('Lead removed from Firebase');
-    } catch (error) {
-      console.error('Error removing lead: ', error);
+  
+    if (!userId) {
+      console.error("No user is signed in");
+      return;
     }
+  
+    const selectedLeadIds = Object.keys(isSelected);
+  
+    for (const leadId of selectedLeadIds) {
+      if (!isSelected[leadId]) continue;
+  
+      const leadToDelete = leads.find((lead: Lead) => lead.id === leadId);
+      if (leadToDelete) {
+        dispatch(removeLead(leadToDelete));
+      }
+  
+      try {
+        const leadRef = doc(db, 'users', userId, 'leads', leadId);
+        await deleteDoc(leadRef);
+      } catch (error) {
+        console.error('Error removing lead: ', error);
+      }
+    }
+    setIsSelected({});
+    dispatch(clearSelectedLeads());
+  
+    console.log('Selected lead(s) removed from Firebase');
   };
 
 
@@ -274,11 +302,11 @@ const Center = () => {
 
   return (
     <div className="border-r-[1px] flex flex-col h-full">
-      {selectedLeadsCount > 0 && (
+      {/* {selectedLeadsCount > 0 && (
         <div className="top-0 fixed w-full bg-gray-200 py-1 px-5">
           {selectedLeadsCount} lead(s) selected
         </div>
-      )}
+      )} */}
       <div className="flex-grow">
         <div className="flex flex-col border-b-[1px] px-10 py-5 sticky top-0">
           <h1 className="text-2xl">Leads</h1>
@@ -364,71 +392,72 @@ const Center = () => {
                                 </div>
                               </div>
                             ) : (
-                              leads.filter((lead: Lead) => {
-                                const searchString = `${lead.firstName} ${lead.lastName} ${lead.companyName}`.toLowerCase();
-                                return searchString.includes(searchTerm.toLowerCase());
-                              })
-                              .map((lead: Lead) => {
-                                const id = lead.id;
+                              leads
+                                .filter((lead: Lead) => {
+                                  const searchString = `${lead.firstName} ${lead.lastName} ${lead.companyName}`.toLowerCase();
+                                  return searchString.includes(searchTerm.toLowerCase());
+                                })
+                                .map((lead: Lead, index: number) => {
+                                  const id = lead.id;
 
-                                return (
-                                  <tr
-                                    key={lead.id}
-                                    className={`${isSelected[id] ? 'bg-gray-100' : ''}`}
-                                    onClick={() => handleRowClick(id, lead)}
-                                  >
-                                    <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-6">
-                                      <div className="flex items-center space-x-3">
-                                        <div
-                                          className={`h-5 w-5 border-2 rounded-md cursor-pointer ${isSelected[id] ? 'bg-brand' : ''}`}
-                                        ></div>
-                                      </div>
-                                    </td>
-                                    <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-6">
-                                      <div className="flex items-center">
-                                        <div>
-                                          <div className="font-medium text-gray-900">{lead.firstName} {lead.lastName}</div>
+                                  return (
+                                    <tr
+                                      key={lead.id}
+                                      className={`${isSelected[id] ? 'bg-gray-100' : ''}`}
+                                      onClick={(event) => handleRowClick(index, id, lead, event)}
+                                    >
+                                      <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-6">
+                                        <div className="flex items-center space-x-3">
+                                          <div
+                                            className={`h-5 w-5 border-2 rounded-md cursor-pointer ${isSelected[id] ? 'bg-brand' : ''}`}
+                                          ></div>
                                         </div>
-                                      </div>
-                                    </td>
-                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                      <div className="text-gray-900">{lead.jobTitle}</div>
-                                      <div className="text-gray-500">{lead.companyName}</div>
-                                    </td>
-                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                      <div className="flex items-center space-x-2">
-                                        <svg stroke="currentColor" fill="none" strokeWidth="2" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
-                                        <div className="text-gray-500">{lead.email}</div>
-                                      </div>
-                                      <div className="flex items-center space-x-2">
-                                        <svg stroke="currentColor" fill="none" strokeWidth="2" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
-                                        <div className="text-gray-900">{lead.phone}</div>
-                                      </div>
+                                      </td>
+                                      <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-6">
+                                        <div className="flex items-center">
+                                          <div>
+                                            <div className="font-medium select-none text-gray-900">{lead.firstName} {lead.lastName}</div>
+                                          </div>
+                                        </div>
+                                      </td>
+                                      <td className="whitespace-nowrap select-none px-3 py-4 text-sm text-gray-500">
+                                        <div className="text-gray-900">{lead.jobTitle}</div>
+                                        <div className="text-gray-500">{lead.companyName}</div>
+                                      </td>
+                                      <td className="whitespace-nowrap px-3 select-none py-4 text-sm text-gray-500">
+                                        <div className="flex items-center space-x-2">
+                                          <svg stroke="currentColor" fill="none" strokeWidth="2" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                                          <div className="text-gray-500">{lead.email}</div>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                          <svg stroke="currentColor" fill="none" strokeWidth="2" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                                          <div className="text-gray-900">{lead.phone}</div>
+                                        </div>
 
-                                    </td>
-                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{lead.linkedIn}</td>
-                                    <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                                      <a
-                                        href="#"
-                                        className="text-indigo-600 hover:text-indigo-900"
-                                        onClick={(event) => event.stopPropagation()}
-                                      >
-                                        Edit
-                                      </a>
-                                    </td>
-                                    <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                                      <FiTrash
-                                        size={20}
-                                        className="text-red-500 cursor-pointer"
-                                        onClick={(event) => {
-                                          event.stopPropagation();
-                                          handleDeleteLead(id);
-                                        }}
-                                      />
-                                    </td>
-                                  </tr>
-                                );
-                              }))}
+                                      </td>
+                                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{lead.linkedIn}</td>
+                                      <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
+                                        <a
+                                          href="#"
+                                          className="text-indigo-600 select-none hover:text-indigo-900"
+                                          onClick={(event) => event.stopPropagation()}
+                                        >
+                                          Edit
+                                        </a>
+                                      </td>
+                                      <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
+                                        <FiTrash
+                                          size={20}
+                                          className="text-red-500 cursor-pointer"
+                                          onClick={(event) => {
+                                            event.stopPropagation();
+                                            handleDeleteLead(id);
+                                          }}
+                                        />
+                                      </td>
+                                    </tr>
+                                  );
+                                }))}
                           </tbody>
                         </table>
                       </div>
