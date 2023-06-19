@@ -6,6 +6,7 @@ import { onAuthStateChanged, User } from "firebase/auth";
 import { signInWithEmailAndPassword, auth } from "@/lib/firebaseClient";
 import { LockClosedIcon } from "@heroicons/react/solid";
 import { FormEvent } from "react";
+import Link from "next/link";
 
 const LoginPage = () => {
   const router = useRouter();
@@ -34,37 +35,6 @@ const LoginPage = () => {
 
   return (
     <>
-      {/* <div className="login-main flex w-full h-full">
-				<div style={{ backgroundImage: `url(${graphic.src})` }} className="w-2/5 h-full min-h-full bg-center bg-no-repeat bg-cover relative">
-				</div>
-				<div className="login-sec w-3/5 h-full flex justify-center">
-					<div className={`${styles.loginContainer} self-center w-3/5 h-4/5 bg-[#2C2F48] flex flex-col items-center justify-evenly`}>
-						<div className="login-title font-semibold text-slate-200 text-6xl">
-							Log In
-						</div>
-						<div className="login-form flex flex-col gap-5">
-							<input
-								type="text"
-								placeholder="Email"
-								onChange={e => setEmail(e.target.value)}
-								value={email}
-								className='borderTransition p-2 pr-24 text-xl text-black border-b-2 border-solid border-[#e0f2fe] focus:border-[#818cf8]'
-							/>
-							<input
-								type="password"
-								placeholder="Password"
-								onChange={e => setPassword(e.target.value)}
-								value={password}
-								className='borderTransition p-2 pr-24 text-xl text-black border-b-2 border-solid border-[#e0f2fe] focus:border-[#818cf8]'
-							/>
-						</div>
-						<div className={`${styles.loginBTN} p-5 text-2xl text-indigo-200 rounded-3xl font-semibold cursor-pointer select-none`} onClick={submitLogin}>
-							LOG IN
-						</div>
-					</div>
-				</div>
-			</div> */}
-
       <div className="min-h-full flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-md w-full space-y-8 loginContainer p-12">
           <div>
@@ -76,15 +46,13 @@ const LoginPage = () => {
             <h2 className="mt-6 text-center text-3xl font-extrabold text-black">
               Sign in to Pipeline
             </h2>
-            <p className="mt-2 text-center text-sm text-gray-50">
-              Or{" "}
-              <a
+          
+              <Link
                 href="/sign-up"
-                className="font-medium text-indigo-300 hover:text-indigo-200"
+                className="font-medium text-indigo-300 hover:text-indigo-600"
               >
-                sign up now
-              </a>
-            </p>
+                or sign up now
+              </Link>
           </div>
           <form
             className="mt-8 space-y-6"
