@@ -46,13 +46,13 @@ const LoginPage = () => {
             <h2 className="mt-6 text-center text-3xl font-extrabold text-black">
               Sign in to Pipeline
             </h2>
-          
-              <Link
-                href="/sign-up"
-                className="font-medium text-indigo-300 hover:text-indigo-600"
-              >
-                or sign up now
-              </Link>
+
+            <Link
+              href="/sign-up"
+              className="font-medium text-indigo-700 hover:text-indigo-800 flex justify-center"
+            >
+              or sign up now
+            </Link>
           </div>
           <form
             className="mt-8 space-y-6"
