@@ -85,7 +85,7 @@ const LeadsSidebar = () => {
     }
   }, [campaignId, refresh]);
 
-  const playLeadHandler = (lead: Lead | LinkedInLead) => async (event: React.MouseEvent<SVGElement, MouseEvent>) => {
+  const playLeadHandler = async (lead: Lead | LinkedInLead) => {
     if (!lead) return;
     console.log("Play button clicked for lead:", lead);
     dispatch(setSelectedLead(lead));
