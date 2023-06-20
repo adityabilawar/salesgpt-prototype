@@ -7,6 +7,7 @@ import { BsPlay } from 'react-icons/bs';
 import { useDispatch } from 'react-redux';
 import { setSelectedLead } from '@/components/store/leadsSlice';
 import { onAuthStateChanged } from 'firebase/auth';
+import { setCurrentMessage } from '@/components/store/messageSlice';
 
 
 interface Campaign {
@@ -74,7 +75,7 @@ const LeadsSidebar = ({ campaignId, userId }: LeadsSidebarProps) => {
     }
     fetchLinkedInLeads();
   }, [campaignId, userId]);
-  
+
 
   useEffect(() => {
     const fetchLeads = async () => {
@@ -92,20 +93,28 @@ const LeadsSidebar = ({ campaignId, userId }: LeadsSidebarProps) => {
   const playLeadHandler = async (lead: Lead | LinkedInLead) => {
     if (!lead) return;
     console.log("Play button clicked for lead:", lead);
+
+    // Fetch the associated generated message...
+    const leadRef = doc(db, 'users', userId as string, 'leads', lead.id);
+    const leadDoc = await getDoc(leadRef);
+
+    if (leadDoc.exists()) {
+      const leadData = leadDoc.data();
+      // ...and dispatch it to the Redux store
+      if (leadData?.generatedMessage) {
+        dispatch(setCurrentMessage(leadData.generatedMessage));
+      }
+    }
+
     dispatch(setSelectedLead(lead));
   }
 
-  const refreshLeadHandler = (lead: Lead | LinkedInLead) => async (event: React.MouseEvent<SVGElement, MouseEvent>) => {
-    console.log("Refresh button clicked for lead:", lead);
-    dispatch(setSelectedLead({...lead, refresh: 'rephrase' }));
-    // setCurrentLead(lead);
-    // setRefresh(!refresh);
-  }
+
 
   const getLinkedInUsername = (url: string | undefined) => {
     return url ? url.replace('https://www.linkedin.com/in/', '') : '';
   }
-  
+
 
   const editLinkedInLeadHandler = async (id: string, username: string) => {
     const url = `https://www.linkedin.com/in/${username}`;
@@ -140,11 +149,13 @@ const LeadsSidebar = ({ campaignId, userId }: LeadsSidebarProps) => {
       <h1 className="p-5 text-3xl mt-5 border-b-[1px]">Leads</h1>
       {activeTab === 'leads' && leads.map((lead: Lead) => (
         lead && (
-          <div key={lead.id} className="flex w-full justify-between p-5">
+          <div key={lead.id} className="flex justify-between m-2 p-4 cursor-pointer rounded-md duration-100 hover:bg-gray-100" onClick={async () => {
+            dispatch(setSelectedLead(lead));
+          }}
+          >
             {`${lead.firstName} ${lead.lastName}`}
             <div className="flex space-x-2 text-xl">
               <BsPlay className="cursor-pointer" onClick={() => playLeadHandler(lead)} />
-              <FiRefreshCw className="cursor-pointer" onClick={refreshLeadHandler(lead)} />
               <FiTrash2 className="cursor-pointer" onClick={() => removeLeadHandler(lead)} />
             </div>
           </div>

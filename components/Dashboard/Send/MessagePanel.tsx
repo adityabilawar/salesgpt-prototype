@@ -25,9 +25,19 @@ const MessagePanel = () => {
   const [finalMessage, setFinalMessage] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const [userId, setUserId] = useState<string | null>(null);
+  const [campaignTitle, setCampaignTitle] = useState<string | null>(null);
   const router = useRouter();
   const { campaignId } = router.query;
+  const [currentMessage, setCurrentMessage] = useState<string | null>(null);
 
+  
+  
+  const [displayedMessage, setDisplayedMessage] = useState('');
+
+
+  if (selectedLead) {
+    console.log("Selected lead: " + selectedLead.toString());
+  }
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
@@ -59,6 +69,8 @@ const MessagePanel = () => {
         console.error('Invalid campaign data');
         return;
       }
+
+      setCampaignTitle(campaignData.campaignTitle);
 
       const campaign: Campaign = {
         id: campaignSnapshot.id,
@@ -106,12 +118,21 @@ const MessagePanel = () => {
           JSON.parse(JSON.stringify(user))
         );
         setFinalMessage(message);
+        if (!currentMessage) {
+          setCurrentMessage(message);
+        }
         setMessagesGenerated((prevCount) => prevCount + 1);
-      }
+      }      
     }
 
     fetchData();
   }, [selectedLead, campaignId, userId]);
+
+  useEffect(() => {
+    if (currentMessage) {
+      setDisplayedMessage(currentMessage);
+    }
+  }, [currentMessage]);
 
   const saveGeneratedMessage = async () => {
     if (finalMessage.trim() === '') {
@@ -119,30 +140,44 @@ const MessagePanel = () => {
       return;
     }
 
-    if (!user || !selectedLead || !campaignId || !userId) return;
-    const campaignRef = doc(db, 'users', userId, 'campaigns', campaignId as string);
-    const campaignDoc = await getDoc(campaignRef);
+    if (!user || !selectedLead || !userId || !campaignId) return;
 
-    if (!campaignDoc.exists()) {
-      console.error('Campaign does not exist');
+    const leadRef = doc(db, 'users', userId, 'leads', selectedLead.id);
+    const leadDoc = await getDoc(leadRef);
+
+    if (!leadDoc.exists()) {
+      console.error('Lead does not exist');
       return;
     }
 
-    let campaignData = campaignDoc.data();
+    let leadData = leadDoc.data();
 
-    if (campaignData) {
-      let leadIndex = campaignData.leads.findIndex((lead: Lead) => lead.id === selectedLead.id);
-      if (leadIndex !== -1) {
-        campaignData.leads[leadIndex].generatedMessage = finalMessage;
-        await setDoc(campaignRef, campaignData);
-        console.log('Message saved successfully');
+    if (leadData) {
+      // Save to lead
+      leadData.generatedMessages = leadData.generatedMessages || [];
+      let messageIndex = leadData.generatedMessages.findIndex((msg: { campaignId: string, message: string }) => msg.campaignId === campaignId);
+      if (messageIndex !== -1) {
+        leadData.generatedMessages[messageIndex].message = finalMessage;
       } else {
-        console.error('Lead not found in campaign');
+        leadData.generatedMessages.push({ campaignId, message: finalMessage });
       }
+      await setDoc(leadRef, leadData);
+
+
+      console.log('Message saved successfully');
+      return (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="success">
+          <span className="block sm:inline">Message saved successfully!</span>
+          <span className="absolute top-0 bottom-0 right-0 px-4 py-3">
+            <svg className="fill-current h-6 w-6 text-red-500" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><title>Close</title><path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z" /></svg>
+          </span>
+        </div>
+      )
     } else {
-      console.error('Invalid campaign data');
+      console.error('Invalid lead data');
     }
   };
+
 
   async function generatePersonalizedMessage(lead: Lead, campaign: Campaign, user: User): Promise<string> {
     setLoading(true);
@@ -150,7 +185,7 @@ const MessagePanel = () => {
 
     try {
       const response = (lead.refresh) ? await axios.post('/api/refresh', { user, lead, campaign, currResult: finalMessage }) : await axios.post('/api/openai', { user, lead, campaign });
-      // console.log(response.data);
+      // F(response.data);
       if (response.data && response.data.message) {
         const message = response.data.message;
 
@@ -163,7 +198,7 @@ const MessagePanel = () => {
           'leads'
         );
         const leadRef = doc(leadsCollectionRef, lead.id as string);
-        
+
         await setDoc(leadRef, { generatedMessage: message }, { merge: true });
         return message;
       } else {
@@ -185,20 +220,24 @@ const MessagePanel = () => {
   return (
     <div className="flex-grow">
       <div className="relative flex border-b px-10 py-5 text-2xl">
-        Campaigns
+        {campaignTitle}
       </div>
       <div className="flex-grow-0 px-10 py-5 flex flex-col justify-start items-start">
-        {loading && (
-          <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-          </svg>
-        )}
-        <textarea
-          className="w-full h-60 border text-black"
-          value={finalMessage}
-          onChange={(e) => setFinalMessage(e.target.value)}
-        ></textarea>
+        <div className="relative w-full h-60">
+          <textarea
+            className={`w-full h-full border text-black rounded-md ${loading ? 'opacity-50' : ''}`}
+            value={displayedMessage}
+            onChange={(e) => setDisplayedMessage(e.target.value)}
+          ></textarea>
+          {loading && (
+            <div className="absolute inset-0 bg-gray-200 opacity-50 rounded-md flex justify-center items-center">
+              <svg className="animate-spin h-5 w-5 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            </div>
+          )}
+        </div>
         <div className="flex space-x-2 justify-center items-center h-full mt-5">
           <button
             className="px-4 py-2 border-[1px] rounded-md bg-brand text-white"

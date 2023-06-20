@@ -90,24 +90,18 @@ const CampaignsList = () => {
 
     useEffect(() => {
         const fetchLeadsForCampaigns = async () => {
-            // Create a copy of the current campaignsWithLeads state
             const updatedCampaignsWithLeads = { ...campaignsWithLeads };
 
-            // Iterate over each campaign
             for (const campaign of campaigns) {
-                // Fetch the document for the campaign from Firestore
                 const docRef = doc(db, 'users', userId as string, 'campaigns', campaign.id);
                 const campaignDoc = await getDoc(docRef);
 
-                // Update the value of the campaign in the object to indicate if it has leads or not
                 updatedCampaignsWithLeads[campaign.id] = Boolean(campaignDoc.data()?.leads?.length);
             }
 
-            // Update the state with the new values
             setCampaignsWithLeads(updatedCampaignsWithLeads);
         };
 
-        // Only run this effect if there is a user and there are campaigns
         if (userId && campaigns.length) {
             fetchLeadsForCampaigns();
         }
