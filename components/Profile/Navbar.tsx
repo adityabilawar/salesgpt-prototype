@@ -15,7 +15,7 @@
   ```
 */
 const tabs = [
-  { name: "Leads", href: "/leads", current: false },
+  { name: "Leads", href: "/dashboard", current: true },
   { name: "Campaigns", href: "/dashboard/send", current: false },
 ];
 

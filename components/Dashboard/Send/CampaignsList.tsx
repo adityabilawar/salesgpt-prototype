@@ -124,15 +124,14 @@ const CampaignsList = () => {
                 setCampaignHasDocuments(!campaignDocuments.empty);
             }
         };
-
         fetchCampaignDocuments();
     }, [campaigns, userId]);
     return (
-        <div className="border-r-[1px] h-screen flex flex-col">
-            <div className="flex-grow">
+        <div className="border-r-[1px] flex flex-col">
+            <div>
                 <div className="relative flex border-b-[1px] px-10 py-5 text-2xl">Campaigns</div>
 
-                <div className="m-10 border rounded-md">
+                <div className="m-10 border rounded-md h-full overflow-auto">
                     {!editingCampaign && (
                         <div className="flex-grow-0 px-5 py-5 flex space-x-5 border-b">
                             <Link href="/dashboard/create-campaign">
