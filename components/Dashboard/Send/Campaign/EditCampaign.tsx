@@ -16,16 +16,16 @@ const EditCampaign: React.FC<EditCampaignProps> = ({ campaign, onBack }) => {
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (user) => {
-          if (user) {
-            setUserId(user.uid);
-          } else {
-            setUserId(null);
-          }
+            if (user) {
+                setUserId(user.uid);
+            } else {
+                setUserId(null);
+            }
         });
         return () => {
-          unsubscribe();
+            unsubscribe();
         };
-      }, []);
+    }, []);
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const updatedCampaign = { ...editedCampaign, [event.target.name]: event.target.value };
@@ -34,7 +34,7 @@ const EditCampaign: React.FC<EditCampaignProps> = ({ campaign, onBack }) => {
 
     const handleGeneratePrompt = () => {
         const generatedPrompt = generatePrompt(editedCampaign);
-        setEditedCampaign({...editedCampaign, generatedPrompt});
+        setEditedCampaign({ ...editedCampaign, generatedPrompt });
     };
 
     const handleSave = async (event: React.FormEvent) => {
@@ -62,7 +62,7 @@ const EditCampaign: React.FC<EditCampaignProps> = ({ campaign, onBack }) => {
             }
         }
     };
-    
+
 
     const generatePrompt = (campaign: Campaign) => {
         const generatedPrompt = `Craft a ${campaign.campaignTitle} for ${campaign.platform} with a maximum of ${campaign.wordLimit} words. The message should include a call to action for ${campaign.callToAction} and should be written in a ${campaign.toneOfVoice} tone. The purpose of this message is ${campaign.purpose}`;
@@ -70,7 +70,7 @@ const EditCampaign: React.FC<EditCampaignProps> = ({ campaign, onBack }) => {
     };
 
     return (
-        <div className=" text-black h-full min-h-screen">
+        <div className=" text-black overflow-auto mb-5">
             <nav className="px-6 py-5 flex items-center justify-between">
                 <div className="flex items-center space-x-4">
                     <button onClick={onBack} className="-full p-2">
@@ -82,40 +82,43 @@ const EditCampaign: React.FC<EditCampaignProps> = ({ campaign, onBack }) => {
                     </button>
                 </div>
             </nav>
-            <div className="grid grid-cols-5 gap-6 px-6">
-                <div className="col-span-3">
-                    <h2 className="text-2xl mb-4">Campaign Details</h2>
-                    <form onSubmit={handleSave}>
-                        <div className="mb-4">
-                            <label htmlFor="campaign-title" className="block text-sm">Campaign Title</label>
-                            <input id="campaign-title" name="campaignTitle" value={editedCampaign.campaignTitle} onChange={handleChange} className="w-full p-2 border-[1px]" />
-                        </div>
-                        <div className="mb-4">
-                            <label htmlFor="platform" className="block text-sm">Platform</label>
-                            <input id="platform" name="platform" value={editedCampaign.platform} onChange={handleChange} className="w-full p-2 border-[1px]" />
-                        </div>
-                        <div className="mb-4">
-                            <label htmlFor="call-to-action" className="block text-sm">Call To Action</label>
-                            <input id="call-to-action" name="callToAction" value={editedCampaign.callToAction} onChange={handleChange} className="w-full p-2 border-[1px]" />
-                        </div>
-                        <div className="mb-4">
-                            <label htmlFor="tone-of-voice" className="block text-sm">Tone of Voice</label>
-                            <input id="tone-of-voice" name="toneOfVoice" value={editedCampaign.toneOfVoice} onChange={handleChange} className="w-full p-2 border-[1px]" />
-                        </div>
-                        <div className="mb-4">
-                            <label htmlFor="purpose" className="block text-sm">Purpose/goal for message</label>
-                            <input id="purpose" name="purpose" value={editedCampaign.purpose} onChange={handleChange} className="w-full p-2 border-[1px]" />
-                        </div>
-                        <div className="mb-4">
-                            <label htmlFor="word-limit" className="block text-sm">Word Limit</label>
-                            <input id="word-limit" placeholder="150" value={editedCampaign.wordLimit} onChange={handleChange} name="wordLimit" className="w-full p-2 border-[1px]" />
-                        </div>
-                        <button type="button" onClick={handleGeneratePrompt} className="border-[1px] mr-5 px-4 py-2">Generate Prompt</button>
-                        <button type="submit" className="border-[1px] px-4 py-2">Save</button>
-                    </form>
-                    <hr className="my-4" />
-                    <h2 className="text-2xl mb-4">Prompt</h2>
-                    <textarea value={editedCampaign.generatedPrompt} className="w-full p-2 h-64 border-[1px] text-black mb-4" readOnly></textarea>
+            <div className="px-6 h-full">
+                <div className="overflow-y-auto grid grid-cols-2 gap-10 w-full">
+                    <div>
+                        <h2 className="text-2xl mb-4">Campaign Details</h2>
+                        <form onSubmit={handleSave} className="overflow-y-auto">
+                            <div className="mb-4">
+                                <label htmlFor="campaign-title" className="block text-sm">Campaign Title</label>
+                                <input id="campaign-title" name="campaignTitle" value={editedCampaign.campaignTitle} onChange={handleChange} className="rounded-md w-full p-2 border-[1px]" />
+                            </div>
+                            <div className="mb-4">
+                                <label htmlFor="platform" className="block text-sm">Platform</label>
+                                <input id="platform" name="platform" value={editedCampaign.platform} onChange={handleChange} className="rounded-md w-full p-2 border-[1px]" />
+                            </div>
+                            <div className="mb-4">
+                                <label htmlFor="call-to-action" className="block text-sm">Call To Action</label>
+                                <input id="call-to-action" name="callToAction" value={editedCampaign.callToAction} onChange={handleChange} className="rounded-md w-full p-2 border-[1px]" />
+                            </div>
+                            <div className="mb-4">
+                                <label htmlFor="tone-of-voice" className="block text-sm">Tone of Voice</label>
+                                <input id="tone-of-voice" name="toneOfVoice" value={editedCampaign.toneOfVoice} onChange={handleChange} className="rounded-md w-full p-2 border-[1px]" />
+                            </div>
+                            <div className="mb-4">
+                                <label htmlFor="purpose" className="block text-sm">Purpose/goal for message</label>
+                                <input id="purpose" name="purpose" value={editedCampaign.purpose} onChange={handleChange} className="rounded-md w-full p-2 border-[1px]" />
+                            </div>
+                            <div className="mb-4">
+                                <label htmlFor="word-limit" className="block text-sm">Word Limit</label>
+                                <input id="word-limit" placeholder="150" value={editedCampaign.wordLimit} onChange={handleChange} name="wordLimit" className="rounded-md w-full p-2 border-[1px]" />
+                            </div>
+                            <button type="button" onClick={handleGeneratePrompt} className="border-[1px] rounded-md bg-brand text-white mr-5 px-4 py-2">Generate Prompt</button>
+                            <button type="submit" className="border-[1px] rounded-md bg-brand text-white px-4 py-2">Save</button>
+                        </form>
+                    </div>
+                    <div>
+                        <h2 className="text-2xl mb-4">Prompt</h2>
+                        <textarea value={editedCampaign.generatedPrompt} className="rounded-md w-full p-2 h-64 border-[1px] text-black mb-4" readOnly></textarea>
+                    </div>
                 </div>
             </div>
         </div>

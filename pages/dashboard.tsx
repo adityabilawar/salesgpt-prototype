@@ -16,7 +16,6 @@ const dashboard = () => {
   return (
     <div className="text-black h-screen flex flex-col overflow-hidden">
       <div className="h-full overflow-y-auto">
-
         <div className="flex flex-col">
           <Navbar />
           <div className="overflow-auto">
