@@ -33,8 +33,7 @@ export default function onboarding() {
             Profile
           </h3>
           <p className="mt-1 max-w-2xl text-sm text-gray-500">
-            This information will be displayed publicly so be careful what you
-            share.
+            Set up your account to start increasing your sales.
           </p>
         </div>
         <div className="border-t border-gray-200">
