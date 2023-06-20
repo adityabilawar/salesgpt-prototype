@@ -2,10 +2,12 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface GeneratedMessageState {
   currentMessage: string | null;
+  displayedMessage: string | null;
 }
 
 const initialState: GeneratedMessageState = {
-  currentMessage: null
+  currentMessage: null,
+  displayedMessage: null,
 };
 
 export const messageSlice = createSlice({
@@ -14,10 +16,13 @@ export const messageSlice = createSlice({
   reducers: {
     setCurrentMessage: (state, action: PayloadAction<string>) => {
       state.currentMessage = action.payload;
-    }
-  }
+    },
+    setDisplayedMessage: (state, action: PayloadAction<string | null>) => {
+      state.displayedMessage = action.payload;
+    },
+  },
 });
 
-export const { setCurrentMessage } = messageSlice.actions;
+export const { setCurrentMessage, setDisplayedMessage } = messageSlice.actions;
 
 export default messageSlice.reducer;

@@ -14,8 +14,4 @@ interface Lead extends BaseLead {
     [key: string]: any;
 }
 
-interface LinkedInLead extends BaseLead {
-  url: string;
-}
-
 

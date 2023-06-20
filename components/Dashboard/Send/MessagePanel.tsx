@@ -29,10 +29,7 @@ const MessagePanel = () => {
   const router = useRouter();
   const { campaignId } = router.query;
   const [currentMessage, setCurrentMessage] = useState<string | null>(null);
-
-  
-  
-  const [displayedMessage, setDisplayedMessage] = useState('');
+  const [displayedMessage, setDisplayedMessage] = useState<string | null>(null);
 
 
   if (selectedLead) {
@@ -53,9 +50,30 @@ const MessagePanel = () => {
 
   useEffect(() => {
     async function fetchData() {
-      if (!campaignId || !userId) return;
-
-      const campaignDocRef = doc(db, 'users', userId, 'campaigns', campaignId as string);
+      if (!campaignId || !userId || !selectedLead) return;
+  
+      const leadRef = doc(db, 'users', userId, 'leads', selectedLead.id);
+      const leadDoc = await getDoc(leadRef);
+  
+      if (leadDoc.exists()) {
+        const leadData = leadDoc.data();
+        if (leadData?.generatedMessages) {
+          const campaignMessage = leadData.generatedMessages.find((msg: { campaignId: string, message: string }) => msg.campaignId === campaignId);
+          if (campaignMessage) {
+            // If there's already a generated message for the selectedLead associated with the current campaign ID, set it as the finalMessage and currentMessage
+            setFinalMessage(campaignMessage.message);
+            setCurrentMessage(campaignMessage.message);
+            setDisplayedMessage(campaignMessage.message);
+            return;
+          }
+        }
+      }
+  
+      // If the lead doesn't have generatedMessages or the generatedMessage for the campaign doesn't exist, set the finalMessage, currentMessage, and displayedMessage to an empty string
+      setFinalMessage('');
+      setCurrentMessage('');
+      setDisplayedMessage('');
+const campaignDocRef = doc(db, 'users', userId, 'campaigns', campaignId as string);
       const campaignSnapshot = await getDoc(campaignDocRef);
 
       if (!campaignSnapshot.exists()) {
@@ -135,48 +153,46 @@ const MessagePanel = () => {
   }, [currentMessage]);
 
   const saveGeneratedMessage = async () => {
+
     if (finalMessage.trim() === '') {
       alert('The message is empty. Please generate a message before saving.');
       return;
     }
-
+  
     if (!user || !selectedLead || !userId || !campaignId) return;
-
+  
     const leadRef = doc(db, 'users', userId, 'leads', selectedLead.id);
     const leadDoc = await getDoc(leadRef);
-
+  
     if (!leadDoc.exists()) {
       console.error('Lead does not exist');
       return;
     }
-
-    let leadData = leadDoc.data();
-
-    if (leadData) {
-      // Save to lead
-      leadData.generatedMessages = leadData.generatedMessages || [];
-      let messageIndex = leadData.generatedMessages.findIndex((msg: { campaignId: string, message: string }) => msg.campaignId === campaignId);
-      if (messageIndex !== -1) {
-        leadData.generatedMessages[messageIndex].message = finalMessage;
-      } else {
-        leadData.generatedMessages.push({ campaignId, message: finalMessage });
-      }
-      await setDoc(leadRef, leadData);
-
-
-      console.log('Message saved successfully');
-      return (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="success">
-          <span className="block sm:inline">Message saved successfully!</span>
-          <span className="absolute top-0 bottom-0 right-0 px-4 py-3">
-            <svg className="fill-current h-6 w-6 text-red-500" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><title>Close</title><path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z" /></svg>
-          </span>
-        </div>
-      )
-    } else {
+  
+    const leadData = leadDoc.data();
+  
+    if (!leadData) {
       console.error('Invalid lead data');
+      return;
     }
+  
+    const updatedLeadData = {
+      ...leadData,
+      generatedMessages: leadData.generatedMessages || [],
+    };
+  
+    let messageIndex = updatedLeadData.generatedMessages.findIndex((msg: { campaignId: string, message: string }) => msg.campaignId === campaignId);
+    if (messageIndex !== -1) {
+      updatedLeadData.generatedMessages[messageIndex].message = finalMessage;
+    } else {
+      updatedLeadData.generatedMessages.push({ campaignId, message: finalMessage });
+    }
+  
+    await setDoc(leadRef, updatedLeadData);
+  
+    console.log('Message saved successfully');
   };
+  
 
 
   async function generatePersonalizedMessage(lead: Lead, campaign: Campaign, user: User): Promise<string> {
@@ -226,7 +242,7 @@ const MessagePanel = () => {
         <div className="relative w-full h-60">
           <textarea
             className={`w-full h-full border text-black rounded-md ${loading ? 'opacity-50' : ''}`}
-            value={displayedMessage}
+            value={displayedMessage || ''} // when displayedMessage is null, set the value to an empty string
             onChange={(e) => setDisplayedMessage(e.target.value)}
           ></textarea>
           {loading && (
