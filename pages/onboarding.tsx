@@ -27,7 +27,7 @@ export default function onboarding() {
     <Confirmation />
   ) : (
     <div className="py-8">
-      <div className="max-w-2xl mx-auto bg-white shadow-md rounded-lg overflow-hidden">
+      <div className="max-w-2xl mx-auto bg-white shadow-2xl rounded-lg overflow-hidden">
         <div className="px-6 py-8">
           <h3 className="text-lg leading-6 font-medium text-gray-900">
             Profile

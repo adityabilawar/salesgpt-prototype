@@ -50,7 +50,7 @@ const CampaignsList = () => {
                 console.error('User ID is null');
                 return;
             }
-
+ 
             const docRef = doc(db, 'users', userId, 'campaigns', campaignId);
             await setDoc(docRef, { leads: selectedLeads }, { merge: true });
             dispatch(clearSelectedLeads());
@@ -135,7 +135,7 @@ const CampaignsList = () => {
                     {!editingCampaign && (
                         <div className="flex-grow-0 px-5 py-5 flex space-x-5 border-b">
                             <Link href="/dashboard/create-campaign">
-                                <button className="border-[1px] px-6 py-3 rounded-md bg-brand text-white">Add Campaign</button>
+                                <button className="border-[1px] px-6 py-3 rounded-md bg-brand text-white md:text-sm lg:text-md">Add Campaign</button>
                             </Link>
                         </div>
                     )}
@@ -156,19 +156,19 @@ const CampaignsList = () => {
                                                         className="flex text-white bg-brand items-center rounded-md px-6 py-2"
                                                         onClick={() => setEditingCampaign(campaign)}
                                                     >
-                                                        <FiEdit3 size={24} />
-                                                        <p className="ml-2">Edit</p>
+                                                        <FiEdit3 size={20} />
+                                                        <p className="ml-2 md:text-sm lg:text-md ">Edit</p>
                                                     </button>
                                                     <button
                                                         className="flex bg-brand text-white items-center rounded-md px-6 py-2"
                                                         onClick={() => sendLeads(campaign.id)}
                                                     >
-                                                        <FiUpload size={24} />
-                                                        <p className="ml-2">Send Leads</p>
+                                                        <FiUpload size={20} />
+                                                        <p className="ml-2 md:text-sm lg:text-md">Send Leads</p>
                                                     </button>
                                                     <div className="group relative flex justify-center">
                                                         <button disabled={!campaignsWithLeads[campaign.id]} // Disable the button if the campaign has no leads
-                                                            className={`group relative flex bg-brand ${!campaignsWithLeads[campaign.id] && "bg-gray-600"} text-white items-center rounded-md px-6 py-2`}
+                                                            className={`group relative flex bg-brand ${!campaignsWithLeads[campaign.id] && "bg-gray-600"} text-white items-center rounded-md px-6 py-2 md:text-sm lg:text-md`}
                                                             onClick={() => {
                                                                 router.push(`/dashboard/generate/${campaign.id}`);
                                                                 dispatch(clearSelectedLead());
