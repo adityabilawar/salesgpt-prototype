@@ -10,6 +10,7 @@ interface Lead extends BaseLead {
     jobTitle: string;
     linkedIn: string;
     phone: string;
+    refresh?: string;
     [key: string]: any;
 }
 

@@ -97,8 +97,9 @@ const LeadsSidebar = ({ campaignId, userId }: LeadsSidebarProps) => {
 
   const refreshLeadHandler = (lead: Lead | LinkedInLead) => async (event: React.MouseEvent<SVGElement, MouseEvent>) => {
     console.log("Refresh button clicked for lead:", lead);
-    setCurrentLead(lead);
-    setRefresh(!refresh);
+    dispatch(setSelectedLead({...lead, refresh: 'rephrase' }));
+    // setCurrentLead(lead);
+    // setRefresh(!refresh);
   }
 
   const getLinkedInUsername = (url: string | undefined) => {
@@ -143,6 +144,7 @@ const LeadsSidebar = ({ campaignId, userId }: LeadsSidebarProps) => {
             {`${lead.firstName} ${lead.lastName}`}
             <div className="flex space-x-2 text-xl">
               <BsPlay className="cursor-pointer" onClick={() => playLeadHandler(lead)} />
+              <FiRefreshCw className="cursor-pointer" onClick={refreshLeadHandler(lead)} />
               <FiTrash2 className="cursor-pointer" onClick={() => removeLeadHandler(lead)} />
             </div>
           </div>
