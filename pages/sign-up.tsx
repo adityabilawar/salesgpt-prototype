@@ -22,7 +22,7 @@ const RegisterPage = () => {
         firstName,
         lastName
       );
-      router.push("/leads");
+      router.push("/onboarding");
     } catch (error) {
       console.error(error);
     }

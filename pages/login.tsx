@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import styles from "@/styles/Login.module.css";
 import graphic from "@/public/graphic.png";
 import { useRouter } from "next/router";
@@ -7,12 +7,16 @@ import { signInWithEmailAndPassword, auth } from "@/lib/firebaseClient";
 import { LockClosedIcon } from "@heroicons/react/solid";
 import { FormEvent } from "react";
 import Link from "next/link";
+import Snackbar from "@/components/Snackbar";
 
 const LoginPage = () => {
   const router = useRouter();
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string>("");
+
+  const [showNotif, setShowNotif] = useState(false);
+  const timeoutRef = useRef(null);
 
   const submitLogin = async (event: FormEvent) => {
     event.preventDefault();
@@ -22,6 +26,13 @@ const LoginPage = () => {
     } else {
       setError(error);
     }
+
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+
+    setShowNotif(true);
+    setTimeout(() => setShowNotif(false), 5000);
   };
 
   useEffect(() => {
@@ -30,11 +41,15 @@ const LoginPage = () => {
         router.push("/dashboard");
       }
     });
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
     return unsubscribe;
   }, []);
 
   return (
     <>
+    {showNotif && error && <Snackbar message="Wrong email or password." color="red" />}
       <div className="min-h-full flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-md w-full space-y-8 loginContainer p-12">
           <div>
@@ -116,25 +131,20 @@ const LoginPage = () => {
               <div className="text-sm">
                 <a
                   href="#"
-                  className="font-medium text-indigo-300 hover:text-indigo-200"
+                  className="font-medium text-indigo-800 hover:text-indigo-700"
                 >
                   Forgot your password?
                 </a>
               </div>
             </div>
 
-            {error && <p className="text-red-500">{error}</p>}
+            {/* {error && <p className="text-red-500">{error}</p>} */}
             <div>
               <button
                 type="submit"
-                className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-black bg-indigo-500 hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-500 hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
               >
-                <span className="absolute left-0 inset-y-0 flex items-center pl-3">
-                  <LockClosedIcon
-                    className="h-5 w-5 text-indigo-300 group-hover:text-indigo-200"
-                    aria-hidden="true"
-                  />
-                </span>
+                <span className="absolute left-0 inset-y-0 flex items-center pl-3"></span>
                 Sign in
               </button>
             </div>
