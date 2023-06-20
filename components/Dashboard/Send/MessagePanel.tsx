@@ -154,12 +154,13 @@ const campaignDocRef = doc(db, 'users', userId, 'campaigns', campaignId as strin
 
   const saveGeneratedMessage = async () => {
 
-    if (finalMessage.trim() === '') {
+    if (displayedMessage && displayedMessage.trim() === '') {
       alert('The message is empty. Please generate a message before saving.');
       return;
     }
-  
-    if (!user || !selectedLead || !userId || !campaignId) return;
+    console.log(selectedLead);
+    console.log(userId);
+    if (!selectedLead || !userId) return;
   
     const leadRef = doc(db, 'users', userId, 'leads', selectedLead.id);
     const leadDoc = await getDoc(leadRef);
@@ -183,9 +184,9 @@ const campaignDocRef = doc(db, 'users', userId, 'campaigns', campaignId as strin
   
     let messageIndex = updatedLeadData.generatedMessages.findIndex((msg: { campaignId: string, message: string }) => msg.campaignId === campaignId);
     if (messageIndex !== -1) {
-      updatedLeadData.generatedMessages[messageIndex].message = finalMessage;
+      updatedLeadData.generatedMessages[messageIndex].message = displayedMessage;
     } else {
-      updatedLeadData.generatedMessages.push({ campaignId, message: finalMessage });
+      updatedLeadData.generatedMessages.push({ campaignId, message: displayedMessage });
     }
   
     await setDoc(leadRef, updatedLeadData);
@@ -193,8 +194,6 @@ const campaignDocRef = doc(db, 'users', userId, 'campaigns', campaignId as strin
     console.log('Message saved successfully');
   };
   
-
-
   async function generatePersonalizedMessage(lead: Lead, campaign: Campaign, user: User): Promise<string> {
     setLoading(true);
     const aboutInput = `Never forget the recipient's name is ${lead.firstName} ${lead.lastName}. The company values are ${user.companyValues} and we are solving ${user.problem}. Never forget our name is ${user.firstName} ${user.lastName}.`;
