@@ -8,7 +8,7 @@ import { setView } from '@/components/store/sidebarSlice';
 import { FiChevronDown, FiCircle, FiMail, FiSearch, FiEdit3, FiMoreHorizontal, FiTrash, FiUpload } from 'react-icons/fi';
 import Link from 'next/link';
 import Papa from "papaparse";
-import { addDoc, arrayUnion, collection, deleteDoc, doc, getDoc, onSnapshot, updateDoc } from 'firebase/firestore';
+import { addDoc, arrayUnion, collection, deleteDoc, doc, getDoc, onSnapshot, setDoc, updateDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebaseClient';
 import { animated, useSpring, useSprings } from 'react-spring';
 import axios from 'axios';
@@ -30,7 +30,40 @@ const Center = () => {
   const fileInput = useRef<HTMLInputElement>(null);
   const [lastSelectedIndex, setLastSelectedIndex] = useState<number | null>(null);
   const [createModalOpen, setCreateModalOpen] = useState<boolean>(false);
-  const selectedLeadsCount = useSelector((state: RootState) => state.leads.selectedLeads.length);
+  const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [editingLead, setEditingLead] = useState<{
+    id?: string;
+    firstName: string;
+    lastName: string;
+    jobTitle: string;
+    companyName: string;
+    email: string;
+    phone: string;
+    linkedIn: string;
+  }>({
+    firstName: '',
+    lastName: '',
+    jobTitle: '',
+    companyName: '',
+    email: '',
+    phone: '',
+    linkedIn: '',
+  });
+
+  const handleSaveLead = async (id: string) => {
+    setIsEditing(false);
+    if (userId) {
+      const docRef = doc(db, 'users', userId, 'leads', id);
+      await setDoc(docRef, editingLead, { merge: true });
+    } else {
+      console.error("No user is signed in");
+    }
+  };
+
+  const handleEditClick = (id: string, lead: Lead) => {
+    setEditingLead({ id, ...lead });
+    setIsEditing(true);
+  };
 
 
   const [newLead, setNewLead] = useState({
@@ -65,11 +98,11 @@ const Center = () => {
   }, []);
   const handleRowClick = (index: number, id: string, lead: Lead, event: React.MouseEvent) => {
     let updatedIsSelected = { ...isSelected };
-  
+
     if (event.shiftKey && lastSelectedIndex !== null) {
       const start = Math.min(index, lastSelectedIndex);
       const end = Math.max(index, lastSelectedIndex);
-  
+
       for (let i = start; i <= end; i++) {
         const leadId = leads[i].id;
         updatedIsSelected[leadId] = true;
@@ -87,11 +120,11 @@ const Center = () => {
         dispatch(addSelectedLead(lead));
       }
     }
-  
+
     setIsSelected(updatedIsSelected);
     setLastSelectedIndex(index);
   };
-  
+
 
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -251,22 +284,22 @@ const Center = () => {
     if (!confirmDelete) {
       return;
     }
-  
+
     if (!userId) {
       console.error("No user is signed in");
       return;
     }
-  
+
     const selectedLeadIds = Object.keys(isSelected);
-  
+
     for (const leadId of selectedLeadIds) {
       if (!isSelected[leadId]) continue;
-  
+
       const leadToDelete = leads.find((lead: Lead) => lead.id === leadId);
       if (leadToDelete) {
         dispatch(removeLead(leadToDelete));
       }
-  
+
       try {
         const leadRef = doc(db, 'users', userId, 'leads', leadId);
         await deleteDoc(leadRef);
@@ -276,7 +309,7 @@ const Center = () => {
     }
     setIsSelected({});
     dispatch(clearSelectedLeads());
-  
+
     console.log('Selected lead(s) removed from Firebase');
   };
 
@@ -317,7 +350,7 @@ const Center = () => {
             <div className="bg-brand text-white rounded-md text-white text-sm px-5 flex justify-center items-center cursor-pointer" onClick={() => setCreateModalOpen(true)}>
               Create Lead
             </div>
-            <div className="relative border border-gray-200 border-md flex justify-center items-center space-x-2">
+            <div className="relative rounded-md border border-gray-200 border-md flex justify-center items-center space-x-2">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <FiSearch size={24} />
               </div>
@@ -414,36 +447,93 @@ const Center = () => {
                                         </div>
                                       </td>
                                       <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-6">
-                                        <div className="flex items-center">
-                                          <div>
-                                            <div className="font-medium select-none text-gray-900">{lead.firstName} {lead.lastName}</div>
+                                        {isEditing && editingLead.id === lead.id ? (
+                                          <div className="flex flex-col space-y-2">
+                                            <input className="border px-2 py-1 rounded-md" placeholder="First name" value={editingLead.firstName} onChange={(e) => setEditingLead({ ...editingLead, firstName: e.target.value })} />
+                                            <input className="border px-2 py-1 rounded-md" placeholder="Last name" value={editingLead.lastName} onChange={(e) => setEditingLead({ ...editingLead, lastName: e.target.value })} />
                                           </div>
-                                        </div>
+                                        ) : (
+                                          <div className="font-medium select-none text-gray-900">{lead.firstName} {lead.lastName}</div>
+                                        )}
+                                      </td>
+
+                                      <td className="whitespace-nowrap select-none px-3 py-4 text-sm text-gray-500">
+                                        {isEditing && editingLead.id === lead.id ? (
+                                          <div className="flex flex-col space-y-2">
+                                            <input className="border px-2 py-1 rounded-md" placeholder="Job Title" value={editingLead.jobTitle} onChange={(e) => setEditingLead({ ...editingLead, jobTitle: e.target.value })} />
+                                            <input className="border px-2 py-1 rounded-md" placeholder="Company" value={editingLead.companyName} onChange={(e) => setEditingLead({ ...editingLead, companyName: e.target.value })} />
+                                          </div>
+                                        ) : (
+                                          <>
+                                            <div className="text-gray-900">{lead.jobTitle}</div>
+                                            <div className="text-gray-500">{lead.companyName}</div>
+                                          </>
+                                        )}
                                       </td>
                                       <td className="whitespace-nowrap select-none px-3 py-4 text-sm text-gray-500">
-                                        <div className="text-gray-900">{lead.jobTitle}</div>
-                                        <div className="text-gray-500">{lead.companyName}</div>
+                                        {isEditing && editingLead.id === lead.id ? (
+                                          <div className="flex flex-col space-y-2">
+                                            <input className="border px-2 py-1 rounded-md" placeholder="Email" value={editingLead.email} onChange={(e) => setEditingLead({ ...editingLead, email: e.target.value })} />
+                                            <input className="border px-2 py-1 rounded-md" placeholder="Phone Number" value={editingLead.phone} onChange={(e) => setEditingLead({ ...editingLead, phone: e.target.value })} />
+                                          </div>
+                                        ) : (
+                                          <>
+                                            <div className="flex items-center space-x-2">
+                                              <svg stroke="currentColor" fill="none" strokeWidth="2" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                                              <div className="text-gray-500">{lead.email}</div>
+                                            </div>
+                                            <div className="flex items-center space-x-2">
+                                              <svg stroke="currentColor" fill="none" strokeWidth="2" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                                              <div className="text-gray-900">{lead.phone}</div>
+                                            </div>
+                                          </>
+                                        )}
                                       </td>
-                                      <td className="whitespace-nowrap px-3 select-none py-4 text-sm text-gray-500">
-                                        <div className="flex items-center space-x-2">
-                                          <svg stroke="currentColor" fill="none" strokeWidth="2" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
-                                          <div className="text-gray-500">{lead.email}</div>
-                                        </div>
-                                        <div className="flex items-center space-x-2">
-                                          <svg stroke="currentColor" fill="none" strokeWidth="2" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
-                                          <div className="text-gray-900">{lead.phone}</div>
-                                        </div>
-
+                                      <td className="whitespace-nowrap select-none px-3 py-4 text-sm text-gray-500">
+                                        {isEditing && editingLead.id === lead.id ? (
+                                          <div>
+                                            <input className="border px-2 py-1 rounded-md" placeholder="LinkedIn URL" value={editingLead.linkedIn} onChange={(e) => setEditingLead({ ...editingLead, linkedIn: e.target.value })} />
+                                          </div>
+                                        ) : (
+                                          <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{lead.linkedIn}</td>
+                                        )}
                                       </td>
-                                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{lead.linkedIn}</td>
                                       <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                                        <a
-                                          href="#"
-                                          className="text-indigo-600 select-none hover:text-indigo-900"
-                                          onClick={(event) => event.stopPropagation()}
-                                        >
-                                          Edit
-                                        </a>
+                                        {isEditing && editingLead.id === lead.id ? (
+                                          <>
+                                            <a
+                                              href="#"
+                                              className="text-indigo-600 mr-5 select-none hover:text-indigo-900"
+                                              onClick={(event) => {
+                                                event.stopPropagation();
+                                                setIsEditing(false);
+                                              }}
+                                            >
+                                              Cancel
+                                            </a>
+                                            <a
+                                              href="#"
+                                              className="text-indigo-600 select-none hover:text-indigo-900"
+                                              onClick={(event) => {
+                                                event.stopPropagation();
+                                                handleSaveLead(lead.id);
+                                              }}
+                                            >
+                                              Save
+                                            </a>
+                                          </>
+                                        ) : (
+                                          <a
+                                            href="#"
+                                            className="text-indigo-600 select-none hover:text-indigo-900"
+                                            onClick={(event) => {
+                                              event.stopPropagation();
+                                              handleEditClick(lead.id, lead);
+                                            }}
+                                          >
+                                            Edit
+                                          </a>
+                                        )}
                                       </td>
                                       <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
                                         <FiTrash

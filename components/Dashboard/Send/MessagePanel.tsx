@@ -149,7 +149,7 @@ const MessagePanel = () => {
     const aboutInput = `Never forget the recipient's name is ${lead.firstName} ${lead.lastName}. The company values are ${user.companyValues} and we are solving ${user.problem}. Never forget our name is ${user.firstName} ${user.lastName}.`;
 
     try {
-      const response = await axios.post('/api/openai', { user, lead, campaign });
+      const response = (lead.refresh) ? await axios.post('/api/refresh', { user, lead, campaign, currResult: finalMessage }) : await axios.post('/api/openai', { user, lead, campaign });
       // console.log(response.data);
       if (response.data && response.data.message) {
         const message = response.data.message;
