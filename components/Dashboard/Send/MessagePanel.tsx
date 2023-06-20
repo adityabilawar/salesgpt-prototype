@@ -239,6 +239,7 @@ const campaignDocRef = doc(db, 'users', userId, 'campaigns', campaignId as strin
         {campaignTitle}
       </div>
       <div className="flex-grow-0 px-10 py-5 flex flex-col justify-start items-start">
+        <h1 className="mb-5 font-bold">Generating message for {selectedLead && selectedLead.firstName} {selectedLead && selectedLead.lastName}</h1>
         <div className="relative w-full h-60">
           <textarea
             className={`w-full h-full border text-black rounded-md ${loading ? 'opacity-50' : ''}`}
