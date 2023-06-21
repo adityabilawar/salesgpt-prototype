@@ -22,7 +22,6 @@ const MessagePanel = () => {
   const [user, setUser] = useState<User | null>(null);
   const selectedLead: Lead | null = useSelector((state: RootState) => state.leads.selectedLead);
   const [messagesGenerated, setMessagesGenerated] = useState<number>(0);
-  const [finalMessage, setFinalMessage] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const [userId, setUserId] = useState<string | null>(null);
   const [campaignTitle, setCampaignTitle] = useState<string | null>(null);
@@ -61,7 +60,6 @@ const MessagePanel = () => {
           const campaignMessage = leadData.generatedMessages.find((msg: { campaignId: string, message: string }) => msg.campaignId === campaignId);
           if (campaignMessage) {
             // If there's already a generated message for the selectedLead associated with the current campaign ID, set it as the finalMessage and currentMessage
-            setFinalMessage(campaignMessage.message);
             setCurrentMessage(campaignMessage.message);
             setDisplayedMessage(campaignMessage.message);
             return;
@@ -70,7 +68,6 @@ const MessagePanel = () => {
       }
   
       // If the lead doesn't have generatedMessages or the generatedMessage for the campaign doesn't exist, set the finalMessage, currentMessage, and displayedMessage to an empty string
-      setFinalMessage('');
       setCurrentMessage('');
       setDisplayedMessage('');
 const campaignDocRef = doc(db, 'users', userId, 'campaigns', campaignId as string);
@@ -135,7 +132,7 @@ const campaignDocRef = doc(db, 'users', userId, 'campaigns', campaignId as strin
           campaign,
           JSON.parse(JSON.stringify(user))
         );
-        setFinalMessage(message);
+        setDisplayedMessage(message);
         if (!currentMessage) {
           setCurrentMessage(message);
         }
@@ -154,12 +151,12 @@ const campaignDocRef = doc(db, 'users', userId, 'campaigns', campaignId as strin
 
   const saveGeneratedMessage = async () => {
 
-    if (finalMessage.trim() === '') {
+    if (displayedMessage && displayedMessage.trim() === '') {
       alert('The message is empty. Please generate a message before saving.');
       return;
     }
   
-    if (!user || !selectedLead || !userId || !campaignId) return;
+    if (!selectedLead || !userId || !campaignId) return;
   
     const leadRef = doc(db, 'users', userId, 'leads', selectedLead.id);
     const leadDoc = await getDoc(leadRef);
@@ -183,9 +180,9 @@ const campaignDocRef = doc(db, 'users', userId, 'campaigns', campaignId as strin
   
     let messageIndex = updatedLeadData.generatedMessages.findIndex((msg: { campaignId: string, message: string }) => msg.campaignId === campaignId);
     if (messageIndex !== -1) {
-      updatedLeadData.generatedMessages[messageIndex].message = finalMessage;
+      updatedLeadData.generatedMessages[messageIndex].message = displayedMessage;
     } else {
-      updatedLeadData.generatedMessages.push({ campaignId, message: finalMessage });
+      updatedLeadData.generatedMessages.push({ campaignId, message: displayedMessage });
     }
   
     await setDoc(leadRef, updatedLeadData);
@@ -200,7 +197,7 @@ const campaignDocRef = doc(db, 'users', userId, 'campaigns', campaignId as strin
     const aboutInput = `Never forget the recipient's name is ${lead.firstName} ${lead.lastName}. The company values are ${user.companyValues} and we are solving ${user.problem}. Never forget our name is ${user.firstName} ${user.lastName}.`;
 
     try {
-      const response = (lead.refresh) ? await axios.post('/api/refresh', { user, lead, campaign, currResult: finalMessage }) : await axios.post('/api/openai', { user, lead, campaign });
+      const response = (lead.refresh) ? await axios.post('/api/refresh', { user, lead, campaign, currResult: displayedMessage }) : await axios.post('/api/openai', { user, lead, campaign });
       // F(response.data);
       if (response.data && response.data.message) {
         const message = response.data.message;
