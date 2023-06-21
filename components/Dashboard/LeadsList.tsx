@@ -155,19 +155,19 @@ const Center = () => {
 
 
 
-  const fetchLinkedInData = async (url: string) => {
-    const key = process.env.NEXT_PUBLIC_DIFFBOT_KEY;
-    console.log("Diffbot key is: ", key);
-    const options = {
-      method: 'GET',
-      url: `https://kg.diffbot.com/kg/v3/enhance?type=Person&url=${encodeURIComponent(url)}&size=1&refresh=false&search=false&nonCanonicalFacts=false&useCache=false&jsonmode=%20&token=${key}`,
-      headers: { accept: 'application/json' }
-    };
+  // const fetchLinkedInData = async (url: string) => {
+  //   const key = process.env.NEXT_PUBLIC_DIFFBOT_KEY;
+  //   console.log("Diffbot key is: ", key);
+  //   const options = {
+  //     method: 'GET',
+  //     url: `https://kg.diffbot.com/kg/v3/enhance?type=Person&url=${encodeURIComponent(url)}&size=1&refresh=false&search=false&nonCanonicalFacts=false&useCache=false&jsonmode=%20&token=${key}`,
+  //     headers: { accept: 'application/json' }
+  //   };
 
-    const diffreq = (await axios.request(options)).data;
-    console.log(diffreq);
-    return (url && diffreq.data.length !== 0) ? diffreq.data[0].entity.description : '';
-  };
+  //   const diffreq = (await axios.request(options)).data;
+  //   console.log(diffreq);
+  //   return (url && diffreq.data.length !== 0) ? diffreq.data[0].entity.description : '';
+  // };
 
 
 
@@ -177,27 +177,34 @@ const Center = () => {
       return;
     }
 
-    const linkedInUrls = linkedinInput.split('\n');
+    // const linkedInUrls = linkedinInput.split('\n');
 
-    for (let url of linkedInUrls) {
-      const data = await fetchLinkedInData(url);
+    // for (let url of linkedInUrls) {
+    //   const data = await fetchLinkedInData(url);
 
-      if (data && data.name) {
-        const lead = {
-          firstName: data.name.givenName,
-          lastName: data.name.familyName,
-          jobTitle: data.title,
-          companyName: data.employer,
-          email: data.email,
-          phone: data.phoneNumbers?.[0].number,
-          linkedIn: url,
-        };
+    //   if (data && data.name) {
+    //     const lead = {
+    //       firstName: data.name.givenName,
+    //       lastName: data.name.familyName,
+    //       jobTitle: data.title,
+    //       companyName: data.employer,
+    //       email: data.email,
+    //       phone: data.phoneNumbers?.[0].number,
+    //       linkedIn: url,
+    //     };
 
-        const leadsRef = collection(db, 'users', userId, 'leads');
-        await addDoc(leadsRef, lead);
-      }
+    //     const leadsRef = collection(db, 'users', userId, 'leads');
+    //     await addDoc(leadsRef, lead);
+    //   }
+    // }
+    const userData = await axios.post('/api/user', { urlInput: linkedinInput });
+    const leads = userData.data;
+    const leadsRef = collection(db, 'users', userId, 'leads');
+    for(const lead of leads) {
+      await addDoc(leadsRef, lead);
     }
     setLinkedinInput('');
+    setModalOpen(false);
   }
 
   const handleContactAll = () => {
