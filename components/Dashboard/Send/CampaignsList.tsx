@@ -24,6 +24,7 @@ import { auth } from "@/lib/firebaseClient";
 import EditCampaign from "./Campaign/EditCampaign";
 import { RootState } from "@/components/store";
 import { useRouter } from "next/router";
+import { PlusIcon } from "@heroicons/react/solid";
 
 interface Campaign {
   id: string;
@@ -164,14 +165,20 @@ const CampaignsList = () => {
 
         <div className="m-10 border rounded-md h-full overflow-auto">
           {!editingCampaign && (
-            <div className="flex-grow-0 px-5 py-5 flex space-x-5 border-b">
+            <div className="flex-grow-0 px-5 py-5 flex space-x-5 border-b flex items-center justify-between">
+              {/* <div className="flex-grow" /> */}
+              <h2 className="font-semibold text-sm">CAMPAIGN TITLE</h2>
               <Link href="/dashboard/create-campaign">
-                <button className="border-[1px] px-6 py-3 rounded-md bg-brand text-white md:text-sm lg:text-md">
-                  Add Campaign
+                <button className="border-[1px] px-6 py-3 rounded-md bg-emerald-600 text-white md:text-sm lg:text-md">
+                  <div className="flex justify-center items-center gap-x-1">
+                    <PlusIcon className="h-4 w-4"/>
+                    <p className="text-sm">Add Campaign</p>
+                  </div>
                 </button>
               </Link>
             </div>
           )}
+
           {/* <p>yooo</p> */}
           {editingCampaign ? (
             <EditCampaign
