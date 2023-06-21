@@ -371,6 +371,13 @@ const Center = () => {
         </div>
         <div className="p-10 space-y-4 overflow-y-auto">
           <div className="h-full space-y-4 border rounded-md">
+          {leads.length === 0 ? (
+            <div className="flex items-center justify-center h-48">
+              <p className="text-xl text-gray-500">Upload leads to send to campaign</p>
+            </div>
+          ) : (
+            <div>
+
             <div>
               <div className="p-4 border-b">
                 <Link href="/dashboard/send">
@@ -563,6 +570,7 @@ const Center = () => {
                 </div>
               </div>
             </div>
+              </div>)}
           </div>
         </div>
       </div>
@@ -693,5 +701,6 @@ const Center = () => {
     </div>
   );
 };
+
 
 export default Center;
