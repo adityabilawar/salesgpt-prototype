@@ -27,8 +27,8 @@ const SelectedLeads = () => {
   }
 
   return (
-    <div className="border-r-[1px] h-screen flex flex-col">
-      <h1 className="px-5 text-xl py-10">Selected leads</h1>
+    <div className="border-r-[1px] h-screen flex flex-col p-5">
+      {selectedLeads.length != 0 ? <h1 className="text-xl font-medium">Selected leads</h1> : null}
       {selectedLeads.length > 0 ? (
         selectedLeads.map((lead: Lead) => (
           lead && (
@@ -39,7 +39,7 @@ const SelectedLeads = () => {
           )
         ))
       ) : (
-        <div className="p-10 h-full">
+        <div className="h-full py-5 flex items-center text-center">
           <p>There are no leads selected. Please go back to the dashboard to select leads.</p>
         </div>
       )}
