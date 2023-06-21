@@ -49,6 +49,8 @@ export default async function handler(
       : url;
     const scrapedData = await scrape(linkedIn);
     console.log(scrapedData);
+    if(!scrapedData)
+      return res.status(500).json({ error: 'Invalid user ID' });
     const linkedInData = scrapedData[0];
     let jobTitle = '', companyName = '';
     if(linkedInData.experience.length > 0) {
