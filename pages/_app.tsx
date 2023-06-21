@@ -4,6 +4,8 @@ import type { AppProps } from 'next/app'
 import { Provider } from 'react-redux';
 import store from '../components/store';
 import withLayoutAndAuth from '@/components/withLayoutAndAuth';
+import 'nprogress/nprogress.css';
+import NProgress from 'nprogress';
 
 function App({ Component, pageProps, router }: AppProps) {
   const { route } = router;
