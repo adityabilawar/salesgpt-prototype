@@ -1,8 +1,8 @@
 import { useState, Fragment } from "react";
-import { useRouter } from 'next/router';
-import { FiGrid, FiLogOut, FiMail, FiSettings, FiX } from 'react-icons/fi';
-import { HiOutlinePaperAirplane } from 'react-icons/hi';
-import { Dialog, Transition } from '@headlessui/react'
+import { useRouter } from "next/router";
+import { FiGrid, FiLogOut, FiMail, FiSettings, FiX } from "react-icons/fi";
+import { HiOutlinePaperAirplane } from "react-icons/hi";
+import { Dialog, Transition } from "@headlessui/react";
 import { signOut } from "firebase/auth";
 import { auth } from "@/lib/firebaseClient";
 
@@ -13,7 +13,7 @@ const Menus = [
 ];
 
 function classNames(...classes) {
-  return classes.filter(Boolean).join(' ')
+  return classes.filter(Boolean).join(" ");
 }
 
 const Sidebar = () => {
@@ -23,7 +23,11 @@ const Sidebar = () => {
   return (
     <>
       <Transition.Root show={open} as={Fragment}>
-        <Dialog as="div" className="fixed inset-0 flex z-40 md:hidden" onClose={() => setOpen(false)}>
+        <Dialog
+          as="div"
+          className="fixed inset-0 flex z-40 md:hidden"
+          onClose={() => setOpen(false)}
+        >
           <Transition.Child
             as={Fragment}
             enter="transition-opacity ease-linear duration-300"
@@ -62,7 +66,9 @@ const Sidebar = () => {
                   src="/templogo.svg"
                   alt="Pipeline AI"
                 />
-                <span className="ml-3 text-gray-900 text-2xl font-semibold">Pipeline AI</span>
+                <span className="ml-3 text-gray-900 text-2xl font-semibold">
+                  Pipeline AI
+                </span>
               </div>
 
               <div className="mt-5 flex-1 h-0 overflow-y-auto">
@@ -72,15 +78,17 @@ const Sidebar = () => {
                       key={index}
                       href={Menu.path}
                       className={classNames(
-                        asPath === Menu.path ? 'bg-gray-100 text-gray-900' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
-                        'group flex items-center px-2 py-2 text-base font-medium rounded-md'
+                        asPath === Menu.path
+                          ? "bg-gray-100 text-gray-900"
+                          : "text-gray-600 hover:bg-gray-50 hover:text-gray-900",
+                        "group flex items-center px-2 py-2 text-base font-medium rounded-md"
                       )}
                     >
                       <Menu.src className="text-gray-400 group-hover:text-gray-500 mr-4 h-6 w-6" />
                       {Menu.title}
                     </a>
                   ))}
-                  </nav>
+                </nav>
               </div>
             </div>
           </Transition.Child>
@@ -98,7 +106,9 @@ const Sidebar = () => {
                   src="/templogo.svg"
                   alt="Pipeline AI"
                 />
-                <span className="ml-3 text-gray-900 text-2xl font-semibold">Pipeline AI</span>
+                <span className="ml-3 text-gray-900 text-2xl font-semibold">
+                  Pipeline AI
+                </span>
               </div>
 
               <nav className="mt-5 flex-1 px-2 space-y-1">
@@ -107,8 +117,10 @@ const Sidebar = () => {
                     key={index}
                     href={Menu.path}
                     className={classNames(
-                      asPath === Menu.path ? 'bg-gray-100 text-gray-900' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
-                      'group flex items-center px-2 py-2 text-base font-medium rounded-md'
+                      asPath === Menu.path
+                        ? "bg-gray-100 text-gray-900"
+                        : "text-gray-600 hover:bg-gray-50 hover:text-gray-900",
+                      "group flex items-center px-2 py-2 text-base font-medium rounded-md"
                     )}
                   >
                     <Menu.src className="text-gray-400 group-hover:text-gray-500 mr-4 h-6 w-6" />
@@ -124,7 +136,7 @@ const Sidebar = () => {
               >
                 <div className="flex items-center">
                   <div>
-                    <FiLogOut className="text-gray-400 group-hover:text-gray-500 h-6 w-6" />
+                    <FiLogOut className="text-gray-400 group-hover:text-red-500 h-6 w-6" />
                   </div>
                   <div className="ml-3">
                     <p className="text-sm font-medium text-gray-700 group-hover:text-gray-900">
