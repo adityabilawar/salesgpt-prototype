@@ -34,120 +34,6 @@ const MessagePanel = () => {
   if (selectedLead) {
     console.log("Selected lead: " + selectedLead.toString());
   }
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        setUserId(user.uid);
-      } else {
-        setUserId(null);
-      }
-    });
-    return () => {
-      unsubscribe();
-    };
-  }, []);
-
-  useEffect(() => {
-    async function fetchData() {
-      if (!campaignId || !userId || !selectedLead) return;
-  
-      const leadRef = doc(db, 'users', userId, 'leads', selectedLead.id);
-      const leadDoc = await getDoc(leadRef);
-  
-      if (leadDoc.exists()) {
-        const leadData = leadDoc.data();
-        if (leadData?.generatedMessages) {
-          const campaignMessage = leadData.generatedMessages.find((msg: { campaignId: string, message: string }) => msg.campaignId === campaignId);
-          if (campaignMessage) {
-            // If there's already a generated message for the selectedLead associated with the current campaign ID, set it as the finalMessage and currentMessage
-            setCurrentMessage(campaignMessage.message);
-            setDisplayedMessage(campaignMessage.message);
-            return;
-          }
-        }
-      }
-  
-      // If the lead doesn't have generatedMessages or the generatedMessage for the campaign doesn't exist, set the finalMessage, currentMessage, and displayedMessage to an empty string
-      setCurrentMessage('');
-      setDisplayedMessage('');
-const campaignDocRef = doc(db, 'users', userId, 'campaigns', campaignId as string);
-      const campaignSnapshot = await getDoc(campaignDocRef);
-
-      if (!campaignSnapshot.exists()) {
-        console.error('Campaign does not exist');
-        return;
-      }
-
-      const campaignData = campaignSnapshot.data();
-
-      if (!campaignData || typeof campaignData.generatedPrompt !== 'string') {
-        console.error('Invalid campaign data');
-        return;
-      }
-
-      setCampaignTitle(campaignData.campaignTitle);
-
-      const campaign: Campaign = {
-        id: campaignSnapshot.id,
-        generatedPrompt: campaignData.generatedPrompt,
-        callToAction: campaignData.callToAction,
-        campaignTitle: campaignData.campaignTitle,
-        platform: campaignData.platform,
-        toneOfVoice: campaignData.toneOfVoice,
-        purpose: campaignData.purpose,
-        ...campaignData,
-      };
-
-      const userDataRef = doc(db, 'users', userId);
-      const userSnapshot = await getDoc(userDataRef);
-
-      if (!userSnapshot.exists()) {
-        console.error('User does not exist');
-        return;
-      }
-
-      const userData = userSnapshot.data();
-      if (!userData) {
-        console.error('Invalid user data');
-        return;
-      }
-
-      const user: User = {
-        id: userSnapshot.id,
-        firstName: userData.firstName,
-        lastName: userData.lastName,
-        companyName: userData.companyName,
-        companyInfo: userData.companyInfo,
-        phoneNumber: userData.phoneNumber,
-        companyValues: userData.companyValues,
-        problem: userData.problem,
-        email: userData.email,
-        linkedInProfile: userData.linkedInProfile,
-        jobTitle: userData.jobProfile,
-      };
-      setUser(user);
-      if (selectedLead) {
-        const message = await generatePersonalizedMessage(
-          JSON.parse(JSON.stringify(selectedLead)),
-          campaign,
-          JSON.parse(JSON.stringify(user))
-        );
-        setDisplayedMessage(message);
-        if (!currentMessage) {
-          setCurrentMessage(message);
-        }
-        setMessagesGenerated((prevCount) => prevCount + 1);
-      }      
-    }
-
-    fetchData();
-  }, [selectedLead, campaignId, userId]);
-
-  useEffect(() => {
-    if (currentMessage) {
-      setDisplayedMessage(currentMessage);
-    }
-  }, [currentMessage]);
 
   const saveGeneratedMessage = async () => {
 
@@ -230,10 +116,149 @@ const campaignDocRef = doc(db, 'users', userId, 'campaigns', campaignId as strin
     }
   }
 
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setUserId(user.uid);
+      } else {
+        setUserId(null);
+      }
+    });
+    return () => {
+      unsubscribe();
+    };
+  }, []);
+
+  useEffect(() => {
+    async function fetchCampaignAndUserData() {
+      if (!campaignId || !userId) return;
+  
+      const campaignDocRef = doc(db, 'users', userId, 'campaigns', campaignId as string);
+      const campaignSnapshot = await getDoc(campaignDocRef);
+  
+      if (!campaignSnapshot.exists()) {
+        console.error('Campaign does not exist');
+        return;
+      }
+  
+      const campaignData = campaignSnapshot.data();
+  
+      if (!campaignData || typeof campaignData.generatedPrompt !== 'string') {
+        console.error('Invalid campaign data');
+        return;
+      }
+  
+      setCampaignTitle(campaignData.campaignTitle);
+  
+      const userDataRef = doc(db, 'users', userId);
+      const userSnapshot = await getDoc(userDataRef);
+  
+      if (!userSnapshot.exists()) {
+        console.error('User does not exist');
+        return;
+      }
+  
+      const userData = userSnapshot.data();
+      if (!userData) {
+        console.error('Invalid user data');
+        return;
+      }
+  
+      const user: User = {
+        id: userSnapshot.id,
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+        companyName: userData.companyName,
+        companyInfo: userData.companyInfo,
+        phoneNumber: userData.phoneNumber,
+        companyValues: userData.companyValues,
+        problem: userData.problem,
+        email: userData.email,
+        linkedInProfile: userData.linkedInProfile,
+        jobTitle: userData.jobProfile,
+      };
+      setUser(user);
+    }
+  
+    fetchCampaignAndUserData();
+  }, [campaignId, userId]);
+
+  useEffect(() => {
+    async function handleLeadSelectionAndMessageGeneration() {
+      if (!selectedLead || !userId || !campaignId) return;
+  
+      const leadRef = doc(db, 'users', userId, 'leads', selectedLead.id);
+      const leadDoc = await getDoc(leadRef);
+    
+      if (leadDoc.exists()) {
+        const leadData = leadDoc.data();
+        if (leadData?.generatedMessages) {
+          const campaignMessage = leadData.generatedMessages.find((msg: { campaignId: string, message: string }) => msg.campaignId === campaignId);
+          if (campaignMessage) {
+            setCurrentMessage(campaignMessage.message);
+            setDisplayedMessage(campaignMessage.message);
+            return;
+          }
+        }
+      }
+  
+      // If the lead doesn't have generatedMessages or the generatedMessage for the campaign doesn't exist, set the finalMessage, currentMessage, and displayedMessage to an empty string
+      setCurrentMessage('');
+      setDisplayedMessage('');
+  
+      const campaignDocRef = doc(db, 'users', userId, 'campaigns', campaignId as string);
+      const campaignSnapshot = await getDoc(campaignDocRef);
+  
+      if (!campaignSnapshot.exists()) {
+        console.error('Campaign does not exist');
+        return;
+      }
+  
+      const campaignData = campaignSnapshot.data();
+  
+      if (!campaignData || typeof campaignData.generatedPrompt !== 'string') {
+        console.error('Invalid campaign data');
+        return;
+      }
+  
+      const campaign: Campaign = {
+        id: campaignSnapshot.id,
+        generatedPrompt: campaignData.generatedPrompt,
+        callToAction: campaignData.callToAction,
+        campaignTitle: campaignData.campaignTitle,
+        platform: campaignData.platform,
+        toneOfVoice: campaignData.toneOfVoice,
+        purpose: campaignData.purpose,
+        ...campaignData,
+      };
+  
+      if (user) {
+        const message = await generatePersonalizedMessage(
+          JSON.parse(JSON.stringify(selectedLead)),
+          campaign,
+          JSON.parse(JSON.stringify(user))
+        );
+        setDisplayedMessage(message);
+        if (!currentMessage) {
+          setCurrentMessage(message);
+        }
+        setMessagesGenerated((prevCount) => prevCount + 1);
+      }      
+    }
+  
+    handleLeadSelectionAndMessageGeneration();
+  }, [selectedLead, campaignId, userId, user]);
+  
+  useEffect(() => {
+    if (currentMessage) {
+      setDisplayedMessage(currentMessage);
+    }
+  }, [currentMessage]);
+
   return (
     <div className="flex-grow">
       <div className="relative flex border-b px-10 py-5 text-2xl">
-        {campaignTitle}
+      {campaignTitle ? campaignTitle : 'Loading...'}
       </div>
       <div className="flex-grow-0 px-10 py-5 flex flex-col justify-start items-start">
         <h1 className="mb-5 font-bold">Generating message for {selectedLead && selectedLead.firstName} {selectedLead && selectedLead.lastName}</h1>

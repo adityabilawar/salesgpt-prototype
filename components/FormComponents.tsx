@@ -38,7 +38,7 @@ export function textBox(
       <div className="mt-1 col-span-2">
         <div className="max-w-lg flex rounded-md shadow-sm">
           <input
-            value={value} // Set this to value, not placeholder
+            // value={value} // Comment this line
             readOnly={readOnly}
             required
             onChange={e => {
@@ -55,6 +55,7 @@ export function textBox(
     </div>
   );
 }
+
 
 
 export function dropDown(question, id, options, setValue) {

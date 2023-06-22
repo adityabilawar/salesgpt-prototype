@@ -83,22 +83,24 @@ const Profile = () => {
 
   useEffect(() => {
     const fetchUserData = async () => {
-      try {
-        const userDoc = await getDoc(doc(collection(db, "users"), userId as string));
-        if (userDoc.exists()) {
-          const userData = userDoc.data() as ProfileData;
-          setProfileData(userData);
-          setEditData(userData); // set editData here directly
-        } else {
-          console.log("No such document!");
+      if (userId) {
+        try {
+          const userDoc = await getDoc(doc(collection(db, "users"), userId));
+          if (userDoc.exists()) {
+            const userData = userDoc.data() as ProfileData;
+            setProfileData(userData);
+            setEditData(userData); // set editData here directly
+          } else {
+            console.log("No such document!");
+          }
+        } catch (error) {
+          console.error("Error fetching user data: ", error);
         }
-      } catch (error) {
-        console.error("Error fetching user data: ", error);
+        setLoading(false);
       }
-      setLoading(false);
     };
     fetchUserData();
-  }, []);
+  }, [userId]);
 
   const handleSave = async () => {
     if (editData) {

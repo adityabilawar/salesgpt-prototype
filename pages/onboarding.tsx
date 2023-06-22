@@ -3,24 +3,60 @@ import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { BadgeCheckIcon } from "@heroicons/react/solid";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth, db } from "@/lib/firebaseClient";
+import { collection, doc, setDoc } from "firebase/firestore";
 
 export default function onboarding() {
   const router = useRouter();
   const [onboarding, setOnboarding] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
 
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [linkedIn, setLinkedIn] = useState("");
+  const [jobTitle, setJobTitle] = useState("");
   const [companyInformation, setCompanyInformation] = useState("");
   const [valueProvide, setValueProvide] = useState("");
   const [problemSolve, setProblemSolve] = useState("");
 
-  const handleSubmit = e => {
-    setOnboarding(true);
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setUserId(user.uid);
+      } else {
+        setUserId(null);
+      }
+    });
+    return () => {
+      unsubscribe();
+    };
+  }, []);
 
-    router.push("/login");
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setOnboarding(true);
+    if (userId) {
+      const userData = {
+        firstName,
+        lastName,
+        email,
+        phoneNumber,
+        linkedInProfile: linkedIn,
+        jobTitle: jobTitle,
+        companyInformation,
+        companyValue: valueProvide,
+        problem: problemSolve,
+      };
+      try {
+        await setDoc(doc(collection(db, "users"), userId), userData);
+        router.push("/login");
+      } catch (error) {
+        console.error("Error saving user data: ", error);
+      }
+    }
   };
 
   return onboarding ? (
@@ -72,14 +108,22 @@ export default function onboarding() {
                   false
                 )}
                 {textBox(
-                  "LinkedIn URL",
-                  "url",
+                  "LinkedIn username",
+                  "text",
                   "linkedin",
                   "",
                   setLinkedIn,
                   false
                 )}
-
+                {textBox(
+                  "Job title",
+                  "text",
+                  "job-title",
+                  "",
+                  setJobTitle,
+                  false
+                )}
+{/* 
                 <div className="mt-6">
                   <label
                     htmlFor="photo"
@@ -104,7 +148,7 @@ export default function onboarding() {
                       Change
                     </button>
                   </div>
-                </div>
+                </div> */}
 
                 <hr className="mt-6"/>
 
@@ -133,114 +177,7 @@ export default function onboarding() {
                 )}
               </div>
             </div>
-            <div className="pt-8">
-              <div>
-                <h3 className="text-lg leading-6 font-medium text-gray-900">
-                  Notifications
-                </h3>
-                <p className="mt-1 max-w-2xl text-sm text-gray-500">
-                  We'll always let you know about important changes, but you
-                  pick what else you want to hear about.
-                </p>
-              </div>
-              <div className="mt-6 space-y-6 divide-y divide-gray-200">
-                <div className="pt-6">
-                  <div role="group" aria-labelledby="label-email">
-                    <div className="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-baseline">
-                      <div>
-                        <div
-                          className="text-base font-medium text-gray-900 sm:text-sm sm:text-gray-700"
-                          id="label-email"
-                        >
-                          By Email
-                        </div>
-                      </div>
-                      <div className="mt-4 sm:mt-0 sm:col-span-2">
-                        <div className="max-w-lg space-y-4">
-                          <div className="relative flex items-start">
-                            <div className="flex items-center h-5">
-                              <input
-                                id="comments"
-                                name="comments"
-                                type="checkbox"
-                                className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded"
-                              />
-                            </div>
-                            <div className="ml-3 text-sm">
-                              <label
-                                htmlFor="comments"
-                                className="font-medium text-gray-700"
-                              >
-                                Comments
-                              </label>
-                              <p className="text-gray-500">
-                                Get notified when someone posts a comment on a
-                                posting.
-                              </p>
-                            </div>
-                          </div>
-                          <div>
-                            <div className="relative flex items-start">
-                              <div className="flex items-center h-5">
-                                <input
-                                  id="candidates"
-                                  name="candidates"
-                                  type="checkbox"
-                                  className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded"
-                                />
-                              </div>
-                              <div className="ml-3 text-sm">
-                                <label
-                                  htmlFor="candidates"
-                                  className="font-medium text-gray-700"
-                                >
-                                  Candidates
-                                </label>
-                                <p className="text-gray-500">
-                                  Get notified when a candidate applies for a
-                                  job.
-                                </p>
-                              </div>
-                            </div>
-                          </div>
-                          <div>
-                            <div className="relative flex items-start">
-                              <div className="flex items-center h-5">
-                                <input
-                                  id="offers"
-                                  name="offers"
-                                  type="checkbox"
-                                  className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded"
-                                />
-                              </div>
-                              <div className="ml-3 text-sm">
-                                <label
-                                  htmlFor="offers"
-                                  className="font-medium text-gray-700"
-                                >
-                                  Offers
-                                </label>
-                                <p className="text-gray-500">
-                                  Get notified when a candidate accepts or
-                                  rejects an offer.
-                                </p>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
             <div className="flex justify-end pt-5">
-              <button
-                type="button"
-                className="mr-4 py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-              >
-                Cancel
-              </button>
               <button
                 type="submit"
                 className="py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"

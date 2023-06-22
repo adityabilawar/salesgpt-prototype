@@ -46,12 +46,60 @@ const LeadsSidebar = ({ campaignId, userId }: LeadsSidebarProps) => {
       fetchLeads();
     }
   }, [campaignId, refresh]);
-
+  
+  const deleteMessage = async (lead: Lead, campaignId: string) => {
+    if (!lead || !userId || !campaignId) return;
+  
+    const leadRef = doc(db, 'users', userId, 'leads', lead.id);
+    const leadDoc = await getDoc(leadRef);
+  
+    if (!leadDoc.exists()) {
+      console.error('Lead does not exist');
+      return;
+    }
+  
+    const leadData = leadDoc.data();
+  
+    if (!leadData) {
+      console.error('Invalid lead data');
+      return;
+    }
+  
+    // Filter out the message associated with the campaignId
+    const updatedMessages = leadData.generatedMessages.filter((msg: { campaignId: string, message: string }) => msg.campaignId !== campaignId);
+  
+    const updatedLeadData = {
+      ...leadData,
+      generatedMessages: updatedMessages,
+    };
+  
+    await setDoc(leadRef, updatedLeadData);
+  
+    console.log('Message deleted successfully');
+  };
+  
   const playLeadHandler = async (lead: Lead) => {
     if (!lead) return;
     console.log("Play button clicked for lead:", lead);
-    dispatch(setSelectedLead(lead));
+  
+    const existingMessage = lead.generatedMessages.find((msg: { campaignId: string, message: string }) => msg.campaignId === campaignId);
+  
+    if(existingMessage){
+      if (window.confirm(`There exists a message under this lead for the campaign already. Do you want to delete it and generate a new one?`)) {
+        try{
+          // Assume deleteMessage is your function to delete a message.
+          // This function should handle the message deletion logic in the backend.
+          await deleteMessage(lead, campaignId);
+          dispatch(setSelectedLead(lead));
+        }catch(error){
+          console.error('Error in message deletion:', error);
+        }
+      }
+    }else{
+      dispatch(setSelectedLead(lead));
+    }
   }
+  
 
   const removeLeadHandler = async (lead: Lead) => {
     if (window.confirm(`Are you sure you want to remove ${lead.firstName} ${lead.lastName} from the list?`)) {

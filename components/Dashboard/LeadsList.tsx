@@ -7,13 +7,16 @@ import { fetchLeads, addSelectedLead, setSelectedLead, clearSelectedLeads, remov
 import { setView } from '@/components/store/sidebarSlice';
 import { FiChevronDown, FiCircle, FiMail, FiSearch, FiEdit3, FiMoreHorizontal, FiTrash, FiUpload } from 'react-icons/fi';
 import Link from 'next/link';
+import NProgress from 'nprogress';
 import Papa from "papaparse";
 import { addDoc, arrayUnion, collection, deleteDoc, doc, getDoc, onSnapshot, setDoc, updateDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebaseClient';
 import { animated, useSpring, useSprings } from 'react-spring';
 import axios from 'axios';
 
-const Center = () => {
+NProgress.configure({ showSpinner: false });
+
+const LeadsList = () => {
   const dispatch = useDispatch();
   const leads = useSelector((state: RootState) => state.leads.leads) || [];
   const sidebarView = useSelector((state: RootState) => state.sidebar.view);
@@ -23,6 +26,7 @@ const Center = () => {
   const [isOpen, setIsOpen] = useState<Record<string, boolean>>({});
   const [isSelected, setIsSelected] = useState<Record<string, boolean>>({});
   const [file, setFile] = useState<File | null>(null);
+  const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState<string | null>(null);
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<string>('linkedin');
@@ -31,6 +35,7 @@ const Center = () => {
   const [lastSelectedIndex, setLastSelectedIndex] = useState<number | null>(null);
   const [createModalOpen, setCreateModalOpen] = useState<boolean>(false);
   const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [selectedLeadsCount, setSelectedLeadsCount] = useState<number>(0);
   const [editingLead, setEditingLead] = useState<{
     id?: string;
     firstName: string;
@@ -83,26 +88,14 @@ const Center = () => {
   const toggleOpen = (id: string) => {
     setIsOpen((prev) => ({ ...prev, [id]: !prev[id] }));
   };
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        setUserId(user.uid);
-      } else {
-        setUserId(null);
-      }
-    });
-    return () => {
-      unsubscribe();
-    };
-  }, []);
+  
   const handleRowClick = (index: number, id: string, lead: Lead, event: React.MouseEvent) => {
     let updatedIsSelected = { ...isSelected };
-
+  
     if (event.shiftKey && lastSelectedIndex !== null) {
       const start = Math.min(index, lastSelectedIndex);
       const end = Math.max(index, lastSelectedIndex);
-
+  
       for (let i = start; i <= end; i++) {
         const leadId = leads[i].id;
         updatedIsSelected[leadId] = true;
@@ -120,11 +113,15 @@ const Center = () => {
         dispatch(addSelectedLead(lead));
       }
     }
-
+  
     setIsSelected(updatedIsSelected);
     setLastSelectedIndex(index);
+  
+    const selectedCount = Object.values(updatedIsSelected).filter((value) => value).length;
+    console.log(selectedLeadsCount);
+    setSelectedLeadsCount(selectedCount);
   };
-
+  
 
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -154,53 +151,15 @@ const Center = () => {
   };
 
 
-
-  // const fetchLinkedInData = async (url: string) => {
-  //   const key = process.env.NEXT_PUBLIC_DIFFBOT_KEY;
-  //   console.log("Diffbot key is: ", key);
-  //   const options = {
-  //     method: 'GET',
-  //     url: `https://kg.diffbot.com/kg/v3/enhance?type=Person&url=${encodeURIComponent(url)}&size=1&refresh=false&search=false&nonCanonicalFacts=false&useCache=false&jsonmode=%20&token=${key}`,
-  //     headers: { accept: 'application/json' }
-  //   };
-
-  //   const diffreq = (await axios.request(options)).data;
-  //   console.log(diffreq);
-  //   return (url && diffreq.data.length !== 0) ? diffreq.data[0].entity.description : '';
-  // };
-
-
-
   const handleLinkedInInput = async () => {
     if (!userId) {
       console.error("No user is signed in");
       return;
     }
-
-    // const linkedInUrls = linkedinInput.split('\n');
-
-    // for (let url of linkedInUrls) {
-    //   const data = await fetchLinkedInData(url);
-
-    //   if (data && data.name) {
-    //     const lead = {
-    //       firstName: data.name.givenName,
-    //       lastName: data.name.familyName,
-    //       jobTitle: data.title,
-    //       companyName: data.employer,
-    //       email: data.email,
-    //       phone: data.phoneNumbers?.[0].number,
-    //       linkedIn: url,
-    //     };
-
-    //     const leadsRef = collection(db, 'users', userId, 'leads');
-    //     await addDoc(leadsRef, lead);
-    //   }
-    // }
     const userData = await axios.post('/api/user', { urlInput: linkedinInput });
     const leads = userData.data;
     const leadsRef = collection(db, 'users', userId, 'leads');
-    for(const lead of leads) {
+    for (const lead of leads) {
       await addDoc(leadsRef, lead);
     }
     setLinkedinInput('');
@@ -224,33 +183,44 @@ const Center = () => {
     setSearchTerm(event.target.value);
   };
 
-  const springs = useSprings(
-    leads.length,
-    leads.map((_: any, index: number) => ({
-      transform: isOpen[index.toString()] ? 'rotate(0deg)' : 'rotate(180deg)',
-    }))
-  );
-
   useEffect(() => {
-    if (!userId) {
-      console.error("No user is signed in");
-      return;
-    }
-
-    const leadsRef = collection(db, 'users', userId, 'leads');
-    const unsubscribe = onSnapshot(leadsRef, (snapshot) => {
-      const updatedLeads: Lead[] = [];
-      snapshot.forEach((doc) => {
-        updatedLeads.push({ id: doc.id, ...doc.data() } as Lead);
-      });
-      dispatch(updateLeads(updatedLeads));
-      setIsLoading(false);
+    NProgress.start();
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setUserId(user.uid);
+      } else {
+        setUserId(null);
+      }
+      setLoading(false);
+      NProgress.done();
+  
+      if (user) {
+        const leadsRef = collection(db, 'users', user.uid, 'leads');
+        const unsubscribeLeads = onSnapshot(leadsRef, (snapshot) => {
+          const updatedLeads: Lead[] = [];
+          snapshot.forEach((doc) => {
+            updatedLeads.push({ id: doc.id, ...doc.data() } as Lead);
+          });
+          dispatch(updateLeads(updatedLeads));
+          setIsLoading(false);
+        });
+  
+        return () => {
+          unsubscribeLeads();
+        };
+      }
     });
-
+  
     return () => {
+      NProgress.remove();
       unsubscribe();
     };
-  }, [dispatch, userId]);
+  }, [dispatch]);
+  
+
+  if (loading) {
+    return null;
+  }
 
   const handleUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     if (!userId) {
@@ -371,205 +341,210 @@ const Center = () => {
         </div>
         <div className="p-10 space-y-4 overflow-y-auto">
           <div className="h-full space-y-4 border rounded-md">
-          {leads.length === 0 ? (
-            <div className="flex items-center justify-center h-48">
-              <p className="text-xl text-gray-500">Upload leads to send to campaign</p>
-            </div>
-          ) : (
-            <div>
-
-            <div>
-              <div className="p-4 border-b">
-                <Link href="/dashboard/send">
-                  <button className="border-[1px] rounded-md px-6 py-3 bg-brand text-white text-white text-sm" onClick={handleContactAll}>
-                    Send selected leads to campaign
-                  </button>
-                </Link>
+            {leads.length === 0 ? (
+              <div className="flex items-center justify-center h-48">
+                <p className="text-xl text-gray-500">Upload leads to send to campaign</p>
               </div>
+            ) : (
               <div>
-                <div className="flex flex-col">
-                  <div className="overflow-x-auto">
-                    <div className="inline-block min-w-full">
-                      <div className="overflow-hidden">
-                        <table className="min-w-full divide-y divide-gray-300">
-                          <thead className="bg-gray-50">
-                            <tr>
-                              <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6">
-                                <div
-                                  className={`h-5 w-5 border-2 ml-3 rounded-md cursor-pointer ${Object.keys(isSelected).length === leads.length && !Object.values(isSelected).includes(false) ? 'bg-brand' : ''}`}
-                                  onClick={handleSelectAll}
-                                ></div>
-                              </th>
-                              <th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">
-                                LEAD NAME
-                              </th>
-                              <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                                COMPANY INFO
-                              </th>
-                              <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                                PERSONAL INFO
-                              </th>
-                              <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                                LINKEDIN
-                              </th>
-                              <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6">
-                                <span className="sr-only">Edit</span>
-                              </th>
-                              <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6">
-                                <span className="sr-only">Delete</span>
-                              </th>
-                            </tr>
-                          </thead>
-                          <tbody className="divide-y divide-gray-200 bg-white">
-                            {isLoading ? (
-                              <div className="animate-pulse flex space-x-4 w-full">
-                                <div className="flex-1 space-y-6 py-1">
-                                  <div className="space-y-3">
-                                    <div className="grid grid-cols-7 gap-4">
-                                      <div className="h-2 bg-slate-700 rounded w-1/8"></div>
-                                      <div className="h-2 bg-slate-700 rounded w-2/8"></div>
-                                      <div className="h-2 bg-slate-700 rounded w-1/8"></div>
-                                      <div className="h-2 bg-slate-700 rounded w-1/8"></div>
-                                      <div className="h-2 bg-slate-700 rounded w-1/8"></div>
-                                      <div className="h-2 bg-slate-700 rounded w-1/8"></div>
-                                      <div className="h-2 bg-slate-700 rounded w-1/8"></div>
-                                    </div>
-                                    <div className="h-2 bg-slate-700 rounded"></div>
-                                  </div>
-                                </div>
-                              </div>
-                            ) : (
-                              leads
-                                .filter((lead: Lead) => {
-                                  const searchString = `${lead.firstName} ${lead.lastName} ${lead.companyName}`.toLowerCase();
-                                  return searchString.includes(searchTerm.toLowerCase());
-                                })
-                                .map((lead: Lead, index: number) => {
-                                  const id = lead.id;
 
-                                  return (
-                                    <tr
-                                      key={lead.id}
-                                      className={`${isSelected[id] ? 'bg-gray-100' : ''}`}
-                                      onClick={(event) => handleRowClick(index, id, lead, event)}
-                                    >
-                                      <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-6">
-                                        <div className="flex items-center space-x-3">
-                                          <div
-                                            className={`h-5 w-5 border-2 rounded-md cursor-pointer ${isSelected[id] ? 'bg-brand' : ''}`}
-                                          ></div>
+                <div>
+                  <div className="p-4 border-b">
+                    <Link href="/dashboard/send">
+                      <button
+                        className={`border-[1px] rounded-md px-6 py-3 bg-brand text-white text-white text-sm ${selectedLeadsCount > 0 ? '' : 'opacity-50 cursor-not-allowed'}`}
+                        onClick={handleContactAll}
+                        disabled={selectedLeadsCount === 0}
+                      >
+                        Send selected leads to campaign
+                      </button>
+
+                    </Link>
+                  </div>
+                  <div>
+                    <div className="flex flex-col">
+                      <div className="overflow-x-auto">
+                        <div className="inline-block min-w-full">
+                          <div className="overflow-hidden">
+                            <table className="min-w-full divide-y divide-gray-300">
+                              <thead className="bg-gray-50">
+                                <tr>
+                                  <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6">
+                                    <div
+                                      className={`h-5 w-5 border-2 ml-3 rounded-md cursor-pointer ${Object.keys(isSelected).length === leads.length && !Object.values(isSelected).includes(false) ? 'bg-brand' : ''}`}
+                                      onClick={handleSelectAll}
+                                    ></div>
+                                  </th>
+                                  <th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">
+                                    LEAD NAME
+                                  </th>
+                                  <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                                    COMPANY INFO
+                                  </th>
+                                  <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                                    PERSONAL INFO
+                                  </th>
+                                  <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                                    LINKEDIN
+                                  </th>
+                                  <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6">
+                                    <span className="sr-only">Edit</span>
+                                  </th>
+                                  <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6">
+                                    <span className="sr-only">Delete</span>
+                                  </th>
+                                </tr>
+                              </thead>
+                              <tbody className="divide-y divide-gray-200 bg-white">
+                                {isLoading ? (
+                                  <div className="animate-pulse flex space-x-4 w-full">
+                                    <div className="flex-1 space-y-6 py-1">
+                                      <div className="space-y-3">
+                                        <div className="grid grid-cols-7 gap-4">
+                                          <div className="h-2 bg-slate-700 rounded w-1/8"></div>
+                                          <div className="h-2 bg-slate-700 rounded w-2/8"></div>
+                                          <div className="h-2 bg-slate-700 rounded w-1/8"></div>
+                                          <div className="h-2 bg-slate-700 rounded w-1/8"></div>
+                                          <div className="h-2 bg-slate-700 rounded w-1/8"></div>
+                                          <div className="h-2 bg-slate-700 rounded w-1/8"></div>
+                                          <div className="h-2 bg-slate-700 rounded w-1/8"></div>
                                         </div>
-                                      </td>
-                                      <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-6">
-                                        {isEditing && editingLead.id === lead.id ? (
-                                          <div className="flex flex-col space-y-2">
-                                            <input className="border px-2 py-1 rounded-md" placeholder="First name" value={editingLead.firstName} onChange={(e) => setEditingLead({ ...editingLead, firstName: e.target.value })} />
-                                            <input className="border px-2 py-1 rounded-md" placeholder="Last name" value={editingLead.lastName} onChange={(e) => setEditingLead({ ...editingLead, lastName: e.target.value })} />
-                                          </div>
-                                        ) : (
-                                          <div className="font-medium select-none text-gray-900">{lead.firstName} {lead.lastName}</div>
-                                        )}
-                                      </td>
+                                        <div className="h-2 bg-slate-700 rounded"></div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                ) : (
+                                  leads
+                                    .filter((lead: Lead) => {
+                                      const searchString = `${lead.firstName} ${lead.lastName} ${lead.companyName}`.toLowerCase();
+                                      return searchString.includes(searchTerm.toLowerCase());
+                                    })
+                                    .map((lead: Lead, index: number) => {
+                                      const id = lead.id;
 
-                                      <td className="whitespace-nowrap select-none px-3 py-4 text-sm text-gray-500">
-                                        {isEditing && editingLead.id === lead.id ? (
-                                          <div className="flex flex-col space-y-2">
-                                            <input className="border px-2 py-1 rounded-md" placeholder="Job Title" value={editingLead.jobTitle} onChange={(e) => setEditingLead({ ...editingLead, jobTitle: e.target.value })} />
-                                            <input className="border px-2 py-1 rounded-md" placeholder="Company" value={editingLead.companyName} onChange={(e) => setEditingLead({ ...editingLead, companyName: e.target.value })} />
-                                          </div>
-                                        ) : (
-                                          <>
-                                            <div className="text-gray-900">{lead.jobTitle}</div>
-                                            <div className="text-gray-500">{lead.companyName}</div>
-                                          </>
-                                        )}
-                                      </td>
-                                      <td className="whitespace-nowrap select-none px-3 py-4 text-sm text-gray-500">
-                                        {isEditing && editingLead.id === lead.id ? (
-                                          <div className="flex flex-col space-y-2">
-                                            <input className="border px-2 py-1 rounded-md" placeholder="Email" value={editingLead.email} onChange={(e) => setEditingLead({ ...editingLead, email: e.target.value })} />
-                                            <input className="border px-2 py-1 rounded-md" placeholder="Phone Number" value={editingLead.phone} onChange={(e) => setEditingLead({ ...editingLead, phone: e.target.value })} />
-                                          </div>
-                                        ) : (
-                                          <>
-                                            <div className="flex items-center space-x-2">
-                                              <svg stroke="currentColor" fill="none" strokeWidth="2" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
-                                              <div className="text-gray-500">{lead.email}</div>
+                                      return (
+                                        <tr
+                                          key={lead.id}
+                                          className={`${isSelected[id] ? 'bg-gray-100' : ''}`}
+                                          onClick={(event) => handleRowClick(index, id, lead, event)}
+                                        >
+                                          <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-6">
+                                            <div className="flex items-center space-x-3">
+                                              <div
+                                                className={`h-5 w-5 border-2 rounded-md cursor-pointer ${isSelected[id] ? 'bg-brand' : ''}`}
+                                              ></div>
                                             </div>
-                                            <div className="flex items-center space-x-2">
-                                              <svg stroke="currentColor" fill="none" strokeWidth="2" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
-                                              <div className="text-gray-900">{lead.phone}</div>
-                                            </div>
-                                          </>
-                                        )}
-                                      </td>
-                                      <td className="whitespace-nowrap select-none px-3 py-4 text-sm text-gray-500">
-                                        {isEditing && editingLead.id === lead.id ? (
-                                          <div>
-                                            <input className="border px-2 py-1 rounded-md" placeholder="LinkedIn URL" value={editingLead.linkedIn} onChange={(e) => setEditingLead({ ...editingLead, linkedIn: e.target.value })} />
-                                          </div>
-                                        ) : (
-                                          <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{lead.linkedIn}</td>
-                                        )}
-                                      </td>
-                                      <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                                        {isEditing && editingLead.id === lead.id ? (
-                                          <>
-                                            <a
-                                              href="#"
-                                              className="text-indigo-600 mr-5 select-none hover:text-indigo-900"
+                                          </td>
+                                          <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-6">
+                                            {isEditing && editingLead.id === lead.id ? (
+                                              <div className="flex flex-col space-y-2">
+                                                <input className="border px-2 py-1 rounded-md" placeholder="First name" value={editingLead.firstName} onChange={(e) => setEditingLead({ ...editingLead, firstName: e.target.value })} />
+                                                <input className="border px-2 py-1 rounded-md" placeholder="Last name" value={editingLead.lastName} onChange={(e) => setEditingLead({ ...editingLead, lastName: e.target.value })} />
+                                              </div>
+                                            ) : (
+                                              <div className="font-medium select-none text-gray-900">{lead.firstName} {lead.lastName}</div>
+                                            )}
+                                          </td>
+
+                                          <td className="whitespace-nowrap select-none px-3 py-4 text-sm text-gray-500">
+                                            {isEditing && editingLead.id === lead.id ? (
+                                              <div className="flex flex-col space-y-2">
+                                                <input className="border px-2 py-1 rounded-md" placeholder="Job Title" value={editingLead.jobTitle} onChange={(e) => setEditingLead({ ...editingLead, jobTitle: e.target.value })} />
+                                                <input className="border px-2 py-1 rounded-md" placeholder="Company" value={editingLead.companyName} onChange={(e) => setEditingLead({ ...editingLead, companyName: e.target.value })} />
+                                              </div>
+                                            ) : (
+                                              <>
+                                                <div className="text-gray-900">{lead.jobTitle}</div>
+                                                <div className="text-gray-500">{lead.companyName}</div>
+                                              </>
+                                            )}
+                                          </td>
+                                          <td className="whitespace-nowrap select-none px-3 py-4 text-sm text-gray-500">
+                                            {isEditing && editingLead.id === lead.id ? (
+                                              <div className="flex flex-col space-y-2">
+                                                <input className="border px-2 py-1 rounded-md" placeholder="Email" value={editingLead.email} onChange={(e) => setEditingLead({ ...editingLead, email: e.target.value })} />
+                                                <input className="border px-2 py-1 rounded-md" placeholder="Phone Number" value={editingLead.phone} onChange={(e) => setEditingLead({ ...editingLead, phone: e.target.value })} />
+                                              </div>
+                                            ) : (
+                                              <>
+                                                <div className="flex items-center space-x-2">
+                                                  <svg stroke="currentColor" fill="none" strokeWidth="2" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                                                  <div className="text-gray-500">{lead.email}</div>
+                                                </div>
+                                                <div className="flex items-center space-x-2">
+                                                  <svg stroke="currentColor" fill="none" strokeWidth="2" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                                                  <div className="text-gray-900">{lead.phone}</div>
+                                                </div>
+                                              </>
+                                            )}
+                                          </td>
+                                          <td className="whitespace-nowrap select-none px-3 py-4 text-sm text-gray-500">
+                                            {isEditing && editingLead.id === lead.id ? (
+                                              <div>
+                                                <input className="border px-2 py-1 rounded-md" placeholder="LinkedIn URL" value={editingLead.linkedIn} onChange={(e) => setEditingLead({ ...editingLead, linkedIn: e.target.value })} />
+                                              </div>
+                                            ) : (
+                                              <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{lead.linkedIn}</td>
+                                            )}
+                                          </td>
+                                          <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
+                                            {isEditing && editingLead.id === lead.id ? (
+                                              <>
+                                                <a
+                                                  href="#"
+                                                  className="text-indigo-600 mr-5 select-none hover:text-indigo-900"
+                                                  onClick={(event) => {
+                                                    event.stopPropagation();
+                                                    setIsEditing(false);
+                                                  }}
+                                                >
+                                                  Cancel
+                                                </a>
+                                                <a
+                                                  href="#"
+                                                  className="text-indigo-600 select-none hover:text-indigo-900"
+                                                  onClick={(event) => {
+                                                    event.stopPropagation();
+                                                    handleSaveLead(lead.id);
+                                                  }}
+                                                >
+                                                  Save
+                                                </a>
+                                              </>
+                                            ) : (
+                                              <a
+                                                href="#"
+                                                className="text-indigo-600 select-none hover:text-indigo-900"
+                                                onClick={(event) => {
+                                                  event.stopPropagation();
+                                                  handleEditClick(lead.id, lead);
+                                                }}
+                                              >
+                                                Edit
+                                              </a>
+                                            )}
+                                          </td>
+                                          <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
+                                            <FiTrash
+                                              size={20}
+                                              className="text-red-500 cursor-pointer"
                                               onClick={(event) => {
                                                 event.stopPropagation();
-                                                setIsEditing(false);
+                                                handleDeleteLead(id);
                                               }}
-                                            >
-                                              Cancel
-                                            </a>
-                                            <a
-                                              href="#"
-                                              className="text-indigo-600 select-none hover:text-indigo-900"
-                                              onClick={(event) => {
-                                                event.stopPropagation();
-                                                handleSaveLead(lead.id);
-                                              }}
-                                            >
-                                              Save
-                                            </a>
-                                          </>
-                                        ) : (
-                                          <a
-                                            href="#"
-                                            className="text-indigo-600 select-none hover:text-indigo-900"
-                                            onClick={(event) => {
-                                              event.stopPropagation();
-                                              handleEditClick(lead.id, lead);
-                                            }}
-                                          >
-                                            Edit
-                                          </a>
-                                        )}
-                                      </td>
-                                      <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                                        <FiTrash
-                                          size={20}
-                                          className="text-red-500 cursor-pointer"
-                                          onClick={(event) => {
-                                            event.stopPropagation();
-                                            handleDeleteLead(id);
-                                          }}
-                                        />
-                                      </td>
-                                    </tr>
-                                  );
-                                }))}
-                          </tbody>
-                        </table>
+                                            />
+                                          </td>
+                                        </tr>
+                                      );
+                                    }))}
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            </div>
               </div>)}
           </div>
         </div>
@@ -703,4 +678,4 @@ const Center = () => {
 };
 
 
-export default Center;
+export default LeadsList;

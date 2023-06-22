@@ -1,6 +1,6 @@
 import Sidebar from "@/components/Dashboard/Sidebar";
 import Navbar from "../components/Profile/Navbar";
-import Center from "@/components/Dashboard/LeadsList";
+import LeadsList from "@/components/Dashboard/LeadsList";
 import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { setView } from "@/components/store/sidebarSlice";
@@ -19,7 +19,7 @@ const dashboard = () => {
         <div className="flex flex-col">
           <Navbar />
           <div className="overflow-auto">
-            <Center />
+            <LeadsList />
           </div>
         </div>
       </div>

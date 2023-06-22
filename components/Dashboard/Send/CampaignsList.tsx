@@ -18,6 +18,8 @@ import {
   clearSelectedLead,
   clearSelectedLeads,
 } from "@/components/store/leadsSlice";
+import NProgress from 'nprogress';
+import 'nprogress/nprogress.css';
 import { doc, setDoc } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "@/lib/firebaseClient";
@@ -32,6 +34,8 @@ interface Campaign {
   // Add other campaign properties here
 }
 
+NProgress.configure({ showSpinner: false });
+
 const CampaignsList = () => {
   const router = useRouter();
   const dispatch = useDispatch();
@@ -39,6 +43,7 @@ const CampaignsList = () => {
   const [editingCampaign, setEditingCampaign] = useState<Campaign | null>(null);
   const [isOpen, setIsOpen] = useState<Record<string, boolean>>({});
   const [campaignHasDocuments, setCampaignHasDocuments] = useState(false);
+  const [loading, setLoading] = useState(true);
   const selectedLeads = useSelector(
     (state: RootState) => state.leads.selectedLeads
   );
@@ -47,18 +52,6 @@ const CampaignsList = () => {
     Record<string, boolean>
   >({});
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, user => {
-      if (user) {
-        setUserId(user.uid);
-      } else {
-        setUserId(null);
-      }
-    });
-    return () => {
-      unsubscribe();
-    };
-  }, []);
 
   const sendLeads = async (campaignId: string) => {
     try {
@@ -66,42 +59,73 @@ const CampaignsList = () => {
         console.error("User ID is null");
         return;
       }
-
+  
       const docRef = doc(db, "users", userId, "campaigns", campaignId);
-      await setDoc(docRef, { leads: selectedLeads }, { merge: true });
+      const docSnap = await getDoc(docRef);
+  
+      const existingLeads = docSnap.data()?.leads ?? [];
+  
+      const updatedLeads = [...existingLeads];
+  
+      for (const lead of selectedLeads) {
+        if (!existingLeads.includes(lead)) {
+          updatedLeads.push(lead);
+        }
+      }
+  
+      await setDoc(docRef, { leads: updatedLeads }, { merge: true });
       dispatch(clearSelectedLeads());
     } catch (error) {
       console.error("Error sending leads:", error);
     }
   };
-
+  
+  useEffect(() => {
+    NProgress.start();
+    const unsubscribe = onAuthStateChanged(auth, user => {
+      if (user) {
+        setUserId(user.uid);
+      } else {
+        setUserId(null);
+      }
+      setLoading(false);
+      NProgress.done();
+    });
+    return () => {
+      NProgress.remove();
+      unsubscribe();
+    };
+  }, []);
+  
   useEffect(() => {
     if (!userId) {
-      console.error("User ID is null");
+      setLoading(true);
       return;
+    } else {
+      setLoading(false);
     }
-
+  
     const fetchCampaigns = () => {
       const campaignCollection = collection(db, "users", userId, "campaigns");
       const unsubscribe = onSnapshot(campaignCollection, campaignSnapshot => {
         const campaignsData: Campaign[] = campaignSnapshot.docs.map(
-          doc =>
-            ({
-              id: doc.id,
-              ...doc.data(),
-            } as Campaign)
+          doc => ({
+            id: doc.id,
+            ...doc.data(),
+          } as Campaign)
         );
         setCampaigns(campaignsData);
       });
       return unsubscribe;
     };
-
+  
     const unsubscribe = fetchCampaigns();
-
     return () => {
       unsubscribe();
     };
   }, [userId]);
+  
+  
 
   const toggleOpen = (id: number) => {
     setIsOpen(prev => ({ ...prev, [id]: !prev[id] }));
@@ -136,9 +160,7 @@ const CampaignsList = () => {
 
   useEffect(() => {
     const fetchCampaignDocuments = async () => {
-      // Iterate over each campaign
       for (const campaign of campaigns) {
-        // Fetch the documents for the campaign from Firestore
         const campaignDocuments = await getDocs(
           collection(
             db,
@@ -149,13 +171,15 @@ const CampaignsList = () => {
             "leads"
           )
         );
-
-        // Set campaignHasDocuments based on whether any documents were fetched
         setCampaignHasDocuments(!campaignDocuments.empty);
       }
     };
     fetchCampaignDocuments();
   }, [campaigns, userId]);
+
+  if (loading) {
+    return null;
+  }
   return (
     <div className="border-r-[1px] flex flex-col">
       <div>
