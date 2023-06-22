@@ -9,9 +9,11 @@ const RegisterPage = () => {
   const [password, setPassword] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+  const [showNotif, setShowNotif] = useState(false);
 
   const [termsOfService, setTermsOfService] = useState(false);
   const [privacyPolicy, setPrivacyPolicy] = useState(false);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const submitRegistration = async () => {
     try {
@@ -191,7 +193,6 @@ const RegisterPage = () => {
               >
                 Sign up
               </button>
-
             </div>
           </form>
         </div>
