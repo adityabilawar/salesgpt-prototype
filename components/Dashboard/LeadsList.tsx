@@ -1,18 +1,55 @@
-import { useState, useEffect, useRef } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { onAuthStateChanged } from 'firebase/auth';
-import { auth } from '@/lib/firebaseClient';
-import { RootState } from '../store';
-import { fetchLeads, addSelectedLead, setSelectedLead, clearSelectedLeads, removeLead, updateLeads, toggleLeadSelection, updateSelectedLead } from '@/components/store/leadsSlice';
-import { setView } from '@/components/store/sidebarSlice';
-import { FiChevronDown, FiCircle, FiMail, FiSearch, FiEdit3, FiMoreHorizontal, FiTrash, FiUpload } from 'react-icons/fi';
-import Link from 'next/link';
-import NProgress from 'nprogress';
+import { useState, useEffect, useRef } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "@/lib/firebaseClient";
+import { RootState } from "../store";
+import {
+  fetchLeads,
+  addSelectedLead,
+  setSelectedLead,
+  clearSelectedLeads,
+  removeLead,
+  updateLeads,
+  toggleLeadSelection,
+  updateSelectedLead,
+} from "@/components/store/leadsSlice";
+import { setView } from "@/components/store/sidebarSlice";
+import {
+  FiChevronDown,
+  FiCircle,
+  FiMail,
+  FiSearch,
+  FiEdit3,
+  FiMoreHorizontal,
+  FiTrash,
+  FiUpload,
+} from "react-icons/fi";
+import Link from "next/link";
+import NProgress from "nprogress";
 import Papa from "papaparse";
-import { addDoc, arrayUnion, collection, deleteDoc, doc, getDoc, onSnapshot, setDoc, updateDoc } from 'firebase/firestore';
-import { db } from '@/lib/firebaseClient';
-import { animated, useSpring, useSprings } from 'react-spring';
-import axios from 'axios';
+import {
+  addDoc,
+  arrayUnion,
+  collection,
+  deleteDoc,
+  doc,
+  getDoc,
+  onSnapshot,
+  setDoc,
+  updateDoc,
+} from "firebase/firestore";
+import { db } from "@/lib/firebaseClient";
+import { animated, useSpring, useSprings } from "react-spring";
+import axios from "axios";
+import {
+  CheckCircleIcon,
+  MailIcon,
+  PencilAltIcon,
+  PhoneIcon,
+  TrashIcon,
+  XIcon,
+} from "@heroicons/react/outline";
+import { CheckIcon } from "@heroicons/react/solid";
 
 NProgress.configure({ showSpinner: false });
 
@@ -22,17 +59,19 @@ const LeadsList = () => {
   const sidebarView = useSelector((state: RootState) => state.sidebar.view);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [selectedDetail, setSelectedDetail] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState<string>('');
+  const [searchTerm, setSearchTerm] = useState<string>("");
   const [isOpen, setIsOpen] = useState<Record<string, boolean>>({});
   const [isSelected, setIsSelected] = useState<Record<string, boolean>>({});
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState<string | null>(null);
   const [modalOpen, setModalOpen] = useState<boolean>(false);
-  const [activeTab, setActiveTab] = useState<string>('linkedin');
-  const [linkedinInput, setLinkedinInput] = useState<string>('');
+  const [activeTab, setActiveTab] = useState<string>("linkedin");
+  const [linkedinInput, setLinkedinInput] = useState<string>("");
   const fileInput = useRef<HTMLInputElement>(null);
-  const [lastSelectedIndex, setLastSelectedIndex] = useState<number | null>(null);
+  const [lastSelectedIndex, setLastSelectedIndex] = useState<number | null>(
+    null
+  );
   const [createModalOpen, setCreateModalOpen] = useState<boolean>(false);
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [selectedLeadsCount, setSelectedLeadsCount] = useState<number>(0);
@@ -46,19 +85,19 @@ const LeadsList = () => {
     phone: string;
     linkedIn: string;
   }>({
-    firstName: '',
-    lastName: '',
-    jobTitle: '',
-    companyName: '',
-    email: '',
-    phone: '',
-    linkedIn: '',
+    firstName: "",
+    lastName: "",
+    jobTitle: "",
+    companyName: "",
+    email: "",
+    phone: "",
+    linkedIn: "",
   });
 
   const handleSaveLead = async (id: string) => {
     setIsEditing(false);
     if (userId) {
-      const docRef = doc(db, 'users', userId, 'leads', id);
+      const docRef = doc(db, "users", userId, "leads", id);
       await setDoc(docRef, editingLead, { merge: true });
     } else {
       console.error("No user is signed in");
@@ -70,15 +109,14 @@ const LeadsList = () => {
     setIsEditing(true);
   };
 
-
   const [newLead, setNewLead] = useState({
-    firstName: '',
-    lastName: '',
-    jobTitle: '',
-    companyName: '',
-    email: '',
-    phone: '',
-    linkedIn: '',
+    firstName: "",
+    lastName: "",
+    jobTitle: "",
+    companyName: "",
+    email: "",
+    phone: "",
+    linkedIn: "",
   });
 
   const onRowClick = (lead: Lead) => {
@@ -86,10 +124,15 @@ const LeadsList = () => {
   };
 
   const toggleOpen = (id: string) => {
-    setIsOpen((prev) => ({ ...prev, [id]: !prev[id] }));
+    setIsOpen(prev => ({ ...prev, [id]: !prev[id] }));
   };
 
-  const handleRowClick = (index: number, id: string, lead: Lead, event: React.MouseEvent) => {
+  const handleRowClick = (
+    index: number,
+    id: string,
+    lead: Lead,
+    event: React.MouseEvent
+  ) => {
     let updatedIsSelected = { ...isSelected };
 
     if (event.shiftKey && lastSelectedIndex !== null) {
@@ -103,7 +146,9 @@ const LeadsList = () => {
       }
     } else if (event.ctrlKey) {
       updatedIsSelected[id] = !isSelected[id];
-      updatedIsSelected[id] ? dispatch(addSelectedLead(lead)) : dispatch(removeLead(lead));
+      updatedIsSelected[id]
+        ? dispatch(addSelectedLead(lead))
+        : dispatch(removeLead(lead));
     } else {
       if (isSelected[id]) {
         updatedIsSelected[id] = false;
@@ -117,32 +162,34 @@ const LeadsList = () => {
     setIsSelected(updatedIsSelected);
     setLastSelectedIndex(index);
 
-    const selectedCount = Object.values(updatedIsSelected).filter((value) => value).length;
+    const selectedCount = Object.values(updatedIsSelected).filter(
+      value => value
+    ).length;
     console.log(selectedLeadsCount);
     setSelectedLeadsCount(selectedCount);
   };
 
-
-
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
-    setNewLead((prevLead) => ({ ...prevLead, [name]: value }));
+    setNewLead(prevLead => ({ ...prevLead, [name]: value }));
   };
 
-  const handleCreateLead = async (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+  const handleCreateLead = async (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
     event.preventDefault();
     if (userId) {
       console.log(userId);
-      const leadsRef = collection(db, 'users', userId, 'leads');
+      const leadsRef = collection(db, "users", userId, "leads");
       await addDoc(leadsRef, newLead);
       setNewLead({
-        firstName: '',
-        lastName: '',
-        jobTitle: '',
-        companyName: '',
-        email: '',
-        phone: '',
-        linkedIn: '',
+        firstName: "",
+        lastName: "",
+        jobTitle: "",
+        companyName: "",
+        email: "",
+        phone: "",
+        linkedIn: "",
       });
       setCreateModalOpen(false);
     } else {
@@ -150,21 +197,20 @@ const LeadsList = () => {
     }
   };
 
-
   const handleLinkedInInput = async () => {
     if (!userId) {
       console.error("No user is signed in");
       return;
     }
-    const userData = await axios.post('/api/user', { urlInput: linkedinInput });
+    const userData = await axios.post("/api/user", { urlInput: linkedinInput });
     const leads = userData.data;
-    const leadsRef = collection(db, 'users', userId, 'leads');
+    const leadsRef = collection(db, "users", userId, "leads");
     for (const lead of leads) {
       await addDoc(leadsRef, lead);
     }
-    setLinkedinInput('');
+    setLinkedinInput("");
     setModalOpen(false);
-  }
+  };
 
   const handleContactAll = () => {
     dispatch(clearSelectedLeads());
@@ -176,7 +222,7 @@ const LeadsList = () => {
         }
       }
     });
-    dispatch(setView('SELECTED_LEADS'));
+    dispatch(setView("SELECTED_LEADS"));
   };
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -185,7 +231,7 @@ const LeadsList = () => {
 
   useEffect(() => {
     NProgress.start();
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, user => {
       if (user) {
         setUserId(user.uid);
       } else {
@@ -195,10 +241,10 @@ const LeadsList = () => {
       NProgress.done();
 
       if (user) {
-        const leadsRef = collection(db, 'users', user.uid, 'leads');
-        const unsubscribeLeads = onSnapshot(leadsRef, (snapshot) => {
+        const leadsRef = collection(db, "users", user.uid, "leads");
+        const unsubscribeLeads = onSnapshot(leadsRef, snapshot => {
           const updatedLeads: Lead[] = [];
-          snapshot.forEach((doc) => {
+          snapshot.forEach(doc => {
             updatedLeads.push({ id: doc.id, ...doc.data() } as Lead);
           });
           dispatch(updateLeads(updatedLeads));
@@ -217,7 +263,6 @@ const LeadsList = () => {
     };
   }, [dispatch]);
 
-
   if (loading) {
     return null;
   }
@@ -235,12 +280,12 @@ const LeadsList = () => {
         complete: async function (results) {
           for (let i = 0; i < results.data.length; i += 500) {
             const batch = results.data.slice(i, i + 500);
-            const batchPromises = batch.map(async (lead) => {
+            const batchPromises = batch.map(async lead => {
               try {
-                const userRef = doc(db, 'users', userId);
+                const userRef = doc(db, "users", userId);
                 const userSnapshot = await getDoc(userRef);
                 if (userSnapshot.exists()) {
-                  const leadsRef = collection(db, 'users', userId, 'leads');
+                  const leadsRef = collection(db, "users", userId, "leads");
                   await addDoc(leadsRef, lead);
                 }
               } catch (e) {
@@ -257,7 +302,9 @@ const LeadsList = () => {
   };
 
   const handleDeleteLead = async () => {
-    const confirmDelete = window.confirm("Are you sure you want to delete the selected lead(s)?");
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete the selected lead(s)?"
+    );
     if (!confirmDelete) {
       return;
     }
@@ -278,22 +325,22 @@ const LeadsList = () => {
       }
 
       try {
-        const leadRef = doc(db, 'users', userId, 'leads', leadId);
+        const leadRef = doc(db, "users", userId, "leads", leadId);
         await deleteDoc(leadRef);
       } catch (error) {
-        console.error('Error removing lead: ', error);
+        console.error("Error removing lead: ", error);
       }
     }
     setIsSelected({});
     dispatch(clearSelectedLeads());
 
-    console.log('Selected lead(s) removed from Firebase');
+    console.log("Selected lead(s) removed from Firebase");
   };
 
-
-
   const handleSelectAll = () => {
-    const allSelected = Object.keys(isSelected).length === leads.length && !Object.values(isSelected).includes(false);
+    const allSelected =
+      Object.keys(isSelected).length === leads.length &&
+      !Object.values(isSelected).includes(false);
 
     // If all leads are already selected, unselect them. Otherwise, select all.
     if (allSelected) {
@@ -301,7 +348,7 @@ const LeadsList = () => {
       setIsSelected({});
     } else {
       const newSelected: Record<string, boolean> = {}; // Define the type for newSelected
-      leads.forEach((lead) => {
+      leads.forEach(lead => {
         newSelected[lead.id] = true;
         dispatch(addSelectedLead(lead));
       });
@@ -311,56 +358,76 @@ const LeadsList = () => {
   };
 
   return (
-    <div className="border-r-[1px] flex flex-col h-full">
+    <div className="border-r-[1px] flex flex-col h-full py-6">
       {/* {selectedLeadsCount > 0 && (
         <div className="top-0 fixed w-full bg-gray-200 py-1 px-5">
           {selectedLeadsCount} lead(s) selected
         </div>
       )} */}
       <div className="flex-grow">
-        <div className="flex flex-col border-b-[1px] px-10 py-5 sticky top-0">
+        <div className="flex flex-col border-b-[1px] px-10  sticky top-0">
           <h1 className="text-2xl">Leads</h1>
-          <div className="flex-grow-0 py-5 flex space-x-5">
-            <div className="bg-brand text-white rounded-md text-white text-sm px-5 flex justify-center items-center cursor-pointer" onClick={() => setModalOpen(true)}>
-              Upload Leads
-            </div>
-            <div className="bg-brand text-white rounded-md text-white text-sm px-5 flex justify-center items-center cursor-pointer" onClick={() => setCreateModalOpen(true)}>
-              Create Lead
-            </div>
-            <div className="relative rounded-md border border-gray-200 border-md flex justify-center items-center space-x-2">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <FiSearch size={24} />
-              </div>
+
+          <div className="flex py-5">
+            <div className="relative flex items-center flex-grow">
               <input
-                className="py-2 pl-10 pr-4 w-full  rounded-md bg-transparent focus:outline-none"
+                className="py-3 pl-12 pr-4 w-full rounded-md bg-transparent focus:outline-none border-gray-300 focus:border-brand"
+                type="text"
                 placeholder="Search..."
                 onChange={handleSearchChange}
               />
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <FiSearch className="h-6 w-6 text-gray-400" />
+              </div>
             </div>
           </div>
         </div>
-        <div className="p-10 space-y-4 overflow-y-auto">
+
+        <div className="px-10 overflow-y-auto">
+          <div className="flex justify-end ">
+            <div className="p-5 flex ">
+              <button
+                className="border-[1px] rounded-md px-4 py-3 bg-brand text-white text-white text-xs"
+                onClick={() => setModalOpen(true)}
+              >
+                Upload leads
+              </button>
+            </div>
+
+            <div className="p-5 flex ">
+              <button
+                className="border-[1px] rounded-md px-4 py-3 bg-brand text-white text-white text-xs"
+                onClick={() => setCreateModalOpen(true)}
+              >
+                Create lead
+              </button>
+            </div>
+            <div className="p-5 flex ">
+              <Link href="/dashboard/send">
+                <button
+                  className={`border-[1px] rounded-md px-4 py-3 bg-brand text-white text-white text-xs ${
+                    selectedLeadsCount > 0
+                      ? ""
+                      : "opacity-50 cursor-not-allowed"
+                  }`}
+                  onClick={handleContactAll}
+                  disabled={selectedLeadsCount === 0}
+                >
+                  Send selected leads to campaign
+                </button>
+              </Link>
+            </div>
+          </div>
           <div className="h-full space-y-4 border rounded-md">
             {leads.length === 0 ? (
               <div className="flex items-center justify-center h-48">
-                <p className="text-xl text-gray-500">Upload leads to send to campaign</p>
+                <p className="text-xl text-gray-500">
+                  Upload leads to send to campaign
+                </p>
               </div>
             ) : (
               <div>
-
                 <div>
-                  <div className="p-4 border-b">
-                    <Link href="/dashboard/send">
-                      <button
-                        className={`border-[1px] rounded-md px-6 py-3 bg-brand text-white text-white text-sm ${selectedLeadsCount > 0 ? '' : 'opacity-50 cursor-not-allowed'}`}
-                        onClick={handleContactAll}
-                        disabled={selectedLeadsCount === 0}
-                      >
-                        Send selected leads to campaign
-                      </button>
-
-                    </Link>
-                  </div>
                   <div>
                     <div className="flex flex-col">
                       <div className="overflow-x-auto">
@@ -369,28 +436,59 @@ const LeadsList = () => {
                             <table className="min-w-full divide-y divide-gray-300">
                               <thead className="bg-gray-50">
                                 <tr>
-                                  <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6">
-                                    <div
-                                      className={`h-5 w-5 border-2 ml-3 rounded-md cursor-pointer ${Object.keys(isSelected).length === leads.length && !Object.values(isSelected).includes(false) ? 'bg-brand' : ''}`}
+                                  <th
+                                    scope="col"
+                                    className="relative py-3.5 pl-3 pr-4 sm:pr-6"
+                                  >
+                                    
+
+                                    <CheckIcon
+                                      className={`ml-3 h-6 w-6 ${
+                                        Object.keys(isSelected).length ===
+                                          leads.length &&
+                                        !Object.values(isSelected).includes(
+                                          false
+                                        )
+                                          ? "text-brand"
+                                          : "text-gray-400"
+                                      }`}
                                       onClick={handleSelectAll}
-                                    ></div>
+                                    />
                                   </th>
-                                  <th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">
+                                  <th
+                                    scope="col"
+                                    className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6"
+                                  >
                                     LEAD NAME
                                   </th>
-                                  <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                                  <th
+                                    scope="col"
+                                    className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                                  >
                                     COMPANY INFO
                                   </th>
-                                  <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                                  <th
+                                    scope="col"
+                                    className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                                  >
                                     PERSONAL INFO
                                   </th>
-                                  <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                                  <th
+                                    scope="col"
+                                    className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                                  >
                                     LINKEDIN
                                   </th>
-                                  <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6">
+                                  <th
+                                    scope="col"
+                                    className="relative py-3.5 pl-3 pr-4 sm:pr-6"
+                                  >
                                     <span className="sr-only">Edit</span>
                                   </th>
-                                  <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6">
+                                  <th
+                                    scope="col"
+                                    className="relative py-3.5 pl-3 pr-4 sm:pr-6"
+                                  >
                                     <span className="sr-only">Delete</span>
                                   </th>
                                 </tr>
@@ -416,8 +514,11 @@ const LeadsList = () => {
                                 ) : (
                                   leads
                                     .filter((lead: Lead) => {
-                                      const searchString = `${lead.firstName} ${lead.lastName} ${lead.companyName}`.toLowerCase();
-                                      return searchString.includes(searchTerm.toLowerCase());
+                                      const searchString =
+                                        `${lead.firstName} ${lead.lastName} ${lead.companyName}`.toLowerCase();
+                                      return searchString.includes(
+                                        searchTerm.toLowerCase()
+                                      );
                                     })
                                     .map((lead: Lead, index: number) => {
                                       const id = lead.id;
@@ -425,72 +526,169 @@ const LeadsList = () => {
                                       return (
                                         <tr
                                           key={lead.id}
-                                          className={`${isSelected[id] ? 'bg-gray-100' : ''}`}
-                                          onClick={(event) => handleRowClick(index, id, lead, event)}
+                                          className={`${
+                                            isSelected[id] ? "bg-gray-100" : ""
+                                          }`}
+                                          onClick={event =>
+                                            handleRowClick(
+                                              index,
+                                              id,
+                                              lead,
+                                              event
+                                            )
+                                          }
                                         >
                                           <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-6">
                                             <div className="flex items-center space-x-3">
-                                              <div
-                                                className={`h-5 w-5 border-2 rounded-md cursor-pointer ${isSelected[id] ? 'bg-brand' : ''}`}
-                                              ></div>
+                                              {isSelected[id] ? (
+                                                <CheckIcon className="h-5 w-5 text-brand" />
+                                              ) : (
+                                                <div className="h-5 w-5 border-2 rounded-md cursor-pointer"></div>
+                                              )}
                                             </div>
                                           </td>
                                           <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-6">
-                                            {isEditing && editingLead.id === lead.id ? (
+                                            {isEditing &&
+                                            editingLead.id === lead.id ? (
                                               <div className="flex flex-col space-y-2">
-                                                <input className="border px-2 py-1 rounded-md" placeholder="First name" value={editingLead.firstName} onChange={(e) => setEditingLead({ ...editingLead, firstName: e.target.value })} />
-                                                <input className="border px-2 py-1 rounded-md" placeholder="Last name" value={editingLead.lastName} onChange={(e) => setEditingLead({ ...editingLead, lastName: e.target.value })} />
+                                                <input
+                                                  className="border-b border-gray-300 px-2 py-1"
+                                                  placeholder="First name"
+                                                  value={editingLead.firstName}
+                                                  onChange={e =>
+                                                    setEditingLead({
+                                                      ...editingLead,
+                                                      firstName: e.target.value,
+                                                    })
+                                                  }
+                                                />
+                                                <input
+                                                  className="border-b border-gray-300 px-2 py-1"
+                                                  placeholder="Last name"
+                                                  value={editingLead.lastName}
+                                                  onChange={e =>
+                                                    setEditingLead({
+                                                      ...editingLead,
+                                                      lastName: e.target.value,
+                                                    })
+                                                  }
+                                                />
                                               </div>
                                             ) : (
-                                              <div className="font-medium select-none text-gray-900">{lead.firstName} {lead.lastName}</div>
+                                              <div className="font-medium select-none text-gray-900">
+                                                {lead.firstName} {lead.lastName}
+                                              </div>
                                             )}
                                           </td>
 
                                           <td className="whitespace-nowrap select-none px-3 py-4 text-sm">
-                                            {isEditing && editingLead.id === lead.id ? (
+                                            {isEditing &&
+                                            editingLead.id === lead.id ? (
                                               <div className="flex flex-col space-y-2">
-                                                <input className="border px-2 py-1 rounded-md" placeholder="Job Title" value={editingLead.jobTitle} onChange={(e) => setEditingLead({ ...editingLead, jobTitle: e.target.value })} />
-                                                <input className="border px-2 py-1 rounded-md" placeholder="Company" value={editingLead.companyName} onChange={(e) => setEditingLead({ ...editingLead, companyName: e.target.value })} />
-                                              </div>
-                                            ) : (
-                                              <>
-                                                <div className="text-gray-900">{lead.jobTitle}</div>
-                                                <div className="text-gray-500">{lead.companyName}</div>
-                                              </>
-                                            )}
-                                          </td>
-                                          <td className="whitespace-nowrap select-none px-3 py-4 text-sm">
-                                            {isEditing && editingLead.id === lead.id ? (
-                                              <div className="flex flex-col space-y-2">
-                                                <input className="border px-2 py-1 rounded-md" placeholder="Email" value={editingLead.email} onChange={(e) => setEditingLead({ ...editingLead, email: e.target.value })} />
-                                                <input className="border px-2 py-1 rounded-md" placeholder="Phone Number" value={editingLead.phone} onChange={(e) => setEditingLead({ ...editingLead, phone: e.target.value })} />
-                                              </div>
-                                            ) : (
-                                              <>
-                                                <div className="flex items-center space-x-2">
-                                                  <svg stroke="currentColor" fill="none" strokeWidth="2" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
-                                                  <div className="text-gray-500">{lead.email}</div>
-                                                </div>
-                                                <div className="flex items-center space-x-2">
-                                                  <svg stroke="currentColor" fill="none" strokeWidth="2" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
-                                                  <div className="text-gray-900">{lead.phone}</div>
-                                                </div>
-                                              </>
-                                            )}
-                                          </td>
-                                          <td className="whitespace-nowrap select-none px-3 py-4 text-sm">
-                                            {isEditing && editingLead.id === lead.id ? (
-                                              <div>
                                                 <input
-                                                  className="border px-2 py-1 rounded-md"
-                                                  placeholder="LinkedIn URL"
-                                                  value={editingLead.linkedIn}
-                                                  onChange={(e) => setEditingLead({ ...editingLead, linkedIn: e.target.value })}
+                                                  className="border-b border-gray-300 px-2 py-1"
+                                                  placeholder="Job Title"
+                                                  value={editingLead.jobTitle}
+                                                  onChange={e =>
+                                                    setEditingLead({
+                                                      ...editingLead,
+                                                      jobTitle: e.target.value,
+                                                    })
+                                                  }
+                                                />
+                                                <input
+                                                className="border-b border-gray-300 px-2 py-1"
+                                                  placeholder="Company"
+                                                  value={
+                                                    editingLead.companyName
+                                                  }
+                                                  onChange={e =>
+                                                    setEditingLead({
+                                                      ...editingLead,
+                                                      companyName:
+                                                        e.target.value,
+                                                    })
+                                                  }
                                                 />
                                               </div>
                                             ) : (
-                                              <td className="text-brand whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                <a href={lead.linkedIn} target="_blank" rel="noopener noreferrer">
+                                              <>
+                                                <div className="text-gray-900">
+                                                  {lead.jobTitle}
+                                                </div>
+                                                <div className="text-gray-500">
+                                                  {lead.companyName}
+                                                </div>
+                                              </>
+                                            )}
+                                          </td>
+                                          <td className="whitespace-nowrap select-none px-3 py-4 text-sm">
+                                            {isEditing &&
+                                            editingLead.id === lead.id ? (
+                                              <div className="flex flex-col space-y-2">
+                                                <input
+                                                  className="border-b border-gray-300 px-2 py-1"
+                                                  placeholder="Email"
+                                                  value={editingLead.email}
+                                                  onChange={e =>
+                                                    setEditingLead({
+                                                      ...editingLead,
+                                                      email: e.target.value,
+                                                    })
+                                                  }
+                                                />
+                                                <input
+                                                  className="border-b border-gray-300 px-2 py-1"
+                                                  placeholder="Phone Number"
+                                                  value={editingLead.phone}
+                                                  onChange={e =>
+                                                    setEditingLead({
+                                                      ...editingLead,
+                                                      phone: e.target.value,
+                                                    })
+                                                  }
+                                                />
+                                              </div>
+                                            ) : (
+                                              <>
+                                                <div className="flex items-center space-x-2">
+                                                  {/* <MailIcon className="text-gray-500 h-5 w-5"/>  */}
+                                                  <div className="text-gray-500">
+                                                    {lead.email}
+                                                  </div>
+                                                </div>
+                                                <div className="flex items-center space-x-2 mt-1">
+                                                  {/* <PhoneIcon className="text-gray-500 h-5 w-5"/>  */}
+                                                  <div className="text-gray-500">
+                                                    {lead.phone}
+                                                  </div>
+                                                </div>
+                                              </>
+                                            )}
+                                          </td>
+                                          <td className="whitespace-nowrap select-none px-3 py-4 text-sm">
+                                            {isEditing &&
+                                            editingLead.id === lead.id ? (
+                                              <div>
+                                                <input
+                                                  className="border-b border-gray-300 px-2 py-1"
+                                                  placeholder="LinkedIn URL"
+                                                  value={editingLead.linkedIn}
+                                                  onChange={e =>
+                                                    setEditingLead({
+                                                      ...editingLead,
+                                                      linkedIn: e.target.value,
+                                                    })
+                                                  }
+                                                />
+                                              </div>
+                                            ) : (
+                                              <td className="whitespace-nowrap py-4 text-sm text-blue-600">
+                                                <a
+                                                  href={lead.linkedIn}
+                                                  target="_blank"
+                                                  rel="noopener noreferrer"
+                                                >
                                                   {lead.linkedIn}
                                                 </a>
                                               </td>
@@ -498,55 +696,61 @@ const LeadsList = () => {
                                           </td>
 
                                           <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                                            {isEditing && editingLead.id === lead.id ? (
-                                              <>
+                                            {isEditing &&
+                                            editingLead.id === lead.id ? (
+                                              <div className="flex gap-x-3">
                                                 <a
                                                   href="#"
-                                                  className="text-indigo-600 mr-5 select-none hover:text-indigo-900"
-                                                  onClick={(event) => {
-                                                    event.stopPropagation();
-                                                    setIsEditing(false);
-                                                  }}
-                                                >
-                                                  Cancel
-                                                </a>
-                                                <a
-                                                  href="#"
-                                                  className="text-indigo-600 select-none hover:text-indigo-900"
-                                                  onClick={(event) => {
+                                                  className="select-none hover:text-indigo-900"
+                                                  onClick={event => {
                                                     event.stopPropagation();
                                                     handleSaveLead(lead.id);
                                                   }}
                                                 >
-                                                  Save
+                                                  <CheckCircleIcon className="h-5 w-5 text-green-600"/>
                                                 </a>
-                                              </>
+
+                                                <a
+                                                  href="#"
+                                                  className="mr-5 select-none hover:text-indigo-900"
+                                                  onClick={event => {
+                                                    event.stopPropagation();
+                                                    setIsEditing(false);
+                                                  }}
+                                                >
+                                                  <XIcon className="h-5 w-5 text-red-600" />
+                                                </a>
+                                              </div>
                                             ) : (
                                               <a
                                                 href="#"
                                                 className="text-indigo-600 select-none hover:text-indigo-900"
-                                                onClick={(event) => {
+                                                onClick={event => {
                                                   event.stopPropagation();
-                                                  handleEditClick(lead.id, lead);
+                                                  handleEditClick(
+                                                    lead.id,
+                                                    lead
+                                                  );
                                                 }}
                                               >
-                                                Edit
+                                                {/* Edit */}
+                                                <PencilAltIcon className="h-5 w-5" />
                                               </a>
                                             )}
                                           </td>
                                           <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                                            <FiTrash
-                                              size={20}
-                                              className="text-red-500 cursor-pointer"
-                                              onClick={(event) => {
+                                            <TrashIcon
+                                              className="text-red-500 cursor-pointer h-5 w-5"
+                                              onClick={event => {
                                                 event.stopPropagation();
-                                                handleDeleteLead(id);
+                                                handleDeleteLead();
                                               }}
                                             />
                                           </td>
                                         </tr>
                                       );
-                                    }))}
+                                    })
+                                )}
                               </tbody>
                             </table>
                           </div>
@@ -555,7 +759,8 @@ const LeadsList = () => {
                     </div>
                   </div>
                 </div>
-              </div>)}
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -565,38 +770,53 @@ const LeadsList = () => {
             <h2 className="text-2xl  mb-8">Upload Leads</h2>
             <div className="flex">
               <div
-                className={`cursor-pointer rounded-t-md py-2 border px-4 ${activeTab === 'linkedin' ? 'bg-white' : ''}`}
-                onClick={() => setActiveTab('linkedin')}
+                className={`cursor-pointer rounded-t-md py-2 border px-4 ${
+                  activeTab === "linkedin" ? "bg-white" : ""
+                }`}
+                onClick={() => setActiveTab("linkedin")}
               >
                 LinkedIn URLs
               </div>
               <div
-                className={`cursor-pointer rounded-t-md py-2 border px-4 ${activeTab === 'csv' ? 'bg-white' : ''}`}
-                onClick={() => setActiveTab('csv')}
+                className={`cursor-pointer rounded-t-md py-2 border px-4 ${
+                  activeTab === "csv" ? "bg-white" : ""
+                }`}
+                onClick={() => setActiveTab("csv")}
               >
                 CSV File
               </div>
             </div>
-            {activeTab === 'linkedin' && (
+            {activeTab === "linkedin" && (
               <div>
                 <textarea
                   className="mt-8 w-full h-48 bg-white  p-2 rounded-md"
                   placeholder="Paste LinkedIn Usernames here..."
                   value={linkedinInput}
-                  onChange={(e) => setLinkedinInput(e.target.value)}
+                  onChange={e => setLinkedinInput(e.target.value)}
                 />
-                <button className="mt-4 bg-brand rounded-md text-white py-2 px-4 rounded-md" onClick={handleLinkedInInput}>
+                <button
+                  className="mt-4 bg-brand rounded-md text-white py-2 px-4 rounded-md"
+                  onClick={handleLinkedInInput}
+                >
                   Import
                 </button>
               </div>
             )}
-            {activeTab === 'csv' && (
+            {activeTab === "csv" && (
               <div className="py-5 ">
-                CSV files must be formatted as firstName,lastName,jobTitle,companyName,email,phone,linkedIn
+                CSV files must be formatted as
+                firstName,lastName,jobTitle,companyName,email,phone,linkedIn
                 <div className="mt-8 flex flex-col items-center justify-center h-48 bg-white border rounded-md">
-                  <label htmlFor="upload-button" className="cursor-pointer flex items-center space-x-2">
+                  <label
+                    htmlFor="upload-button"
+                    className="cursor-pointer flex items-center space-x-2"
+                  >
                     <FiUpload size={24} />
-                    <span>{file ? `Uploaded ${file.name}` : 'Click here to upload a file'}</span>
+                    <span>
+                      {file
+                        ? `Uploaded ${file.name}`
+                        : "Click here to upload a file"}
+                    </span>
                   </label>
                   <input
                     id="upload-button"
@@ -671,7 +891,11 @@ const LeadsList = () => {
                 value={newLead.linkedIn}
                 onChange={handleInputChange}
               />
-              <button type="button" className="mt-4 bg-white  py-2 px-4 rounded-md" onClick={handleCreateLead}>
+              <button
+                type="button"
+                className="mt-4 bg-white  py-2 px-4 rounded-md"
+                onClick={handleCreateLead}
+              >
                 Create
               </button>
             </form>
@@ -686,6 +910,5 @@ const LeadsList = () => {
     </div>
   );
 };
-
 
 export default LeadsList;
