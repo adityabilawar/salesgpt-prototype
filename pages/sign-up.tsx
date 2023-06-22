@@ -14,7 +14,8 @@ const RegisterPage = () => {
   const [termsOfService, setTermsOfService] = useState(false);
   const [privacyPolicy, setPrivacyPolicy] = useState(false);
 
-  const submitRegistration = async () => {
+  const submitRegistration = async (e) => {
+    e.preventDefault();
     try {
       await createUserWithEmailAndPassword(
         email,
@@ -27,6 +28,7 @@ const RegisterPage = () => {
       console.error(error);
     }
   };
+
 
   return (
     <>
@@ -51,7 +53,7 @@ const RegisterPage = () => {
           </div>
           <form
             className="mt-8 space-y-6"
-            action=""
+            action="#"
             method="POST"
             onSubmit={submitRegistration}
           >
@@ -177,15 +179,12 @@ const RegisterPage = () => {
 
             <div>
               <button
-                onClick={() => {
-                  submitRegistration();
-                  router.push("/leads");
-                }}
                 type="submit"
                 className="text-white group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-black bg-indigo-500 hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
               >
                 Sign up
               </button>
+
             </div>
           </form>
         </div>
