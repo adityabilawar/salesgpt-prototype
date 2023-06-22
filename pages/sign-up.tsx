@@ -1,8 +1,7 @@
-import { useState } from "react";
-import styles from "@/styles/Login.module.css";
-import graphic from "@/public/graphic.png";
+import { useRef, useState } from "react";
 import { useRouter } from "next/router";
 import { createUserWithEmailAndPassword } from "@/lib/firebaseClient";
+import Snackbar from "@/components/Snackbar";
 
 const RegisterPage = () => {
   const router = useRouter();
@@ -14,8 +13,7 @@ const RegisterPage = () => {
   const [termsOfService, setTermsOfService] = useState(false);
   const [privacyPolicy, setPrivacyPolicy] = useState(false);
 
-  const submitRegistration = async (e) => {
-    e.preventDefault();
+  const submitRegistration = async () => {
     try {
       await createUserWithEmailAndPassword(
         email,
@@ -27,12 +25,21 @@ const RegisterPage = () => {
     } catch (error) {
       console.error(error);
     }
+
+    setShowNotif(true);
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+    timeoutRef.current = setTimeout(() => setShowNotif(false), 5000);
   };
 
 
   return (
     <>
       <div className="min-h-full flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        {showNotif && termsOfService && (
+          <Snackbar message="Wrong email or password." color="red" />
+        )}
         <div className="max-w-xl w-full space-y-8 loginContainer p-8 py-16">
           <div>
             <img
@@ -58,7 +65,7 @@ const RegisterPage = () => {
             onSubmit={submitRegistration}
           >
             <input type="hidden" name="remember" defaultValue="true" />
-            <div className="rounded-md shadow-sm -space-y-px">
+            <div className="rounded-md -space-y-px">
               <div className="flex gap-x-8 w-full">
                 <div className="w-1/2">
                   <label htmlFor="email-address" className="sr-only">
