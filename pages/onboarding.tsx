@@ -5,22 +5,54 @@ import Link from "next/link";
 import { BadgeCheckIcon } from "@heroicons/react/solid";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth, db } from "@/lib/firebaseClient";
-import { collection, doc, setDoc } from "firebase/firestore";
+import { collection, doc, setDoc, getDoc } from "firebase/firestore";
 
 export default function onboarding() {
   const router = useRouter();
   const [onboarding, setOnboarding] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
-
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [linkedIn, setLinkedIn] = useState("");
   const [jobTitle, setJobTitle] = useState("");
   const [companyInformation, setCompanyInformation] = useState("");
   const [valueProvide, setValueProvide] = useState("");
   const [problemSolve, setProblemSolve] = useState("");
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        setUserId(user.uid);
+  
+        // Fetch user data
+        const userDoc = doc(collection(db, "users"), user.uid);
+        const userData = await getDoc(userDoc);
+        
+        // Check if necessary fields are filled
+        if (userData.exists()) {
+          const {
+            phoneNumber,
+            linkedInProfile,
+            jobTitle,
+            companyInformation,
+            companyValue,
+            problem,
+          } = userData.data();
+  
+          if (phoneNumber || linkedInProfile || jobTitle || companyInformation || companyValue || problem) {
+            // Redirect the user to another page if all fields are filled
+            router.push('/dashboard');
+          }
+        }
+      } else {
+        setUserId(null);
+      }
+    });
+    
+    return () => {
+      unsubscribe();
+    };
+  }, []);
+  
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -40,9 +72,6 @@ export default function onboarding() {
     setOnboarding(true);
     if (userId) {
       const userData = {
-        firstName,
-        lastName,
-        email,
         phoneNumber,
         linkedInProfile: linkedIn,
         jobTitle: jobTitle,
@@ -82,23 +111,6 @@ export default function onboarding() {
                 Personal Information
               </h3>
               <div>
-                {textBox(
-                  "First name",
-                  "text",
-                  "first-name",
-                  "",
-                  setFirstName,
-                  false
-                )}
-                {textBox(
-                  "Last name",
-                  "text",
-                  "last-name",
-                  "",
-                  setLastName,
-                  false
-                )}
-                {textBox("Email", "email", "email", "", setEmail, false)}
                 {textBox(
                   "Phone number",
                   "tel",

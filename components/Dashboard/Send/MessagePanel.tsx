@@ -26,6 +26,7 @@ const MessagePanel = () => {
   const [userId, setUserId] = useState<string | null>(null);
   const [campaignTitle, setCampaignTitle] = useState<string | null>(null);
   const router = useRouter();
+  const [isDeleted, setIsDeleted] = useState<boolean>(false);
   const { campaignId } = router.query;
   const [currentMessage, setCurrentMessage] = useState<string | null>(null);
   const [displayedMessage, setDisplayedMessage] = useState<string | null>(null);
@@ -36,8 +37,12 @@ const MessagePanel = () => {
   }
 
   const saveGeneratedMessage = async () => {
-
-    if (displayedMessage && displayedMessage.trim() === '') {
+    if (isDeleted) {
+      alert('The message has been deleted. Generate a new one before saving.');
+      return;
+    }
+  
+    if (!displayedMessage || displayedMessage.trim() === '') {
       alert('The message is empty. Please generate a message before saving.');
       return;
     }
@@ -64,7 +69,10 @@ const MessagePanel = () => {
       generatedMessages: leadData.generatedMessages || [],
     };
   
-    let messageIndex = updatedLeadData.generatedMessages.findIndex((msg: { campaignId: string, message: string }) => msg.campaignId === campaignId);
+    let messageIndex = updatedLeadData.generatedMessages.findIndex(
+      (msg: { campaignId: string, message: string }) => msg.campaignId === campaignId
+    );
+  
     if (messageIndex !== -1) {
       updatedLeadData.generatedMessages[messageIndex].message = displayedMessage;
     } else {
@@ -74,6 +82,10 @@ const MessagePanel = () => {
     await setDoc(leadRef, updatedLeadData);
   
     console.log('Message saved successfully');
+  
+    // Set isDeleted to true and clear the displayedMessage
+    setIsDeleted(true);
+    setDisplayedMessage(null);
   };
   
 
@@ -185,6 +197,7 @@ const MessagePanel = () => {
 
   useEffect(() => {
     async function handleLeadSelectionAndMessageGeneration() {
+      setLoading(true);
       if (!selectedLead || !userId || !campaignId) return;
   
       const leadRef = doc(db, 'users', userId, 'leads', selectedLead.id);
@@ -247,8 +260,9 @@ const MessagePanel = () => {
     }
   
     handleLeadSelectionAndMessageGeneration();
+    setLoading(false);
   }, [selectedLead, campaignId, userId, user]);
-  
+
   useEffect(() => {
     if (currentMessage) {
       setDisplayedMessage(currentMessage);
