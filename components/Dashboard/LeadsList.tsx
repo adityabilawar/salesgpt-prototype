@@ -88,14 +88,14 @@ const LeadsList = () => {
   const toggleOpen = (id: string) => {
     setIsOpen((prev) => ({ ...prev, [id]: !prev[id] }));
   };
-  
+
   const handleRowClick = (index: number, id: string, lead: Lead, event: React.MouseEvent) => {
     let updatedIsSelected = { ...isSelected };
-  
+
     if (event.shiftKey && lastSelectedIndex !== null) {
       const start = Math.min(index, lastSelectedIndex);
       const end = Math.max(index, lastSelectedIndex);
-  
+
       for (let i = start; i <= end; i++) {
         const leadId = leads[i].id;
         updatedIsSelected[leadId] = true;
@@ -113,15 +113,15 @@ const LeadsList = () => {
         dispatch(addSelectedLead(lead));
       }
     }
-  
+
     setIsSelected(updatedIsSelected);
     setLastSelectedIndex(index);
-  
+
     const selectedCount = Object.values(updatedIsSelected).filter((value) => value).length;
     console.log(selectedLeadsCount);
     setSelectedLeadsCount(selectedCount);
   };
-  
+
 
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -193,7 +193,7 @@ const LeadsList = () => {
       }
       setLoading(false);
       NProgress.done();
-  
+
       if (user) {
         const leadsRef = collection(db, 'users', user.uid, 'leads');
         const unsubscribeLeads = onSnapshot(leadsRef, (snapshot) => {
@@ -204,19 +204,19 @@ const LeadsList = () => {
           dispatch(updateLeads(updatedLeads));
           setIsLoading(false);
         });
-  
+
         return () => {
           unsubscribeLeads();
         };
       }
     });
-  
+
     return () => {
       NProgress.remove();
       unsubscribe();
     };
   }, [dispatch]);
-  
+
 
   if (loading) {
     return null;
@@ -481,12 +481,22 @@ const LeadsList = () => {
                                           <td className="whitespace-nowrap select-none px-3 py-4 text-sm text-gray-500">
                                             {isEditing && editingLead.id === lead.id ? (
                                               <div>
-                                                <input className="border px-2 py-1 rounded-md" placeholder="LinkedIn URL" value={editingLead.linkedIn} onChange={(e) => setEditingLead({ ...editingLead, linkedIn: e.target.value })} />
+                                                <input
+                                                  className="border px-2 py-1 rounded-md"
+                                                  placeholder="LinkedIn URL"
+                                                  value={editingLead.linkedIn}
+                                                  onChange={(e) => setEditingLead({ ...editingLead, linkedIn: e.target.value })}
+                                                />
                                               </div>
                                             ) : (
-                                              <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{lead.linkedIn}</td>
+                                              <td className="text-brand whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                                <a href={lead.linkedIn} target="_blank" rel="noopener noreferrer">
+                                                  {lead.linkedIn}
+                                                </a>
+                                              </td>
                                             )}
                                           </td>
+
                                           <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
                                             {isEditing && editingLead.id === lead.id ? (
                                               <>
@@ -571,7 +581,7 @@ const LeadsList = () => {
               <div>
                 <textarea
                   className="mt-8 w-full h-48 bg-white  p-2 rounded-md"
-                  placeholder="Paste LinkedIn URLs here..."
+                  placeholder="Paste LinkedIn Usernames here..."
                   value={linkedinInput}
                   onChange={(e) => setLinkedinInput(e.target.value)}
                 />
