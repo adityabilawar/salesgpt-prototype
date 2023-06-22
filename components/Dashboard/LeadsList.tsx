@@ -446,7 +446,7 @@ const LeadsList = () => {
                                             )}
                                           </td>
 
-                                          <td className="whitespace-nowrap select-none px-3 py-4 text-sm text-gray-500">
+                                          <td className="whitespace-nowrap select-none px-3 py-4 text-sm">
                                             {isEditing && editingLead.id === lead.id ? (
                                               <div className="flex flex-col space-y-2">
                                                 <input className="border px-2 py-1 rounded-md" placeholder="Job Title" value={editingLead.jobTitle} onChange={(e) => setEditingLead({ ...editingLead, jobTitle: e.target.value })} />
@@ -459,7 +459,7 @@ const LeadsList = () => {
                                               </>
                                             )}
                                           </td>
-                                          <td className="whitespace-nowrap select-none px-3 py-4 text-sm text-gray-500">
+                                          <td className="whitespace-nowrap select-none px-3 py-4 text-sm">
                                             {isEditing && editingLead.id === lead.id ? (
                                               <div className="flex flex-col space-y-2">
                                                 <input className="border px-2 py-1 rounded-md" placeholder="Email" value={editingLead.email} onChange={(e) => setEditingLead({ ...editingLead, email: e.target.value })} />
@@ -478,7 +478,7 @@ const LeadsList = () => {
                                               </>
                                             )}
                                           </td>
-                                          <td className="whitespace-nowrap select-none px-3 py-4 text-sm text-gray-500">
+                                          <td className="whitespace-nowrap select-none px-3 py-4 text-sm">
                                             {isEditing && editingLead.id === lead.id ? (
                                               <div>
                                                 <input
