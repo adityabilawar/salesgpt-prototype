@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { FiTrash2, FiEdit, FiCheck, FiRefreshCw } from "react-icons/fi";
+import { FiTrash2, FiEdit, FiCheck, FiRefreshCw, FiFastForward } from "react-icons/fi";
 import { auth, db } from '@/lib/firebaseClient';
 import { doc, updateDoc, arrayRemove, getDoc, setDoc, arrayUnion, collection, getDocs, where, query } from 'firebase/firestore';
 import { useRouter } from 'next/router';
@@ -114,7 +114,17 @@ const LeadsSidebar = ({ campaignId, userId }: LeadsSidebarProps) => {
 
   return (
     <div className="border-r-[1px] h-screen flex flex-col overflow-y-auto">
-      <h1 className="p-5 text-3xl mt-5 border-b-[1px]">Leads</h1>
+      <h1 className="px-5 text-3xl mt-5">Leads</h1>
+      <div className="flex border-b items-center">
+          <button
+            className="px-4 py-2 m-5 border-[1px] rounded-md bg-brand text-white"
+          >
+            Export as CSV
+          </button>
+          <h1 className="flex cursor-pointer items-center space-x-2 bg-brand px-4 py-2 rounded-md text-white">
+          <FiFastForward /><span>Run all</span>
+          </h1>
+      </div>
       {activeTab === 'leads' && leads.map((lead: Lead) => (
         lead && (
           <div
