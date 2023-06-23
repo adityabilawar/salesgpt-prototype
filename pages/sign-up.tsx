@@ -9,13 +9,12 @@ const RegisterPage = () => {
   const [password, setPassword] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-  const [showNotif, setShowNotif] = useState(false);
 
   const [termsOfService, setTermsOfService] = useState(false);
   const [privacyPolicy, setPrivacyPolicy] = useState(false);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const submitRegistration = async () => {
+  const submitRegistration = async event => {
+    event.preventDefault(); // Prevent form submission and page refresh
     try {
       await createUserWithEmailAndPassword(
         email,
@@ -27,21 +26,11 @@ const RegisterPage = () => {
     } catch (error) {
       console.error(error);
     }
-
-    setShowNotif(true);
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
-    timeoutRef.current = setTimeout(() => setShowNotif(false), 5000);
   };
-
 
   return (
     <>
       <div className="min-h-full flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-        {showNotif && termsOfService && (
-          <Snackbar message="Wrong email or password." color="red" />
-        )}
         <div className="max-w-xl w-full space-y-8 loginContainer p-8 py-16">
           <div>
             <img
@@ -188,6 +177,7 @@ const RegisterPage = () => {
 
             <div>
               <button
+                // onClick={submitRegistration}
                 type="submit"
                 className="text-white group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-black bg-indigo-500 hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
               >

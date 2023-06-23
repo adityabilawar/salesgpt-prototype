@@ -38,7 +38,7 @@ export function textBox(
       <div className="mt-1 col-span-2">
         <div className="max-w-lg flex rounded-md shadow-sm">
           <input
-            // value={value} // Comment this line
+            // value={value}
             readOnly={readOnly}
             required
             onChange={e => {
@@ -47,7 +47,7 @@ export function textBox(
             type={type}
             name={id}
             id={id}
-            placeholder={placeholder} // Placeholders should go here
+            placeholder={placeholder}
             className="flex-1 block max-w-3xl focus:ring-blue-500 focus:border-blue-500 min-w-0 rounded-none rounded-r-md text-sm border-gray-300"
           />
         </div>
