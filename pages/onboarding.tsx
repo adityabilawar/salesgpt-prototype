@@ -19,18 +19,30 @@ export default function onboarding() {
   const [problemSolve, setProblemSolve] = useState("");
 
   const handleSubmitOnboarding = async event => {
-    event.preventDefault(); // Prevent form submission and page refresh
-    try {
-      await updateUserProfile(
-        phoneNumber,
-        linkedIn,
-        companyInformation,
-        valueProvide,
-        problemSolve
-      );
-      router.push("/login");
-    } catch (error) {
-      console.error(error);
+    event.preventDefault(); 
+    if (
+      phoneNumber &&
+      linkedIn &&
+      jobTitle &&
+      companyInformation &&
+      valueProvide &&
+      problemSolve
+    ) {
+      try {
+        await updateUserProfile(
+          phoneNumber,
+          linkedIn,
+          jobTitle,
+          companyInformation,
+          valueProvide,
+          problemSolve
+        );
+        router.push("/login");
+      } catch (error) {
+        console.error(error);
+      }
+    } else {
+      alert("Please fill all the fields before proceeding.");
     }
   };
 
@@ -82,22 +94,33 @@ export default function onboarding() {
 
   const handleSubmit = async e => {
     e.preventDefault();
-    setOnboarding(true);
-    if (userId) {
-      const userData = {
-        phoneNumber,
-        linkedInProfile: linkedIn,
-        jobTitle: jobTitle,
-        companyInformation,
-        companyValue: valueProvide,
-        problem: problemSolve,
-      };
-      try {
-        await setDoc(doc(collection(db, "users"), userId), userData);
-        router.push("/login");
-      } catch (error) {
-        console.error("Error saving user data: ", error);
+    if (
+      phoneNumber &&
+      linkedIn &&
+      jobTitle &&
+      companyInformation &&
+      valueProvide &&
+      problemSolve
+    ) {
+      setOnboarding(true);
+      if (userId) {
+        const userData = {
+          phoneNumber,
+          linkedInProfile: linkedIn,
+          jobTitle: jobTitle,
+          companyInformation,
+          companyValue: valueProvide,
+          problem: problemSolve,
+        };
+        try {
+          await setDoc(doc(collection(db, "users"), userId), userData);
+          router.push("/login");
+        } catch (error) {
+          console.error("Error saving user data: ", error);
+        }
       }
+    } else {
+      alert("Please fill all the fields before proceeding.");
     }
   };
 
@@ -131,6 +154,14 @@ export default function onboarding() {
                   Personal Information
                 </h3>
                 <div>
+                  {textBox(
+                    "Phone number",
+                    "tel",
+                    "phone-number",
+                    "",
+                    setPhoneNumber,
+                    false
+                  )}
                   {textBox(
                     "Phone number",
                     "tel",
