@@ -159,7 +159,7 @@ const index = () => {
         </div>
       </nav>
       <div className="grid grid-cols-5 gap-6 px-6 h-full overflow-hidden">
-        <div className="col-span-2 overflow-y-auto h-full pb-32">
+        <div className="col-span-2 overflow-y-auto h-full pb-32 px-5">
           <h2 className="text-2xl mb-4">User Information</h2>
           <form onSubmit={handleSave}>
             <div className="mb-4">
@@ -256,7 +256,7 @@ const index = () => {
             </div>
           </form>
         </div>
-        <div className="col-span-3 overflow-y-auto h-full pb-24">
+        <div className="col-span-3 overflow-y-auto h-full pb-24 px-5">
           <h2 className="text-2xl mb-4">Campaign Details</h2>
           <form onSubmit={saveCampaign}>
             <div className="mb-4">
