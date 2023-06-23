@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 import { BadgeCheckIcon } from "@heroicons/react/solid";
 import { onAuthStateChanged } from "firebase/auth";
-import { auth, db } from "@/lib/firebaseClient";
+import { auth, db, updateUserProfile } from "@/lib/firebaseClient";
 import { collection, doc, setDoc, getDoc } from "firebase/firestore";
 
 export default function onboarding() {
@@ -18,15 +18,31 @@ export default function onboarding() {
   const [valueProvide, setValueProvide] = useState("");
   const [problemSolve, setProblemSolve] = useState("");
 
+  const handleSubmitOnboarding = async event => {
+    event.preventDefault(); // Prevent form submission and page refresh
+    try {
+      await updateUserProfile(
+        phoneNumber,
+        linkedIn,
+        companyInformation,
+        valueProvide,
+        problemSolve
+      );
+      router.push("/login");
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async user => {
       if (user) {
         setUserId(user.uid);
-  
+
         // Fetch user data
         const userDoc = doc(collection(db, "users"), user.uid);
         const userData = await getDoc(userDoc);
-        
+
         // Check if necessary fields are filled
         if (userData.exists()) {
           const {
@@ -37,25 +53,31 @@ export default function onboarding() {
             companyValue,
             problem,
           } = userData.data();
-  
-          if (phoneNumber || linkedInProfile || jobTitle || companyInformation || companyValue || problem) {
+
+          if (
+            phoneNumber ||
+            linkedInProfile ||
+            jobTitle ||
+            companyInformation ||
+            companyValue ||
+            problem
+          ) {
             // Redirect the user to another page if all fields are filled
-            router.push('/dashboard');
+            router.push("/dashboard");
           }
         }
       } else {
         setUserId(null);
       }
     });
-    
+
     return () => {
       unsubscribe();
     };
   }, []);
-  
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, user => {
       if (user) {
         setUserId(user.uid);
       } else {
@@ -67,7 +89,7 @@ export default function onboarding() {
     };
   }, []);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async e => {
     e.preventDefault();
     setOnboarding(true);
     if (userId) {
@@ -91,51 +113,58 @@ export default function onboarding() {
   return onboarding ? (
     <Confirmation />
   ) : (
-    <div className="py-8">
-      <div className="max-w-2xl mx-auto bg-white shadow-2xl rounded-lg overflow-hidden">
-        <div className="px-6 py-8">
-          <h3 className="text-lg leading-6 font-medium text-gray-900">
-            Profile
-          </h3>
-          <p className="mt-1 max-w-2xl text-sm text-gray-500">
-            Set up your account to start increasing your sales.
-          </p>
-        </div>
-        <div className="border-t border-gray-200">
-          <form
-            className="px-6 pb-4 space-y-6 divide-y divide-gray-200"
-            onSubmit={handleSubmit}
-          >
-            <div className="py-6 space-y-6">
-              <h3 className="text-lg leading-6 font-medium text-gray-900">
-                Personal Information
-              </h3>
-              <div>
-                {textBox(
-                  "Phone number",
-                  "tel",
-                  "phone-number",
-                  "",
-                  setPhoneNumber,
-                  false
-                )}
-                {textBox(
-                  "LinkedIn username",
-                  "text",
-                  "linkedin",
-                  "",
-                  setLinkedIn,
-                  false
-                )}
-                {textBox(
-                  "Job title",
-                  "text",
-                  "job-title",
-                  "",
-                  setJobTitle,
-                  false
-                )}
-{/* 
+    <div>
+      <div className="flex-shrink-0 flex items-center px-4 pt-5">
+        <img className="h-8 w-auto" src="/templogo.svg" alt="Pipeline AI" />
+        <span className="ml-3 text-gray-900 text-2xl font-semibold">
+          Pipeline AI
+        </span>
+      </div>
+      <div className="py-8">
+        <div className="max-w-2xl mx-auto bg-white shadow-2xl rounded-lg overflow-hidden">
+          <div className="px-6 py-8">
+            <h3 className="text-lg leading-6 font-medium text-gray-900">
+              Profile
+            </h3>
+            <p className="mt-1 max-w-2xl text-sm text-gray-500">
+              Set up your account to start increasing your sales.
+            </p>
+          </div>
+          <div className="border-t border-gray-200">
+            <form
+              className="px-6 pb-4 space-y-6 divide-y divide-gray-200"
+              onSubmit={handleSubmit}
+            >
+              <div className="py-6 space-y-6">
+                <h3 className="text-lg leading-6 font-medium text-gray-900">
+                  Personal Information
+                </h3>
+                <div>
+                  {textBox(
+                    "Phone number",
+                    "tel",
+                    "phone-number",
+                    "",
+                    setPhoneNumber,
+                    false
+                  )}
+                  {textBox(
+                    "LinkedIn username",
+                    "text",
+                    "linkedin",
+                    "",
+                    setLinkedIn,
+                    false
+                  )}
+                  {textBox(
+                    "Job title",
+                    "text",
+                    "job-title",
+                    "",
+                    setJobTitle,
+                    false
+                  )}
+                  {/* 
                 <div className="mt-6">
                   <label
                     htmlFor="photo"
@@ -162,42 +191,44 @@ export default function onboarding() {
                   </div>
                 </div> */}
 
-                <hr className="mt-6"/>
+                  <hr className="mt-6" />
 
-                <div className="py-6 space-y-6"></div>
-                <h3 className="text-lg leading-6 font-medium text-gray-900">
-                  Company Information
-                </h3>
-                <div className="py-3"></div>
+                  <div className="py-6 space-y-6"></div>
+                  <h3 className="text-lg leading-6 font-medium text-gray-900">
+                    Company Information
+                  </h3>
+                  <div className="py-3"></div>
 
-                {textArea(
-                  "Company information",
-                  "company-information",
-                  setCompanyInformation
-                )}
+                  {textArea(
+                    "Company information",
+                    "company-information",
+                    setCompanyInformation
+                  )}
 
-                {textArea(
-                  "Value you provide",
-                  "value-you-provide",
-                  setValueProvide
-                )}
+                  {textArea(
+                    "Value you provide",
+                    "value-you-provide",
+                    setValueProvide
+                  )}
 
-                {textArea(
-                  "Problems you solve",
-                  "problems-you-solve",
-                  setProblemSolve
-                )}
+                  {textArea(
+                    "Problems you solve",
+                    "problems-you-solve",
+                    setProblemSolve
+                  )}
+                </div>
               </div>
-            </div>
-            <div className="flex justify-end pt-5">
-              <button
-                type="submit"
-                className="py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-              >
-                Save
-              </button>
-            </div>
-          </form>
+              <div className="flex justify-end pt-5">
+                <button
+                  onClick={handleSubmitOnboarding}
+                  type="submit"
+                  className="py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                >
+                  Save
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
     </div>
@@ -217,6 +248,12 @@ function Confirmation() {
 
   return (
     <>
+      <div className="flex-shrink-0 flex items-center px-4 py-5">
+        <img className="h-8 w-auto" src="/templogo.svg" alt="Pipeline AI" />
+        <span className="ml-3 text-gray-900 text-2xl font-semibold">
+          Pipeline AI
+        </span>
+      </div>
       <div className="min-h-screen pt-24 pb-12 flex flex-col bg-white">
         <main className="flex-grow flex justify-center max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8">
           <div className="py-4">
