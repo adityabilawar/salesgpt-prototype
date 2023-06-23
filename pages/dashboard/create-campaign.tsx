@@ -16,6 +16,14 @@ const index = () => {
   const userData = useSelector((state: RootState) => state.user);
   const [prompt, setPrompt] = useState<string>("");
   const [userId, setUserId] = useState<string | null>(null);
+  const [campaignDetails, setCampaignDetails] = useState({
+    campaignTitle: '',
+    platform: '',
+    callToAction: '',
+    toneOfVoice: '',
+    purpose: '',
+    wordLimit: '500',
+  });
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, user => {
@@ -44,6 +52,10 @@ const index = () => {
         updatedData: { ...userData, [event.target.name]: event.target.value },
       })
     );
+  };
+
+  const handlePromptChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setPrompt(event.target.value);
   };
 
   const saveCampaign = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -117,18 +129,37 @@ const index = () => {
     );
   };
 
+  useEffect(() => {
+    const generatedPrompt = generatePrompt(
+      campaignDetails.campaignTitle,
+      campaignDetails.platform,
+      campaignDetails.callToAction,
+      campaignDetails.toneOfVoice,
+      campaignDetails.purpose,
+      campaignDetails.wordLimit
+    );
+    setPrompt(generatedPrompt);
+  }, [campaignDetails]);
+
+  const handleCampaignDetailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setCampaignDetails({
+      ...campaignDetails,
+      [event.target.name]: event.target.value,
+    });
+  };
+
   return (
-    <div className=" text-black h-full min-h-screen">
-      <nav className="px-6 py-10 flex items-center justify-between">
+    <div className="text-black h-screen overflow-hidden">
+      <nav className="px-6 py-5 flex items-center justify-between">
         <div className="flex items-center space-x-4">
-          <button onClick={handleGoBack} className="-full p-2">
+          <button onClick={handleGoBack} className="p-2">
             <FiArrowLeft size={24} />
           </button>
           <span className="text-2xl">Create Campaign</span>
         </div>
       </nav>
-      <div className="grid grid-cols-5 gap-6 px-6 ">
-        <div className="col-span-2">
+      <div className="grid grid-cols-5 gap-6 px-6 h-full overflow-hidden">
+        <div className="col-span-2 overflow-y-auto h-full pb-32">
           <h2 className="text-2xl mb-4">User Information</h2>
           <form onSubmit={handleSave}>
             <div className="mb-4">
@@ -220,12 +251,12 @@ const index = () => {
                 type="submit"
                 className="px-5 py-2 bg-brand text-white rounded-md"
               >
-                Save
+                Update User
               </button>
             </div>
           </form>
         </div>
-        <div className="col-span-3">
+        <div className="col-span-3 overflow-y-auto h-full pb-24">
           <h2 className="text-2xl mb-4">Campaign Details</h2>
           <form onSubmit={saveCampaign}>
             <div className="mb-4">
@@ -237,6 +268,7 @@ const index = () => {
                 placeholder="Cold Messaging"
                 id="campaign-title"
                 name="campaignTitle"
+                onChange={handleCampaignDetailChange}
                 className="w-full p-2 border-[2px] mt-1 focus:border-brand"
               />
             </div>
@@ -249,6 +281,7 @@ const index = () => {
                 placeholder="LinkedIn"
                 id="platform"
                 name="platform"
+                onChange={handleCampaignDetailChange}
                 className="w-full p-2 border-[2px] mt-1 focus:border-brand"
               />
             </div>
@@ -261,6 +294,7 @@ const index = () => {
                 placeholder="More follow up calls"
                 id="call-to-action"
                 name="callToAction"
+                onChange={handleCampaignDetailChange}
                 className="w-full p-2 border-[2px] mt-1 focus:border-brand"
               />
             </div>
@@ -273,6 +307,7 @@ const index = () => {
                 placeholder="Humorous"
                 id="tone-of-voice"
                 name="toneOfVoice"
+                onChange={handleCampaignDetailChange}
                 className="w-full p-2 border-[2px] mt-1 focus:border-brand"
               />
             </div>
@@ -285,6 +320,7 @@ const index = () => {
                 placeholder="To introduce our services to potential clients"
                 id="purpose"
                 name="purpose"
+                onChange={handleCampaignDetailChange}
                 className="w-full p-2 border-[2px] mt-1 focus:border-brand"
               />
             </div>
@@ -296,38 +332,34 @@ const index = () => {
                 required
                 placeholder="150"
                 name="wordLimit"
+                onChange={handleCampaignDetailChange}
                 className="w-full p-2 border-[2px] mt-1 focus:border-brand"
               />
             </div>
-
-            <div className="flex justify-end">
-              <button
-                type="submit"
-                className="border-[1px] px-4 py-2 bg-gradient-to-br from-[#01B7C5] to-[#C417E0] text-white rounded-md"
-              >
-                Generate Prompt
-              </button>
-            </div>
+            {promptSection()}
           </form>
         </div>
-
       </div>
-      {promptSection()}
     </div>
   );
 
   function promptSection() {
     return (
-      <div className="mx-24 my-12">
+      <div className="">
         <hr className="my-4" />
-        <h2 className="text-2xl mb-4">Prompt</h2>
+        <div className="flex flex-col justify-center items-start">
+          <h2 className="text-xl">Prompt</h2>
+          <p className="h-full text-sm text-gray-800">Edit the prompt to match your needs!</p>
+        </div>
         <textarea
           value={prompt}
+          onChange={handlePromptChange}
+          name="generatedPrompt"
           className="w-full p-2 h-64 border-[1px] text-black mb-4 border-gray-300"
         ></textarea>
         <div className="flex items-center justify-end space-x-4">
           <Link href="/dashboard/send">
-            <button className="border-[1px] px-4 py-2 bg-brand text-white rounded-md">Save</button>
+            <button className="border-[1px] px-4 py-2 bg-brand text-white rounded-md">Save Campaign</button>
           </Link>
         </div>
       </div>
