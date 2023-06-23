@@ -384,25 +384,20 @@ const LeadsList = () => {
         </div>
 
         <div className="px-10 overflow-y-auto">
-          <div className="flex justify-end ">
-            <div className="p-5 flex ">
+          <div className="flex justify-start ">
+            <div className="space-x-5 my-5">
               <button
                 className="border-[1px] rounded-md px-4 py-3 bg-brand text-white text-white text-xs"
                 onClick={() => setModalOpen(true)}
               >
                 Upload leads
               </button>
-            </div>
-
-            <div className="p-5 flex ">
               <button
                 className="border-[1px] rounded-md px-4 py-3 bg-brand text-white text-white text-xs"
                 onClick={() => setCreateModalOpen(true)}
               >
                 Create lead
               </button>
-            </div>
-            <div className="p-5 flex ">
               <Link href="/dashboard/send">
                 <button
                   className={`border-[1px] rounded-md px-4 py-3 bg-brand text-white text-white text-xs ${

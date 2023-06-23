@@ -68,7 +68,8 @@ const CampaignsList = () => {
       const updatedLeads = [...existingLeads];
   
       for (const lead of selectedLeads) {
-        if (!existingLeads.includes(lead)) {
+        // Check if the lead.id exists in the array of existing lead IDs
+        if (!existingLeads.some(existingLead => existingLead.id === lead.id)) {
           updatedLeads.push(lead);
         }
       }
@@ -79,6 +80,7 @@ const CampaignsList = () => {
       console.error("Error sending leads:", error);
     }
   };
+  
   
   useEffect(() => {
     NProgress.start();
