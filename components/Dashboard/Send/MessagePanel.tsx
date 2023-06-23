@@ -41,53 +41,53 @@ const MessagePanel = () => {
       alert('The message has been deleted. Generate a new one before saving.');
       return;
     }
-  
+
     if (!displayedMessage || displayedMessage.trim() === '') {
       alert('The message is empty. Please generate a message before saving.');
       return;
     }
-  
+
     if (!selectedLead || !userId || !campaignId) return;
-  
+
     const leadRef = doc(db, 'users', userId, 'leads', selectedLead.id);
     const leadDoc = await getDoc(leadRef);
-  
+
     if (!leadDoc.exists()) {
       console.error('Lead does not exist');
       return;
     }
-  
+
     const leadData = leadDoc.data();
-  
+
     if (!leadData) {
       console.error('Invalid lead data');
       return;
     }
-  
+
     const updatedLeadData = {
       ...leadData,
       generatedMessages: leadData.generatedMessages || [],
     };
-  
+
     let messageIndex = updatedLeadData.generatedMessages.findIndex(
       (msg: { campaignId: string, message: string }) => msg.campaignId === campaignId
     );
-  
+
     if (messageIndex !== -1) {
       updatedLeadData.generatedMessages[messageIndex].message = displayedMessage;
     } else {
       updatedLeadData.generatedMessages.push({ campaignId, message: displayedMessage });
     }
-  
+
     await setDoc(leadRef, updatedLeadData);
-  
+
     console.log('Message saved successfully');
-  
+
     // Set isDeleted to true and clear the displayedMessage
     setIsDeleted(true);
     setDisplayedMessage(null);
   };
-  
+
 
 
   async function generatePersonalizedMessage(lead: Lead, campaign: Campaign, user: User): Promise<string> {
@@ -144,38 +144,38 @@ const MessagePanel = () => {
   useEffect(() => {
     async function fetchCampaignAndUserData() {
       if (!campaignId || !userId) return;
-  
+
       const campaignDocRef = doc(db, 'users', userId, 'campaigns', campaignId as string);
       const campaignSnapshot = await getDoc(campaignDocRef);
-  
+
       if (!campaignSnapshot.exists()) {
         console.error('Campaign does not exist');
         return;
       }
-  
+
       const campaignData = campaignSnapshot.data();
-  
+
       if (!campaignData || typeof campaignData.generatedPrompt !== 'string') {
         console.error('Invalid campaign data');
         return;
       }
-  
+
       setCampaignTitle(campaignData.campaignTitle);
-  
+
       const userDataRef = doc(db, 'users', userId);
       const userSnapshot = await getDoc(userDataRef);
-  
+
       if (!userSnapshot.exists()) {
         console.error('User does not exist');
         return;
       }
-  
+
       const userData = userSnapshot.data();
       if (!userData) {
         console.error('Invalid user data');
         return;
       }
-  
+
       const user: User = {
         id: userSnapshot.id,
         firstName: userData.firstName,
@@ -191,7 +191,7 @@ const MessagePanel = () => {
       };
       setUser(user);
     }
-  
+
     fetchCampaignAndUserData();
   }, [campaignId, userId]);
 
@@ -199,10 +199,10 @@ const MessagePanel = () => {
     async function handleLeadSelectionAndMessageGeneration() {
       setLoading(true);
       if (!selectedLead || !userId || !campaignId) return;
-  
+
       const leadRef = doc(db, 'users', userId, 'leads', selectedLead.id);
       const leadDoc = await getDoc(leadRef);
-    
+
       if (leadDoc.exists()) {
         const leadData = leadDoc.data();
         if (leadData?.generatedMessages) {
@@ -214,26 +214,26 @@ const MessagePanel = () => {
           }
         }
       }
-  
+
       // If the lead doesn't have generatedMessages or the generatedMessage for the campaign doesn't exist, set the finalMessage, currentMessage, and displayedMessage to an empty string
       setCurrentMessage('');
       setDisplayedMessage('');
-  
+
       const campaignDocRef = doc(db, 'users', userId, 'campaigns', campaignId as string);
       const campaignSnapshot = await getDoc(campaignDocRef);
-  
+
       if (!campaignSnapshot.exists()) {
         console.error('Campaign does not exist');
         return;
       }
-  
+
       const campaignData = campaignSnapshot.data();
-  
+
       if (!campaignData || typeof campaignData.generatedPrompt !== 'string') {
         console.error('Invalid campaign data');
         return;
       }
-  
+
       const campaign: Campaign = {
         id: campaignSnapshot.id,
         generatedPrompt: campaignData.generatedPrompt,
@@ -244,7 +244,7 @@ const MessagePanel = () => {
         purpose: campaignData.purpose,
         ...campaignData,
       };
-  
+
       if (user) {
         const message = await generatePersonalizedMessage(
           JSON.parse(JSON.stringify(selectedLead)),
@@ -256,9 +256,9 @@ const MessagePanel = () => {
           setCurrentMessage(message);
         }
         setMessagesGenerated((prevCount) => prevCount + 1);
-      }      
+      }
     }
-  
+
     handleLeadSelectionAndMessageGeneration();
     setLoading(false);
   }, [selectedLead, campaignId, userId, user]);
@@ -270,13 +270,13 @@ const MessagePanel = () => {
   }, [currentMessage]);
 
   return (
-    <div className="flex-grow">
+    <div className="flex-grow overflow-y-auto h-full">
       <div className="relative flex border-b px-10 py-5 text-2xl">
-      {campaignTitle ? campaignTitle : 'Loading...'}
+        {campaignTitle ? campaignTitle : 'Loading...'}
       </div>
       <div className="flex-grow-0 px-10 py-5 flex flex-col justify-start items-start">
         <h1 className="mb-5 font-bold">Generating message for {selectedLead && selectedLead.firstName} {selectedLead && selectedLead.lastName}</h1>
-        <div className="relative w-full h-60">
+        <div className="relative w-full min-h-60 overflow-y-auto">
           <textarea
             className={`w-full h-full border text-black rounded-md ${loading ? 'opacity-50' : ''}`}
             value={displayedMessage || ''} // when displayedMessage is null, set the value to an empty string
@@ -291,7 +291,7 @@ const MessagePanel = () => {
             </div>
           )}
         </div>
-        <div className="flex space-x-2 justify-center items-center h-full mt-5">
+        <div className="flex space-x-2 justify-start items-center mt-5">
           <button
             className="px-4 py-2 border-[1px] rounded-md bg-brand text-white"
             onClick={saveGeneratedMessage}

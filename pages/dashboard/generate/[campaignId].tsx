@@ -52,7 +52,7 @@ const CampaignPage = () => {
                 <div className="text-black">
                     <div className="grid grid-cols-5 overflow-hidden">
                         <LeadsSidebar userId={userId} campaignId={campaignId} />
-                        <div className="col-span-4 overflow-y-auto">
+                        <div className="col-span-4 overflow-hidden h-screen">
                             <MessagePanel />
                         </div>
                     </div>

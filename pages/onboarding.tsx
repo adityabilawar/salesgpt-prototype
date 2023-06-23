@@ -23,11 +23,9 @@ export default function onboarding() {
       if (user) {
         setUserId(user.uid);
   
-        // Fetch user data
         const userDoc = doc(collection(db, "users"), user.uid);
         const userData = await getDoc(userDoc);
         
-        // Check if necessary fields are filled
         if (userData.exists()) {
           const {
             phoneNumber,
@@ -39,12 +37,12 @@ export default function onboarding() {
           } = userData.data();
   
           if (phoneNumber || linkedInProfile || jobTitle || companyInformation || companyValue || problem) {
-            // Redirect the user to another page if all fields are filled
             router.push('/dashboard');
           }
         }
       } else {
         setUserId(null);
+        router.push('/login');
       }
     });
     
@@ -52,7 +50,7 @@ export default function onboarding() {
       unsubscribe();
     };
   }, []);
-  
+
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
