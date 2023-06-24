@@ -50,6 +50,7 @@ import {
   XIcon,
 } from "@heroicons/react/outline";
 import { CheckIcon, PaperClipIcon } from "@heroicons/react/solid";
+import { textBox } from "../FormComponents";
 
 NProgress.configure({ showSpinner: false });
 
@@ -135,11 +136,11 @@ const LeadsList = () => {
   ) => {
     if (!isEditing) {
       let updatedIsSelected = { ...isSelected };
-  
+
       if (event.shiftKey && lastSelectedIndex !== null) {
         const start = Math.min(index, lastSelectedIndex);
         const end = Math.max(index, lastSelectedIndex);
-  
+
         for (let i = start; i <= end; i++) {
           const leadId = leads[i].id;
           updatedIsSelected[leadId] = true;
@@ -159,10 +160,10 @@ const LeadsList = () => {
           dispatch(addSelectedLead(lead));
         }
       }
-  
+
       setIsSelected(updatedIsSelected);
       setLastSelectedIndex(index);
-  
+
       const selectedCount = Object.values(updatedIsSelected).filter(
         value => value
       ).length;
@@ -170,13 +171,11 @@ const LeadsList = () => {
       setSelectedLeadsCount(selectedCount);
     }
   };
-  
-  
 
-  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = event.target;
-    setNewLead(prevLead => ({ ...prevLead, [name]: value }));
-  };
+  // const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  //   const { name, value } = event.target;
+  //   setNewLead(prevLead => ({ ...prevLead, [name]: value }));
+  // };
 
   const handleCreateLead = async (
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>
@@ -363,37 +362,44 @@ const LeadsList = () => {
 
   const leadProfileArr = [
     {
-      field: "First name",
+      question: "First Name",
+      field: "firstName",
       value: newLead.firstName,
       type: "text",
     },
     {
-      field: "Last name",
+      question: "Last Name",
+      field: "lastName",
       value: newLead.lastName,
       type: "text",
     },
     {
-      field: "Job title",
+      question: "Job Title",
+      field: "jobTitle",
       value: newLead.jobTitle,
       type: "text",
     },
     {
-      field: "Company name",
+      question: "Company Name",
+      field: "companyName",
       value: newLead.companyName,
       type: "text",
     },
     {
-      field: "Email",
+      question: "Email",
+      field: "email",
       value: newLead.email,
       type: "email",
     },
     {
-      field: "Phone number",
+      question: "Phone Number",
+      field: "phone",
       value: newLead.phone,
       type: "tel",
     },
     {
-      field: "LinkedIn",
+      question: "LinkedIn",
+      field: "linkedIn",
       value: newLead.linkedIn,
       type: "url",
     },
@@ -449,23 +455,22 @@ const LeadsList = () => {
                 </button>
               </Link>
               <button
-                    className={`border-[1px] flex justify-center items-center space-x-2 rounded-md px-4 py-3 bg-red-600 text-white text-white text-xs ${
-                    selectedLeadsCount > 0
-                      ? ""
-                      : "opacity-50 cursor-not-allowed"
-                  }`}
-                  onClick={event => {
-                    event.stopPropagation();
-                    handleDeleteLead();
-                  }}
-                  disabled={selectedLeadsCount === 0}
-                >
-                  <TrashIcon height={15} width={15} />
-                  <h1>Delete lead(s)</h1>
-                </button>
+                className={`border-[1px] flex justify-center items-center space-x-2 rounded-md px-4 py-3 bg-red-600 text-white text-white text-xs ${
+                  selectedLeadsCount > 0 ? "" : "opacity-50 cursor-not-allowed"
+                }`}
+                onClick={event => {
+                  event.stopPropagation();
+                  handleDeleteLead();
+                  setSelectedLeadsCount(0);
+                }}
+                disabled={selectedLeadsCount === 0}
+              >
+                <TrashIcon height={15} width={15} />
+                <h1>Delete lead(s)</h1>
+              </button>
             </div>
           </div>
-          
+
           <div className="h-full space-y-4 border rounded-md">
             {leads.length === 0 ? (
               <div className="flex items-center justify-center h-48">
@@ -575,13 +580,16 @@ const LeadsList = () => {
                                           className={`${
                                             isSelected[id] ? "bg-gray-100" : ""
                                           }`}
-                                          onClick={isEditing ? null : event =>
-                                            handleRowClick(
-                                              index,
-                                              id,
-                                              lead,
-                                              event
-                                            )
+                                          onClick={
+                                            isEditing
+                                              ? () => {}
+                                              : event =>
+                                                  handleRowClick(
+                                                    index,
+                                                    id,
+                                                    lead,
+                                                    event
+                                                  )
                                           }
                                         >
                                           <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-6">
@@ -827,7 +835,7 @@ const LeadsList = () => {
               <div>
                 <textarea
                   className="mt-8 w-full h-48 bg-white  p-2 rounded-md"
-                  placeholder="Paste LinkedIn Usernames here..."
+                  placeholder="Paste LinkedIn usernames here..."
                   value={linkedinInput}
                   onChange={e => setLinkedinInput(e.target.value)}
                 />
@@ -880,79 +888,13 @@ const LeadsList = () => {
       )}
       {createModalOpen && (
         <div className="absolute inset-0 bg-gray-800 bg-opacity-60 z-10 flex justify-center items-center">
-          {/* <div className="bg-white rounded-lg w-2/3 p-8">
-            <h2 className="text-2xl  mb-8">Create Lead</h2>
-            <form className="flex flex-col ">
-              <input
-                type="text"
-                name="firstName"
-                placeholder="First Name"
-                value={newLead.firstName}
-                onChange={handleInputChange}
-              />
-              <input
-                type="text"
-                name="lastName"
-                placeholder="Last Name"
-                value={newLead.lastName}
-                onChange={handleInputChange}
-              />
-              <input
-                type="text"
-                name="jobTitle"
-                placeholder="Job Title"
-                value={newLead.jobTitle}
-                onChange={handleInputChange}
-              />
-              <input
-                type="text"
-                name="companyName"
-                placeholder="Company Name"
-                value={newLead.companyName}
-                onChange={handleInputChange}
-              />
-              <input
-                type="text"
-                name="email"
-                placeholder="Email"
-                value={newLead.email}
-                onChange={handleInputChange}
-              />
-              <input
-                type="text"
-                name="phone"
-                placeholder="Phone"
-                value={newLead.phone}
-                onChange={handleInputChange}
-              />
-              <input
-                type="text"
-                name="linkedIn"
-                placeholder="LinkedIn"
-                value={newLead.linkedIn}
-                onChange={handleInputChange}
-              />
-            </form>
-            <div className="mt-2 text-right">
-              <button
-                type="button"
-                className="mt-4 py-2 px-4 rounded-md bg-brand text-white mr-6"
-                onClick={handleCreateLead}
-              >
-                Create
-              </button>
-              <button className="" onClick={() => setCreateModalOpen(false)}>
-                Close
-              </button>
-            </div>
-          </div> */}
-          <LeadProfile />
+          <CreateLeadProfileModal />
         </div>
       )}
     </div>
   );
 
-  function LeadProfile() {
+  function CreateLeadProfileModal() {
     return (
       <div className="bg-white shadow overflow-hidden sm:rounded-lg w-2/3 h-5/6 p-8 overflow-y-auto">
         <div className="px-4 py-5 sm:px-6">
@@ -976,9 +918,11 @@ const LeadsList = () => {
                     <input
                       type={item.type}
                       name={item.field}
-                      placeholder={item.field}
+                      placeholder={item.question}
                       value={item.value}
-                      onChange={handleInputChange}
+                      onChange={e =>
+                        setNewLead({ ...newLead, [item.field]: e.target.value })
+                      }
                       className="border-b border-gray-300"
                     />
                   </dd>

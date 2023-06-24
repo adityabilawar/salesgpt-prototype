@@ -8,6 +8,7 @@ import {
   HomeIcon,
   InboxIcon,
   MenuIcon,
+  UserIcon,
   UsersIcon,
   XIcon,
 } from "@heroicons/react/outline";
@@ -25,7 +26,7 @@ const navigation = [
     icon: HiOutlinePaperAirplane,
     current: false,
   },
-  { name: "Settings", href: "/settings", icon: FiSettings, current: false },
+  { name: "Profile", href: "/profile", icon: UserIcon, current: false },
 ];
 
 function classNames(...classes) {

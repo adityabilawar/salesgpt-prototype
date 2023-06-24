@@ -115,9 +115,9 @@ const LeadsSidebar = ({ campaignId, userId }: LeadsSidebarProps) => {
   return (
     <div className="border-r-[1px] h-screen flex flex-col overflow-y-auto">
       <h1 className="px-5 text-3xl mt-5">Leads</h1>
-      <div className="flex border-b items-center">
+      <div className="flex justify-center items-center gap-x-3 my-2">
           <button
-            className="px-2 py-2 m-4 text-sm border-[1px] rounded-md bg-brand text-white"
+            className="px-2 py-2 text-sm border-[1px] rounded-md bg-brand text-white"
           >
             Export CSV
           </button>
