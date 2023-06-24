@@ -396,9 +396,9 @@ const LeadsList = () => {
   ];
 
   return (
-    <div className="border-r-[1px] flex flex-col h-full py-6">
+    <div className="border-r-[1px] flex flex-col py-6 px-5 md:px-8">
       <div className="flex-grow">
-        <div className="flex flex-col border-b-[1px] px-10  sticky top-0">
+        <div className="flex flex-col border-b-[1px] sticky top-0">
           <h1 className="text-2xl">Leads</h1>
 
           <div className="flex py-5">
@@ -416,7 +416,8 @@ const LeadsList = () => {
           </div>
         </div>
 
-        <div className="px-10 overflow-y-auto">
+        <div className="">
+          {/* <div className="overflow-y-auto"> */}
           <div className="flex justify-start ">
             <div className="space-x-5 my-5">
               <button
@@ -446,7 +447,7 @@ const LeadsList = () => {
               </Link>
             </div>
           </div>
-          
+
           <div className="h-full space-y-4 border rounded-md">
             {leads.length === 0 ? (
               <div className="flex items-center justify-center h-48">
@@ -459,327 +460,12 @@ const LeadsList = () => {
                 <div>
                   <div>
                     <div className="flex flex-col">
-                      <div className="overflow-x-auto">
+                      <div className="">
+                        {/* <div className="overflow-x-auto"> */}
                         <div className="inline-block min-w-full">
-                          <div className="overflow-hidden">
-                            <table className="min-w-full divide-y divide-gray-300">
-                              <thead className="bg-gray-50">
-                                <tr>
-                                  <th
-                                    scope="col"
-                                    className="relative py-3.5 pl-3 pr-4 sm:pr-6"
-                                  >
-                                    <CheckIcon
-                                      className={`ml-3 h-6 w-6 ${
-                                        Object.keys(isSelected).length ===
-                                          leads.length &&
-                                        !Object.values(isSelected).includes(
-                                          false
-                                        )
-                                          ? "text-brand"
-                                          : "text-gray-400"
-                                      }`}
-                                      onClick={handleSelectAll}
-                                    />
-                                  </th>
-                                  <th
-                                    scope="col"
-                                    className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6"
-                                  >
-                                    LEAD NAME
-                                  </th>
-                                  <th
-                                    scope="col"
-                                    className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                                  >
-                                    COMPANY INFO
-                                  </th>
-                                  <th
-                                    scope="col"
-                                    className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                                  >
-                                    PERSONAL INFO
-                                  </th>
-                                  <th
-                                    scope="col"
-                                    className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                                  >
-                                    LINKEDIN
-                                  </th>
-                                  <th
-                                    scope="col"
-                                    className="relative py-3.5 pl-3 pr-4 sm:pr-6"
-                                  >
-                                    <span className="sr-only">Edit</span>
-                                  </th>
-                                  <th
-                                    scope="col"
-                                    className="relative py-3.5 pl-3 pr-4 sm:pr-6"
-                                  >
-                                    <span className="sr-only">Delete</span>
-                                  </th>
-                                </tr>
-                              </thead>
-                              <tbody className="divide-y divide-gray-200 bg-white">
-                                {isLoading ? (
-                                  <div className="animate-pulse flex space-x-4 w-full">
-                                    <div className="flex-1 space-y-6 py-1">
-                                      <div className="space-y-3">
-                                        <div className="grid grid-cols-7 gap-4">
-                                          <div className="h-2 bg-slate-700 rounded w-1/8"></div>
-                                          <div className="h-2 bg-slate-700 rounded w-2/8"></div>
-                                          <div className="h-2 bg-slate-700 rounded w-1/8"></div>
-                                          <div className="h-2 bg-slate-700 rounded w-1/8"></div>
-                                          <div className="h-2 bg-slate-700 rounded w-1/8"></div>
-                                          <div className="h-2 bg-slate-700 rounded w-1/8"></div>
-                                          <div className="h-2 bg-slate-700 rounded w-1/8"></div>
-                                        </div>
-                                        <div className="h-2 bg-slate-700 rounded"></div>
-                                      </div>
-                                    </div>
-                                  </div>
-                                ) : (
-                                  leads
-                                    .filter((lead: Lead) => {
-                                      const searchString =
-                                        `${lead.firstName} ${lead.lastName} ${lead.companyName}`.toLowerCase();
-                                      return searchString.includes(
-                                        searchTerm.toLowerCase()
-                                      );
-                                    })
-                                    .map((lead: Lead, index: number) => {
-                                      const id = lead.id;
-
-                                      return (
-                                        <tr
-                                          key={lead.id}
-                                          className={`${
-                                            isSelected[id] ? "bg-gray-100" : ""
-                                          }`}
-                                          onClick={event =>
-                                            handleRowClick(
-                                              index,
-                                              id,
-                                              lead,
-                                              event
-                                            )
-                                          }
-                                        >
-                                          <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-6">
-                                            <div className="flex items-center space-x-3">
-                                              {isSelected[id] ? (
-                                                <CheckIcon className="h-5 w-5 text-brand" />
-                                              ) : (
-                                                <div className="h-5 w-5 border-2 rounded-md cursor-pointer"></div>
-                                              )}
-                                            </div>
-                                          </td>
-                                          <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-6">
-                                            {isEditing &&
-                                            editingLead.id === lead.id ? (
-                                              <div className="flex flex-col space-y-2">
-                                                <input
-                                                  className="border-b border-gray-300 px-2 py-1"
-                                                  placeholder="First name"
-                                                  value={editingLead.firstName}
-                                                  onChange={e =>
-                                                    setEditingLead({
-                                                      ...editingLead,
-                                                      firstName: e.target.value,
-                                                    })
-                                                  }
-                                                />
-                                                <input
-                                                  className="border-b border-gray-300 px-2 py-1"
-                                                  placeholder="Last name"
-                                                  value={editingLead.lastName}
-                                                  onChange={e =>
-                                                    setEditingLead({
-                                                      ...editingLead,
-                                                      lastName: e.target.value,
-                                                    })
-                                                  }
-                                                />
-                                              </div>
-                                            ) : (
-                                              <div className="font-medium select-none text-gray-900">
-                                                {lead.firstName} {lead.lastName}
-                                              </div>
-                                            )}
-                                          </td>
-
-                                          <td className="whitespace-nowrap select-none px-3 py-4 text-sm">
-                                            {isEditing &&
-                                            editingLead.id === lead.id ? (
-                                              <div className="flex flex-col space-y-2">
-                                                <input
-                                                  className="border-b border-gray-300 px-2 py-1"
-                                                  placeholder="Job Title"
-                                                  value={editingLead.jobTitle}
-                                                  onChange={e =>
-                                                    setEditingLead({
-                                                      ...editingLead,
-                                                      jobTitle: e.target.value,
-                                                    })
-                                                  }
-                                                />
-                                                <input
-                                                  className="border-b border-gray-300 px-2 py-1"
-                                                  placeholder="Company"
-                                                  value={
-                                                    editingLead.companyName
-                                                  }
-                                                  onChange={e =>
-                                                    setEditingLead({
-                                                      ...editingLead,
-                                                      companyName:
-                                                        e.target.value,
-                                                    })
-                                                  }
-                                                />
-                                              </div>
-                                            ) : (
-                                              <>
-                                                <div className="text-gray-900">
-                                                  {lead.jobTitle}
-                                                </div>
-                                                <div className="text-gray-500">
-                                                  {lead.companyName}
-                                                </div>
-                                              </>
-                                            )}
-                                          </td>
-                                          <td className="whitespace-nowrap select-none px-3 py-4 text-sm">
-                                            {isEditing &&
-                                            editingLead.id === lead.id ? (
-                                              <div className="flex flex-col space-y-2">
-                                                <input
-                                                  className="border-b border-gray-300 px-2 py-1"
-                                                  placeholder="Email"
-                                                  value={editingLead.email}
-                                                  onChange={e =>
-                                                    setEditingLead({
-                                                      ...editingLead,
-                                                      email: e.target.value,
-                                                    })
-                                                  }
-                                                />
-                                                <input
-                                                  className="border-b border-gray-300 px-2 py-1"
-                                                  placeholder="Phone Number"
-                                                  value={editingLead.phone}
-                                                  onChange={e =>
-                                                    setEditingLead({
-                                                      ...editingLead,
-                                                      phone: e.target.value,
-                                                    })
-                                                  }
-                                                />
-                                              </div>
-                                            ) : (
-                                              <>
-                                                <div className="flex items-center space-x-2">
-                                                  {/* <MailIcon className="text-gray-500 h-5 w-5"/>  */}
-                                                  <div className="text-gray-500">
-                                                    {lead.email}
-                                                  </div>
-                                                </div>
-                                                <div className="flex items-center space-x-2 mt-1">
-                                                  {/* <PhoneIcon className="text-gray-500 h-5 w-5"/>  */}
-                                                  <div className="text-gray-500">
-                                                    {lead.phone}
-                                                  </div>
-                                                </div>
-                                              </>
-                                            )}
-                                          </td>
-                                          <td className="whitespace-nowrap select-none px-3 py-4 text-sm">
-                                            {isEditing &&
-                                            editingLead.id === lead.id ? (
-                                              <div>
-                                                <input
-                                                  className="border-b border-gray-300 px-2 py-1"
-                                                  placeholder="LinkedIn URL"
-                                                  value={editingLead.linkedIn}
-                                                  onChange={e =>
-                                                    setEditingLead({
-                                                      ...editingLead,
-                                                      linkedIn: e.target.value,
-                                                    })
-                                                  }
-                                                />
-                                              </div>
-                                            ) : (
-                                              <td className="whitespace-nowrap py-4 text-sm text-blue-600">
-                                                <a
-                                                  href={lead.linkedIn}
-                                                  target="_blank"
-                                                  rel="noopener noreferrer"
-                                                >
-                                                  {lead.linkedIn}
-                                                </a>
-                                              </td>
-                                            )}
-                                          </td>
-
-                                          <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                                            {isEditing &&
-                                            editingLead.id === lead.id ? (
-                                              <div className="flex gap-x-3">
-                                                <a
-                                                  href="#"
-                                                  className="select-none hover:text-indigo-900"
-                                                  onClick={event => {
-                                                    event.stopPropagation();
-                                                    handleSaveLead(lead.id);
-                                                  }}
-                                                >
-                                                  <CheckCircleIcon className="h-5 w-5 text-green-600" />
-                                                </a>
-
-                                                <a
-                                                  href="#"
-                                                  className="mr-5 select-none hover:text-indigo-900"
-                                                  onClick={event => {
-                                                    event.stopPropagation();
-                                                    setIsEditing(false);
-                                                  }}
-                                                >
-                                                  <XIcon className="h-5 w-5 text-red-600" />
-                                                </a>
-                                              </div>
-                                            ) : (
-                                              <a
-                                                href="#"
-                                                className="text-indigo-600 select-none hover:text-indigo-900"
-                                                onClick={event => {
-                                                  event.stopPropagation();
-                                                  handleEditClick(
-                                                    lead.id,
-                                                    lead
-                                                  );
-                                                }}
-                                              >
-                                                {/* Edit */}
-                                                <PencilAltIcon className="h-5 w-5" />
-                                              </a>
-                                            )}
-                                          </td>
-                                          <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                                            <TrashIcon
-                                              className="text-red-500 cursor-pointer h-5 w-5"
-                                              onClick={event => {
-                                                event.stopPropagation();
-                                                handleDeleteLead();
-                                              }}
-                                            />
-                                          </td>
-                                        </tr>
-                                      );
-                                    })
-                                )}
-                              </tbody>
-                            </table>
+                          <div className="">
+                            {/* <div className="overflow-hidden"> */}
+                            <LeadsTable />
                           </div>
                         </div>
                       </div>
@@ -942,9 +628,293 @@ const LeadsList = () => {
     </div>
   );
 
+  function LeadsTable() {
+    return (
+      <table className="min-w-full divide-y divide-gray-300">
+        <thead className="bg-gray-50">
+          <tr>
+            <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6">
+              <CheckIcon
+                className={`ml-3 h-6 w-6 ${
+                  Object.keys(isSelected).length === leads.length &&
+                  !Object.values(isSelected).includes(false)
+                    ? "text-brand"
+                    : "text-gray-400"
+                }`}
+                onClick={handleSelectAll}
+              />
+            </th>
+            <th
+              scope="col"
+              className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6"
+            >
+              LEAD NAME
+            </th>
+            <th
+              scope="col"
+              className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+            >
+              COMPANY INFO
+            </th>
+            <th
+              scope="col"
+              className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+            >
+              PERSONAL INFO
+            </th>
+            <th
+              scope="col"
+              className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+            >
+              LINKEDIN
+            </th>
+            <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6">
+              <span className="sr-only">Edit</span>
+            </th>
+            <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6">
+              <span className="sr-only">Delete</span>
+            </th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-gray-200 bg-white">
+          {isLoading ? (
+            <div className="animate-pulse flex space-x-4 w-full">
+              <div className="flex-1 space-y-6 py-1">
+                <div className="space-y-3">
+                  <div className="grid grid-cols-7 gap-4">
+                    <div className="h-2 bg-slate-700 rounded w-1/8"></div>
+                    <div className="h-2 bg-slate-700 rounded w-2/8"></div>
+                    <div className="h-2 bg-slate-700 rounded w-1/8"></div>
+                    <div className="h-2 bg-slate-700 rounded w-1/8"></div>
+                    <div className="h-2 bg-slate-700 rounded w-1/8"></div>
+                    <div className="h-2 bg-slate-700 rounded w-1/8"></div>
+                    <div className="h-2 bg-slate-700 rounded w-1/8"></div>
+                  </div>
+                  <div className="h-2 bg-slate-700 rounded"></div>
+                </div>
+              </div>
+            </div>
+          ) : (
+            leads
+              .filter((lead: Lead) => {
+                const searchString =
+                  `${lead.firstName} ${lead.lastName} ${lead.companyName}`.toLowerCase();
+                return searchString.includes(searchTerm.toLowerCase());
+              })
+              .map((lead: Lead, index: number) => {
+                const id = lead.id;
+
+                return (
+                  <tr
+                    key={lead.id}
+                    className={`${isSelected[id] ? "bg-gray-100" : ""}`}
+                    onClick={event => handleRowClick(index, id, lead, event)}
+                  >
+                    <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-6">
+                      <div className="flex items-center space-x-3">
+                        {isSelected[id] ? (
+                          <CheckIcon className="h-5 w-5 text-brand" />
+                        ) : (
+                          <div className="h-5 w-5 border-2 rounded-md cursor-pointer"></div>
+                        )}
+                      </div>
+                    </td>
+                    <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-6">
+                      {isEditing && editingLead.id === lead.id ? (
+                        <div className="flex flex-col space-y-2">
+                          <input
+                            className="border-b border-gray-300 px-2 py-1"
+                            placeholder="First name"
+                            value={editingLead.firstName}
+                            onChange={e =>
+                              setEditingLead({
+                                ...editingLead,
+                                firstName: e.target.value,
+                              })
+                            }
+                          />
+                          <input
+                            className="border-b border-gray-300 px-2 py-1"
+                            placeholder="Last name"
+                            value={editingLead.lastName}
+                            onChange={e =>
+                              setEditingLead({
+                                ...editingLead,
+                                lastName: e.target.value,
+                              })
+                            }
+                          />
+                        </div>
+                      ) : (
+                        <div className="font-medium select-none text-gray-900">
+                          {lead.firstName} {lead.lastName}
+                        </div>
+                      )}
+                    </td>
+
+                    <td className="whitespace-nowrap select-none px-3 py-4 text-sm">
+                      {isEditing && editingLead.id === lead.id ? (
+                        <div className="flex flex-col space-y-2">
+                          <input
+                            className="border-b border-gray-300 px-2 py-1"
+                            placeholder="Job Title"
+                            value={editingLead.jobTitle}
+                            onChange={e =>
+                              setEditingLead({
+                                ...editingLead,
+                                jobTitle: e.target.value,
+                              })
+                            }
+                          />
+                          <input
+                            className="border-b border-gray-300 px-2 py-1"
+                            placeholder="Company"
+                            value={editingLead.companyName}
+                            onChange={e =>
+                              setEditingLead({
+                                ...editingLead,
+                                companyName: e.target.value,
+                              })
+                            }
+                          />
+                        </div>
+                      ) : (
+                        <>
+                          <div className="text-gray-900">{lead.jobTitle}</div>
+                          <div className="text-gray-500">
+                            {lead.companyName}
+                          </div>
+                        </>
+                      )}
+                    </td>
+                    <td className="whitespace-nowrap select-none px-3 py-4 text-sm">
+                      {isEditing && editingLead.id === lead.id ? (
+                        <div className="flex flex-col space-y-2">
+                          <input
+                            className="border-b border-gray-300 px-2 py-1"
+                            placeholder="Email"
+                            value={editingLead.email}
+                            onChange={e =>
+                              setEditingLead({
+                                ...editingLead,
+                                email: e.target.value,
+                              })
+                            }
+                          />
+                          <input
+                            className="border-b border-gray-300 px-2 py-1"
+                            placeholder="Phone Number"
+                            value={editingLead.phone}
+                            onChange={e =>
+                              setEditingLead({
+                                ...editingLead,
+                                phone: e.target.value,
+                              })
+                            }
+                          />
+                        </div>
+                      ) : (
+                        <>
+                          <div className="flex items-center space-x-2">
+                            {/* <MailIcon className="text-gray-500 h-5 w-5"/>  */}
+                            <div className="text-gray-500">{lead.email}</div>
+                          </div>
+                          <div className="flex items-center space-x-2 mt-1">
+                            {/* <PhoneIcon className="text-gray-500 h-5 w-5"/>  */}
+                            <div className="text-gray-500">{lead.phone}</div>
+                          </div>
+                        </>
+                      )}
+                    </td>
+                    <td className="whitespace-nowrap select-none px-3 py-4 text-sm">
+                      {isEditing && editingLead.id === lead.id ? (
+                        <div>
+                          <input
+                            className="border-b border-gray-300 px-2 py-1"
+                            placeholder="LinkedIn URL"
+                            value={editingLead.linkedIn}
+                            onChange={e =>
+                              setEditingLead({
+                                ...editingLead,
+                                linkedIn: e.target.value,
+                              })
+                            }
+                          />
+                        </div>
+                      ) : (
+                        <td className="whitespace-nowrap py-4 text-sm text-blue-600">
+                          <a
+                            href={lead.linkedIn}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            {lead.linkedIn}
+                          </a>
+                        </td>
+                      )}
+                    </td>
+
+                    <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
+                      {isEditing && editingLead.id === lead.id ? (
+                        <div className="flex gap-x-3">
+                          <a
+                            href="#"
+                            className="select-none hover:text-indigo-900"
+                            onClick={event => {
+                              event.stopPropagation();
+                              handleSaveLead(lead.id);
+                            }}
+                          >
+                            <CheckCircleIcon className="h-5 w-5 text-green-600" />
+                          </a>
+
+                          <a
+                            href="#"
+                            className="mr-5 select-none hover:text-indigo-900"
+                            onClick={event => {
+                              event.stopPropagation();
+                              setIsEditing(false);
+                            }}
+                          >
+                            <XIcon className="h-5 w-5 text-red-600" />
+                          </a>
+                        </div>
+                      ) : (
+                        <a
+                          href="#"
+                          className="text-indigo-600 select-none hover:text-indigo-900"
+                          onClick={event => {
+                            event.stopPropagation();
+                            handleEditClick(lead.id, lead);
+                          }}
+                        >
+                          {/* Edit */}
+                          <PencilAltIcon className="h-5 w-5" />
+                        </a>
+                      )}
+                    </td>
+                    <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
+                      <TrashIcon
+                        className="text-red-500 cursor-pointer h-5 w-5"
+                        onClick={event => {
+                          event.stopPropagation();
+                          handleDeleteLead();
+                        }}
+                      />
+                    </td>
+                  </tr>
+                );
+              })
+          )}
+        </tbody>
+      </table>
+    );
+  }
+
   function LeadProfile() {
     return (
-      <div className="bg-white shadow overflow-hidden sm:rounded-lg w-2/3 h-5/6 p-8 overflow-y-auto">
+      <div className="">
+        {/* <div className="bg-white shadow overflow-hidden sm:rounded-lg w-2/3 h-5/6 p-8 overflow-y-auto"> */}
         <div className="px-4 py-5 sm:px-6">
           <h3 className="text-lg leading-6 font-medium text-gray-900">
             Lead Information

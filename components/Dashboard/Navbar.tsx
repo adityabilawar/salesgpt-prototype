@@ -1,19 +1,3 @@
-/*
-  This example requires Tailwind CSS v2.0+ 
-  
-  This example requires some changes to your config:
-  
-  ```
-  // tailwind.config.js
-  module.exports = {
-    // ...
-    plugins: [
-      // ...
-      require('@tailwindcss/forms'),
-    ],
-  }
-  ```
-*/
 const tabs = [
   { name: "Leads", href: "/dashboard", current: true },
   { name: "Campaigns", href: "/dashboard/send", current: false },
@@ -25,9 +9,9 @@ function classNames(...classes) {
 
 export default function Navbar() {
   return (
-    <div className="border-b border-gray-200 pb-5 sm:pb-0">
+    <div className="border-b border-gray-200 sm:pb-0 mt-2">
       <div className="mt-3 sm:mt-4">
-        <div className="sm:hidden">
+        {/* <div className="sm:hidden">
           <label htmlFor="current-tab" className="sr-only">
             Select a tab
           </label>
@@ -41,9 +25,10 @@ export default function Navbar() {
               <option key={tab.name}>{tab.name}</option>
             ))}
           </select>
-        </div>
-        <div className="hidden sm:block ml-5">
+        </div> */}
+        <div className=" sm:block ml-5">
           <nav className="-mb-px flex space-x-8">
+            
             {tabs.map(tab => (
               <a
                 key={tab.name}
@@ -52,7 +37,7 @@ export default function Navbar() {
                   tab.current
                     ? "border-indigo-500 text-indigo-600"
                     : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300",
-                  "whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm"
+                  "whitespace-nowrap pb-2 px-1 border-b-2 font-medium text-sm"
                 )}
                 aria-current={tab.current ? "page" : undefined}
               >

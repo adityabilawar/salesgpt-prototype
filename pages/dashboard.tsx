@@ -1,5 +1,5 @@
 import Sidebar from "@/components/Dashboard/Sidebar";
-import Navbar from "../components/Profile/Navbar";
+import Navbar from "../components/Dashboard/Navbar";
 import LeadsList from "@/components/Dashboard/LeadsList";
 import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";

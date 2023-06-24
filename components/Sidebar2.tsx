@@ -96,6 +96,13 @@ const Sidebar = () => {
       </Transition.Root> */}
 
       {/* Static sidebar for desktop */}
+      <DesktopSidebar />
+      <MobileSidebar />
+    </>
+  );
+
+  function DesktopSidebar() {
+    return (
       <div className="hidden md:flex md:flex-shrink-0">
         <div className="flex flex-col w-64">
           <div className="flex flex-col h-0 flex-1 border-r border-gray-200 bg-white">
@@ -152,8 +159,59 @@ const Sidebar = () => {
           </div>
         </div>
       </div>
-    </>
-  );
+    );
+  }
+
+  function MobileSidebar() {
+    return (
+      <div className="md:hidden flex flex-shrink-0">
+        <div className="flex flex-col">
+          <div className="flex flex-col h-0 flex-1 border-r border-gray-200 bg-white">
+            <div className="flex-1 flex flex-col pt-5 pb-4 overflow-y-auto">
+              <div
+                className="flex items-center flex-shrink-0 px-1 hover:cursor-pointer"
+                onClick={() => {}}
+              >
+                <img
+                  className="h-8 w-auto"
+                  src="/templogo.svg"
+                  alt="Pipeline AI"
+                />
+              </div>
+  
+              <nav className="mt-5 flex-1 px-2 space-y-3">
+                {Menus.map((Menu, index) => (
+                  <a
+                    key={index}
+                    href={Menu.path}
+                    className={classNames(
+                      asPath === Menu.path
+                        ? "bg-gray-100 text-gray-900"
+                        : "text-gray-600 hover:bg-gray-50 hover:text-gray-900",
+                      "group flex items-center p-1 text-base font-medium rounded-md"
+                    )}
+                  >
+                    <Menu.src className="text-gray-400 group-hover:text-gray-500 h-5 w-5" />
+                  </a>
+                ))}
+              </nav>
+            </div>
+            <div className="flex-shrink-0 flex bg-gray-50 p-2">
+              <button
+                onClick={() => signOut(auth)}
+                className="flex-shrink-0 w-full group block"
+              >
+                <div className="pl-1">
+                  <FiLogOut className="text-gray-400 group-hover:text-red-500 h-5 w-5" />
+                </div>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+  
 };
 
 export default Sidebar;
