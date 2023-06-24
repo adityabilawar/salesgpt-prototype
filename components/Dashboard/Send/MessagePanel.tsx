@@ -307,6 +307,44 @@ const MessagePanel = () => {
             setDisplayedMessage(campaignMessage.message);
             return; // If we found an existing message, we return here, skipping the setLoading(true) part
           }
+        } else {
+          const campaignDocRef = doc(
+            db,
+            "users",
+            userId,
+            "campaigns",
+            campaignId as string
+          );
+          const campaignSnapshot = await getDoc(campaignDocRef);
+        
+          if (!campaignSnapshot.exists()) {
+            console.error("Campaign does not exist");
+            return;
+          }
+        
+          const campaignData = campaignSnapshot.data();
+
+          const campaign: Campaign = {
+            id: campaignSnapshot.id,
+            generatedPrompt: campaignData.generatedPrompt,
+            callToAction: campaignData.callToAction,
+            campaignTitle: campaignData.campaignTitle,
+            platform: campaignData.platform,
+            toneOfVoice: campaignData.toneOfVoice,
+            purpose: campaignData.purpose,
+            ...campaignData,
+          };
+
+          const message = await generatePersonalizedMessage(
+            JSON.parse(JSON.stringify(selectedLead)),
+            campaign,
+            JSON.parse(JSON.stringify(user))
+          );
+          setDisplayedMessage(message);
+          // if (!currentMessage) {
+            setCurrentMessage(message);
+          // }
+          setMessagesGenerated((prevCount) => prevCount + 1);
         }
       }
 
