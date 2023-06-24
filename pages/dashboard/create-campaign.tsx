@@ -17,12 +17,12 @@ const index = () => {
   const [prompt, setPrompt] = useState<string>("");
   const [userId, setUserId] = useState<string | null>(null);
   const [campaignDetails, setCampaignDetails] = useState({
-    campaignTitle: '',
-    platform: '',
-    callToAction: '',
-    toneOfVoice: '',
-    purpose: '',
-    wordLimit: '500',
+    campaignTitle: "",
+    platform: "",
+    callToAction: "",
+    toneOfVoice: "",
+    purpose: "",
+    wordLimit: "500",
   });
 
   useEffect(() => {
@@ -54,7 +54,9 @@ const index = () => {
     );
   };
 
-  const handlePromptChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+  const handlePromptChange = (
+    event: React.ChangeEvent<HTMLTextAreaElement>
+  ) => {
     setPrompt(event.target.value);
   };
 
@@ -141,7 +143,9 @@ const index = () => {
     setPrompt(generatedPrompt);
   }, [campaignDetails]);
 
-  const handleCampaignDetailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleCampaignDetailChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     setCampaignDetails({
       ...campaignDetails,
       [event.target.name]: event.target.value,
@@ -349,7 +353,9 @@ const index = () => {
         <hr className="my-4" />
         <div className="flex flex-col justify-center items-start">
           <h2 className="text-xl">Prompt</h2>
-          <p className="h-full text-sm text-gray-800">Edit the prompt to match your needs!</p>
+          <p className="h-full text-sm text-gray-800">
+            Edit the prompt to match your needs!
+          </p>
         </div>
         <textarea
           value={prompt}
@@ -359,7 +365,9 @@ const index = () => {
         ></textarea>
         <div className="flex items-center justify-end space-x-4">
           <Link href="/dashboard/send">
-            <button className="border-[1px] px-4 py-2 bg-brand text-white rounded-md">Save Campaign</button>
+            <button className="border-[1px] px-4 py-2 bg-brand text-white rounded-md">
+              Save Campaign
+            </button>
           </Link>
         </div>
       </div>

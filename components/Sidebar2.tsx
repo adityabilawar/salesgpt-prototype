@@ -22,7 +22,7 @@ const Sidebar = () => {
 
   return (
     <>
-      <Transition.Root show={open} as={Fragment}>
+      {/* <Transition.Root show={open} as={Fragment}>
         <Dialog
           as="div"
           className="fixed inset-0 flex z-40 md:hidden"
@@ -60,7 +60,7 @@ const Sidebar = () => {
                 </button>
               </div>
 
-              <div className="flex-shrink-0 flex items-center px-4 py-5">
+              <div className="flex-shrink-0 flex items-center px-4 py-5 hover:cursor-pointer">
                 <img
                   className="h-8 w-auto"
                   src="/templogo.svg"
@@ -93,14 +93,17 @@ const Sidebar = () => {
             </div>
           </Transition.Child>
         </Dialog>
-      </Transition.Root>
+      </Transition.Root> */}
 
       {/* Static sidebar for desktop */}
       <div className="hidden md:flex md:flex-shrink-0">
         <div className="flex flex-col w-64">
           <div className="flex flex-col h-0 flex-1 border-r border-gray-200 bg-white">
             <div className="flex-1 flex flex-col pt-5 pb-4 overflow-y-auto">
-              <div className="flex items-center flex-shrink-0 px-4">
+              <div
+                className="flex items-center flex-shrink-0 px-4 hover:cursor-pointer"
+                onClick={() => {}}
+              >
                 <img
                   className="h-8 w-auto"
                   src="/templogo.svg"
@@ -124,7 +127,7 @@ const Sidebar = () => {
                     )}
                   >
                     <Menu.src className="text-gray-400 group-hover:text-gray-500 mr-4 h-6 w-6" />
-                    {Menu.title}
+                    <p className="">{Menu.title}</p>
                   </a>
                 ))}
               </nav>

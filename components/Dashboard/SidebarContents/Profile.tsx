@@ -118,13 +118,13 @@ const Profile = () => {
   };
 
   return (
-    <div className="border-[1px] p-8 rounded-lg m-10">
+    <div className="border-[1px] p-8 rounded-lg">
       <div className=" grid grid-cols-2 space-y-4">
         <div className="flex gap-x-7">
           <img className="rounded-full w-28 h-28" src="/graphic.png"></img>
 
-          <div>
-            <div className="flex gap-x-2">
+          <div className="">
+            <div className="flex gap-x-2 mt-3">
               <div>
                 {isEditing ? (
                   <input
@@ -162,7 +162,7 @@ const Profile = () => {
               </div>
             </div>
 
-            <div className="flex gap-x-5 justify-content">
+            <div className="flex gap-x-5 justify-content w-max">
               <div className="flex flex-col">
                 <label className="text-gray-400 text-sm">Phone Number</label>
                 {isEditing ? (

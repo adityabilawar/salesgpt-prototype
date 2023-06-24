@@ -9,32 +9,6 @@
 //     </>
 //   );
 // }
-
-/*
-  This example requires Tailwind CSS v2.0+ 
-  
-  This example requires some changes to your config:
-  
-  ```
-  // tailwind.config.js
-  const colors = require('tailwindcss/colors')
-  
-  module.exports = {
-    // ...
-    theme: {
-      extend: {
-        colors: {
-          orange: colors.orange,
-        },
-      },
-    },
-    plugins: [
-      // ...
-      require('@tailwindcss/forms'),
-    ],
-  }
-  ```
-*/
 import { Fragment, useState } from "react";
 import {
   Disclosure,
@@ -43,7 +17,11 @@ import {
   Switch,
   Transition,
 } from "@headlessui/react";
-import { QuestionMarkCircleIcon, SearchIcon } from "@heroicons/react/solid";
+import {
+  PaperClipIcon,
+  QuestionMarkCircleIcon,
+  SearchIcon,
+} from "@heroicons/react/solid";
 import {
   BellIcon,
   CogIcon,
@@ -88,13 +66,89 @@ const payments = [
   // More payments...
 ];
 
+const leadProfileArr = [
+  {
+    field: "First name",
+    value: "newLead.firstName",
+    type: "text",
+  },
+  {
+    field: "Last name",
+    value: "newLead.lastName",
+    type: "text",
+  },
+  {
+    field: "Job title",
+    value: "newLead.jobTitle",
+    type: "text",
+  },
+  {
+    field: "Company name",
+    value: "newLead.companyName",
+    type: "text",
+  },
+  {
+    field: "Email",
+    value: "newLead.email",
+    type: "email",
+  },
+  {
+    field: "Phone number",
+    value: "newLead.phone",
+    type: "tel",
+  },
+  {
+    field: "LinkedIn",
+    value: "newLead.linkedIn",
+    type: "url",
+  },
+];
+
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
-export default function Example() {
+export default function settings() {
   const [selectedPlan, setSelectedPlan] = useState(plans[1]);
   const [annualBillingEnabled, setAnnualBillingEnabled] = useState(true);
+  const [createModalOpen, setCreateModalOpen] = useState<boolean>(false);
+  const [newLead, setNewLead] = useState({
+    firstName: "",
+    lastName: "",
+    jobTitle: "",
+    companyName: "",
+    email: "",
+    phone: "",
+    linkedIn: "",
+  });
+
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event.target;
+    setNewLead(prevLead => ({ ...prevLead, [name]: value }));
+  };
+
+  const handleCreateLead = async (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    event.preventDefault();
+    // if (userId) {
+    //   console.log(userId);
+    //   const leadsRef = collection(db, "users", userId, "leads");
+    //   await addDoc(leadsRef, newLead);
+    //   setNewLead({
+    //     firstName: "",
+    //     lastName: "",
+    //     jobTitle: "",
+    //     companyName: "",
+    //     email: "",
+    //     phone: "",
+    //     linkedIn: "",
+    //   });
+    //   setCreateModalOpen(false);
+    // } else {
+    //   console.error("No user is signed in");
+    // }
+  };
 
   return (
     <>
@@ -102,21 +156,21 @@ export default function Example() {
         <main className="mx-auto pb-10 lg:py-12 lg:px-8">
           <div className=" lg:gap-x-5">
             <div className="space-y-6 sm:px-6 lg:px-0">
+              <h2 className="text-xl leading-6 font-medium text-gray-900">
+                Profile
+              </h2>
               <Profile />
+              {/* <LeadProfile/> */}
               {/* Plan */}
+
+              <div className="h-3" />
+              <h2 className="text-xl leading-6 font-medium text-gray-900">
+                Plan
+              </h2>
               <section aria-labelledby="plan-heading">
                 <form action="#" method="POST">
                   <div className="shadow sm:rounded-md sm:overflow-hidden">
                     <div className="bg-white py-6 px-4 space-y-6 sm:p-6">
-                      <div>
-                        <h2
-                          id="plan-heading"
-                          className="text-lg leading-6 font-medium text-gray-900"
-                        >
-                          Plan
-                        </h2>
-                      </div>
-
                       <RadioGroup
                         value={selectedPlan}
                         onChange={setSelectedPlan}
@@ -138,7 +192,7 @@ export default function Example() {
                                     ? "rounded-bl-md rounded-br-md"
                                     : "",
                                   checked
-                                    ? "bg-orange-50 border-orange-200 z-10"
+                                    ? "bg-indigo-50 border-indigo-200 z-10"
                                     : "border-gray-200",
                                   "relative border p-4 flex flex-col cursor-pointer md:pl-4 md:pr-6 md:grid md:grid-cols-3 focus:outline-none"
                                 )
@@ -150,7 +204,7 @@ export default function Example() {
                                     <span
                                       className={classNames(
                                         checked
-                                          ? "bg-orange-500 border-transparent"
+                                          ? "bg-indigo-500 border-transparent"
                                           : "bg-white border-gray-300",
                                         active
                                           ? "ring-2 ring-offset-2 ring-gray-900"
@@ -172,7 +226,7 @@ export default function Example() {
                                     <span
                                       className={classNames(
                                         checked
-                                          ? "text-orange-900"
+                                          ? "text-indigo-900"
                                           : "text-gray-900",
                                         "font-medium"
                                       )}
@@ -182,7 +236,7 @@ export default function Example() {
                                     <span
                                       className={
                                         checked
-                                          ? "text-orange-700"
+                                          ? "text-indigo-700"
                                           : "text-gray-500"
                                       }
                                     >
@@ -192,7 +246,7 @@ export default function Example() {
                                   <RadioGroup.Description
                                     className={classNames(
                                       checked
-                                        ? "text-orange-700"
+                                        ? "text-indigo-700"
                                         : "text-gray-500",
                                       "ml-6 pl-1 text-sm md:ml-0 md:pl-0 md:text-right"
                                     )}
@@ -212,7 +266,7 @@ export default function Example() {
                           onChange={setAnnualBillingEnabled}
                           className={classNames(
                             annualBillingEnabled
-                              ? "bg-orange-500"
+                              ? "bg-indigo-500"
                               : "bg-gray-200",
                             "relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transition-colors ease-in-out duration-200"
                           )}
@@ -248,90 +302,120 @@ export default function Example() {
                   </div>
                 </form>
               </section>
-
-              {/* Billing history */}
-              <section aria-labelledby="billing-history-heading">
-                <div className="bg-white pt-6 shadow sm:rounded-md sm:overflow-hidden">
-                  <div className="px-4 sm:px-6">
-                    <h2
-                      id="billing-history-heading"
-                      className="text-lg leading-6 font-medium text-gray-900"
-                    >
-                      Billing history
-                    </h2>
-                  </div>
-                  <div className="mt-6 flex flex-col">
-                    <div className="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-                      <div className="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
-                        <div className="overflow-hidden border-t border-gray-200">
-                          <table className="min-w-full divide-y divide-gray-200">
-                            <thead className="bg-gray-50">
-                              <tr>
-                                <th
-                                  scope="col"
-                                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                >
-                                  Date
-                                </th>
-                                <th
-                                  scope="col"
-                                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                >
-                                  Description
-                                </th>
-                                <th
-                                  scope="col"
-                                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                >
-                                  Amount
-                                </th>
-                                {/*
-                                  `relative` is added here due to a weird bug in Safari that causes `sr-only` headings to introduce overflow on the body on mobile.
-                                */}
-                                <th
-                                  scope="col"
-                                  className="relative px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                >
-                                  <span className="sr-only">View receipt</span>
-                                </th>
-                              </tr>
-                            </thead>
-                            <tbody className="bg-white divide-y divide-gray-200">
-                              {payments.map(payment => (
-                                <tr key={payment.id}>
-                                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                    <time dateTime={payment.datetime}>
-                                      {payment.date}
-                                    </time>
-                                  </td>
-                                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    {payment.description}
-                                  </td>
-                                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    {payment.amount}
-                                  </td>
-                                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                    <a
-                                      href={payment.href}
-                                      className="text-orange-600 hover:text-orange-900"
-                                    >
-                                      View receipt
-                                    </a>
-                                  </td>
-                                </tr>
-                              ))}
-                            </tbody>
-                          </table>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </section>
             </div>
           </div>
         </main>
       </div>
     </>
   );
+
+  function LeadProfile() {
+    return (
+      <div className="bg-white shadow overflow-hidden sm:rounded-lg w-2/3 h-5/6 p-8 overflow-y-auto">
+        <div className="px-4 py-5 sm:px-6">
+          <h3 className="text-lg leading-6 font-medium text-gray-900">
+            Lead Information
+          </h3>
+          {/* <p className="mt-1 max-w-2xl text-sm text-gray-500">Personal details and application.</p> */}
+        </div>
+        <div className="border-t border-gray-200 px-4 py-5 sm:p-0">
+          <dl className="sm:divide-y sm:divide-gray-200">
+            {leadProfileArr.map((item, index) => {
+              return (
+                <div
+                  key={index}
+                  className="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 flex items-center"
+                >
+                  <dt className="text-sm font-medium text-gray-500">
+                    {item.field}
+                  </dt>
+                  <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                    <input
+                      type={item.type}
+                      name={item.field}
+                      placeholder={item.field}
+                      value={item.value}
+                      onChange={handleInputChange}
+                      className="border-b border-gray-300"
+                    />
+                  </dd>
+                </div>
+              );
+            })}
+
+            <div className="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+              <dt className="text-sm font-medium text-gray-500">About</dt>
+              <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                Fugiat ipsum ipsum deserunt culpa aute sint do nostrud anim
+                incididunt cillum culpa consequat. Excepteur qui ipsum aliquip
+                consequat sint. Sit id mollit nulla mollit nostrud in ea officia
+                proident. Irure nostrud pariatur mollit ad adipisicing
+                reprehenderit deserunt qui eu.
+              </dd>
+            </div>
+            <div className="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+              <dt className="text-sm font-medium text-gray-500">Attachments</dt>
+              <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                <ul
+                  role="list"
+                  className="border border-gray-200 rounded-md divide-y divide-gray-200"
+                >
+                  <li className="pl-3 pr-4 py-3 flex items-center justify-between text-sm">
+                    <div className="w-0 flex-1 flex items-center">
+                      <PaperClipIcon
+                        className="flex-shrink-0 h-5 w-5 text-gray-400"
+                        aria-hidden="true"
+                      />
+                      <span className="ml-2 flex-1 w-0 truncate">
+                        resume_back_end_developer.pdf
+                      </span>
+                    </div>
+                    <div className="ml-4 flex-shrink-0">
+                      <a
+                        href="#"
+                        className="font-medium text-indigo-600 hover:text-indigo-500"
+                      >
+                        Download
+                      </a>
+                    </div>
+                  </li>
+                  <li className="pl-3 pr-4 py-3 flex items-center justify-between text-sm">
+                    <div className="w-0 flex-1 flex items-center">
+                      <PaperClipIcon
+                        className="flex-shrink-0 h-5 w-5 text-gray-400"
+                        aria-hidden="true"
+                      />
+                      <span className="ml-2 flex-1 w-0 truncate">
+                        coverletter_back_end_developer.pdf
+                      </span>
+                    </div>
+                    <div className="ml-4 flex-shrink-0">
+                      <a
+                        href="#"
+                        className="font-medium text-indigo-600 hover:text-indigo-500"
+                      >
+                        Download
+                      </a>
+                    </div>
+                  </li>
+                </ul>
+              </dd>
+            </div>
+          </dl>
+        </div>
+        <div className="mt-2 text-right">
+          <button
+            type="button"
+            className="mt-4 py-2 px-4 rounded-md bg-brand text-white mr-6"
+            onClick={handleCreateLead}
+          >
+            Create
+          </button>
+          <button className="" onClick={() => setCreateModalOpen(false)}>
+            Close
+          </button>
+        </div>
+      </div>
+    );
+  }
 }
