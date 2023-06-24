@@ -105,7 +105,7 @@ const LeadsList = () => {
   };
 
   const handleEditClick = (id: string, lead: Lead) => {
-    setEditingLead({ id, ...lead });
+    setEditingLead({ ...lead, id });
     setIsEditing(true);
   };
 
@@ -131,43 +131,46 @@ const LeadsList = () => {
     index: number,
     id: string,
     lead: Lead,
-    event: React.MouseEvent
+    event: React.MouseEvent<HTMLTableRowElement, MouseEvent>
   ) => {
-    let updatedIsSelected = { ...isSelected };
-
-    if (event.shiftKey && lastSelectedIndex !== null) {
-      const start = Math.min(index, lastSelectedIndex);
-      const end = Math.max(index, lastSelectedIndex);
-
-      for (let i = start; i <= end; i++) {
-        const leadId = leads[i].id;
-        updatedIsSelected[leadId] = true;
-        dispatch(addSelectedLead(leads[i]));
-      }
-    } else if (event.ctrlKey) {
-      updatedIsSelected[id] = !isSelected[id];
-      updatedIsSelected[id]
-        ? dispatch(addSelectedLead(lead))
-        : dispatch(removeLead(lead));
-    } else {
-      if (isSelected[id]) {
-        updatedIsSelected[id] = false;
-        dispatch(removeLead(lead));
+    if (!isEditing) {
+      let updatedIsSelected = { ...isSelected };
+  
+      if (event.shiftKey && lastSelectedIndex !== null) {
+        const start = Math.min(index, lastSelectedIndex);
+        const end = Math.max(index, lastSelectedIndex);
+  
+        for (let i = start; i <= end; i++) {
+          const leadId = leads[i].id;
+          updatedIsSelected[leadId] = true;
+          dispatch(addSelectedLead(leads[i]));
+        }
+      } else if (event.ctrlKey) {
+        updatedIsSelected[id] = !isSelected[id];
+        updatedIsSelected[id]
+          ? dispatch(addSelectedLead(lead))
+          : dispatch(removeLead(lead));
       } else {
-        updatedIsSelected[id] = true;
-        dispatch(addSelectedLead(lead));
+        if (isSelected[id]) {
+          updatedIsSelected[id] = false;
+          dispatch(removeLead(lead));
+        } else {
+          updatedIsSelected[id] = true;
+          dispatch(addSelectedLead(lead));
+        }
       }
+  
+      setIsSelected(updatedIsSelected);
+      setLastSelectedIndex(index);
+  
+      const selectedCount = Object.values(updatedIsSelected).filter(
+        value => value
+      ).length;
+      console.log(selectedLeadsCount);
+      setSelectedLeadsCount(selectedCount);
     }
-
-    setIsSelected(updatedIsSelected);
-    setLastSelectedIndex(index);
-
-    const selectedCount = Object.values(updatedIsSelected).filter(
-      value => value
-    ).length;
-    console.log(selectedLeadsCount);
-    setSelectedLeadsCount(selectedCount);
   };
+  
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
@@ -417,8 +420,8 @@ const LeadsList = () => {
         </div>
 
         <div className="px-10 overflow-y-auto">
-          <div className="flex justify-start ">
-            <div className="space-x-5 my-5">
+          <div className="flex justify-start w-full">
+            <div className="space-x-5 my-5 w-full flex">
               <button
                 className="border-[1px] rounded-md px-4 py-3 bg-brand text-white text-white text-xs"
                 onClick={() => setModalOpen(true)}
@@ -444,6 +447,21 @@ const LeadsList = () => {
                   Send selected leads to campaign
                 </button>
               </Link>
+              <button
+                    className={`border-[1px] flex justify-center items-center space-x-2 rounded-md px-4 py-3 bg-red-600 text-white text-white text-xs ${
+                    selectedLeadsCount > 0
+                      ? ""
+                      : "opacity-50 cursor-not-allowed"
+                  }`}
+                  onClick={event => {
+                    event.stopPropagation();
+                    handleDeleteLead();
+                  }}
+                  disabled={selectedLeadsCount === 0}
+                >
+                  <TrashIcon height={15} width={15} />
+                  <h1>Delete lead(s)</h1>
+                </button>
             </div>
           </div>
           
@@ -556,7 +574,7 @@ const LeadsList = () => {
                                           className={`${
                                             isSelected[id] ? "bg-gray-100" : ""
                                           }`}
-                                          onClick={event =>
+                                          onClick={isEditing ? null : event =>
                                             handleRowClick(
                                               index,
                                               id,
@@ -579,7 +597,7 @@ const LeadsList = () => {
                                             editingLead.id === lead.id ? (
                                               <div className="flex flex-col space-y-2">
                                                 <input
-                                                  className="border-b border-gray-300 px-2 py-1"
+                                                  className="border-b border-gray-300 bg-white px-2 py-1"
                                                   placeholder="First name"
                                                   value={editingLead.firstName}
                                                   onChange={e =>
@@ -764,15 +782,6 @@ const LeadsList = () => {
                                                 <PencilAltIcon className="h-5 w-5" />
                                               </a>
                                             )}
-                                          </td>
-                                          <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                                            <TrashIcon
-                                              className="text-red-500 cursor-pointer h-5 w-5"
-                                              onClick={event => {
-                                                event.stopPropagation();
-                                                handleDeleteLead();
-                                              }}
-                                            />
                                           </td>
                                         </tr>
                                       );

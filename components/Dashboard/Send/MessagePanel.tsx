@@ -275,7 +275,7 @@ const MessagePanel = () => {
         {campaignTitle ? campaignTitle : 'Loading...'}
       </div>
       <div className="flex-grow-0 px-10 py-5 flex flex-col justify-start items-start">
-        <h1 className="mb-5 font-bold">Generating message for {selectedLead && selectedLead.firstName} {selectedLead && selectedLead.lastName}</h1>
+        <h1 className="mb-5 font-bold">Generating message for {selectedLead && selectedLead.firstName} {selectedLead && selectedLead.lastName}, {selectedLead && selectedLead.companyName}</h1>
         <div className="relative w-full min-h-60 overflow-y-auto">
           <textarea
             className={`w-full h-full border text-black rounded-md ${loading ? 'opacity-50' : ''}`}

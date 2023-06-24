@@ -1,6 +1,6 @@
 import { useState, Fragment } from "react";
 import { useRouter } from "next/router";
-import { FiGrid, FiLogOut, FiMail, FiSettings, FiX } from "react-icons/fi";
+import { FiGrid, FiLogOut, FiMail, FiSettings, FiUser, FiX } from "react-icons/fi";
 import { HiOutlinePaperAirplane } from "react-icons/hi";
 import { Dialog, Transition } from "@headlessui/react";
 import { signOut } from "firebase/auth";
@@ -9,7 +9,7 @@ import { auth } from "@/lib/firebaseClient";
 const Menus = [
   { title: "Dashboard", src: FiGrid, path: "/dashboard" },
   { title: "Campaigns", src: HiOutlinePaperAirplane, path: "/dashboard/send" },
-  { title: "Settings", src: FiSettings, path: "/settings" },
+  { title: "Profile", src: FiUser, path: "/profile" },
 ];
 
 function classNames(...classes) {

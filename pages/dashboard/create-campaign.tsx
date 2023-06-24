@@ -116,7 +116,7 @@ const index = () => {
     purpose: string = "",
     wordLimit: string = "500"
   ) => {
-    const generatedPrompt = `Craft a ${campaignTitle} for ${platform} in a maximum of ${wordLimit} words. The message should include a call to action for ${callToAction} and should be written in a ${toneOfVoice} tone. The purpose of this message is ${purpose}`;
+    const generatedPrompt = `Craft a ${campaignTitle} campaign for ${platform} in a maximum of ${wordLimit} words. The message should include a call to action for ${callToAction} and should be written in a ${toneOfVoice} tone. The purpose of this message is ${purpose}`;
     return generatedPrompt;
   };
 
@@ -260,7 +260,7 @@ const index = () => {
             </div>
           </form>
         </div>
-        <div className="col-span-3 overflow-y-auto h-full pb-24 px-5">
+        <div className="col-span-3 overflow-y-auto h-full pb-32 px-5">
           <h2 className="text-2xl mb-4">Campaign Details</h2>
           <form onSubmit={saveCampaign}>
             <div className="mb-4">

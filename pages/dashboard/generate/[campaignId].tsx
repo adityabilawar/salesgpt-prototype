@@ -48,7 +48,7 @@ const CampaignPage = () => {
 
     return (
         <div>
-            {campaign && (
+            {campaign && typeof campaignId === 'string' && (
                 <div className="text-black">
                     <div className="grid grid-cols-5 overflow-hidden">
                         <LeadsSidebar userId={userId} campaignId={campaignId} />
@@ -60,6 +60,7 @@ const CampaignPage = () => {
             )}
         </div>
     );
+    
 }
 
 export default CampaignPage;
