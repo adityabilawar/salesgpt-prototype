@@ -82,21 +82,9 @@ const LeadsSidebar = ({ campaignId, userId }: LeadsSidebarProps) => {
     if (!lead) return;
     console.log("Play button clicked for lead:", lead);
   
-    const existingMessage = lead.generatedMessages.find((msg: { campaignId: string, message: string }) => msg.campaignId === campaignId);
+    const existingMessage = lead.generatedMessages ? lead.generatedMessages.find((msg: { campaignId: string, message: string }) => msg.campaignId === campaignId) : undefined;
   
     if(existingMessage){
-      if (window.confirm(`There exists a message under this lead for the campaign already. Do you want to delete it and generate a new one?`)) {
-        try{
-          // Assume deleteMessage is your function to delete a message.
-          // This function should handle the message deletion logic in the backend.
-          await deleteMessage(lead, campaignId);
-          dispatch(setSelectedLead(lead));
-        }catch(error){
-          console.error('Error in message deletion:', error);
-        }
-      }
-    }else{
-      dispatch(setSelectedLead(lead));
     }
   }
   
@@ -144,6 +132,7 @@ const LeadsSidebar = ({ campaignId, userId }: LeadsSidebarProps) => {
               } else {
                 console.log(`No generated messages for lead ${lead.id}`);
               }
+              playLeadHandler(lead);
               dispatch(setSelectedLead(lead));
             }}
           >
