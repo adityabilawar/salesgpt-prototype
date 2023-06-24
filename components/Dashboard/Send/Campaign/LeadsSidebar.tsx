@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { FiTrash2, FiEdit, FiCheck, FiRefreshCw, FiFastForward } from "react-icons/fi";
 import { auth, db } from '@/lib/firebaseClient';
 import { doc, updateDoc, arrayRemove, getDoc, setDoc, arrayUnion, collection, getDocs, where, query } from 'firebase/firestore';
@@ -8,6 +8,7 @@ import { useDispatch } from 'react-redux';
 import { setSelectedLead } from '@/components/store/leadsSlice';
 import { onAuthStateChanged } from 'firebase/auth';
 import { setCurrentMessage, setDisplayedMessage } from '@/components/store/messageSlice';
+import { CSVLink } from "react-csv";
 
 
 interface Campaign {
@@ -30,6 +31,8 @@ const LeadsSidebar = ({ campaignId, userId }: LeadsSidebarProps) => {
   const [editingId, setEditingId] = useState<string>('');
   const [currentLead, setCurrentLead] = useState<Lead | null>(null);
   const [refresh, setRefresh] = useState(false);
+  const csvOutput = useRef(null);
+  const [csvData, setCSVData] = useState([]);
 
 
   const linkedinPattern = /^https:\/\/www\.linkedin\.com\/in\/[^\/]+\/$/; // Regex for LinkedIn URL pattern
@@ -82,7 +85,7 @@ const LeadsSidebar = ({ campaignId, userId }: LeadsSidebarProps) => {
     if (!lead) return;
     console.log("Play button clicked for lead:", lead);
   
-    const existingMessage = lead.generatedMessages.find((msg: { campaignId: string, message: string }) => msg.campaignId === campaignId);
+    const existingMessage = lead.generatedMessages?.find((msg: { campaignId: string, message: string }) => msg.campaignId === campaignId);
   
     if(existingMessage){
       if (window.confirm(`There exists a message under this lead for the campaign already. Do you want to delete it and generate a new one?`)) {
@@ -112,17 +115,34 @@ const LeadsSidebar = ({ campaignId, userId }: LeadsSidebarProps) => {
     }
   }
 
+  const runAllLeadsHandler = async() => {
+
+    for(const lead of leads) {
+      console.log('lead', lead);
+    }
+  }
+
+  const exportLeadsHandler = () => {
+    setCSVData([
+      // ['First Name', 'Last Name', 'Campaign Name', 'Message'],
+      {'First Name': 'Aaron', 'Last Name': 'Tang', 'Campaign Name': 'Cold Outreach', 'Message': 'Hello!'}
+    ]);
+    csvOutput.current.link.click();
+  }
+
   return (
     <div className="border-r-[1px] h-screen flex flex-col overflow-y-auto">
       <h1 className="px-5 text-3xl mt-5">Leads</h1>
-      <div className="flex justify-center items-center gap-x-3 my-2">
+      <div className="flex border-b items-center">
+          <CSVLink data={csvData} filename='data.csv' className='hidden' ref={csvOutput} target='_blank' />
           <button
-            className="px-2 py-2 text-sm border-[1px] rounded-md bg-brand text-white"
+            className="px-4 py-2 m-5 border-[1px] rounded-md bg-brand text-white"
+            onClick={exportLeadsHandler}
           >
-            Export CSV
+            Export as CSV
           </button>
-          <h1 className="flex cursor-pointer items-center space-x-2 bg-brand px-4 py-2 rounded-md text-white">
-          <FiFastForward /><span className="text-sm">Run all</span>
+          <h1 className="flex cursor-pointer items-center space-x-2 bg-brand px-4 py-2 rounded-md text-white" onClick={runAllLeadsHandler}>
+          <FiFastForward /><span>Run all</span>
           </h1>
       </div>
       {activeTab === 'leads' && leads.map((lead: Lead) => (
@@ -149,10 +169,8 @@ const LeadsSidebar = ({ campaignId, userId }: LeadsSidebarProps) => {
           >
             {`${lead.firstName} ${lead.lastName}`}
             <div className="flex space-x-2 text-xl">
-              <BsPlay className="cursor-pointer" onClick={(e) => playLeadHandler(lead)} />
-              <FiTrash2 className="cursor-pointer" onClick={(e) => {
-                removeLeadHandler(lead);
-              }} />
+              <BsPlay className="cursor-pointer" onClick={(e) => {e.stopPropagation(); playLeadHandler(lead)}} />
+              <FiTrash2 className="cursor-pointer" onClick={(e) => {e.stopPropagation(); removeLeadHandler(lead)}} />
             </div>
           </div>
         )
