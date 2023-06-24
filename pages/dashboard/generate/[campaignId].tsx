@@ -52,6 +52,7 @@ const CampaignPage = () => {
     fetchCampaign(); // Call the fetchCampaign function directly since it doesn't depend on campaignId in the dependency array
   }, [userId, campaignId]);
 
+<<<<<<< HEAD
   return (
     <div>
       {campaign && (
@@ -67,5 +68,23 @@ const CampaignPage = () => {
     </div>
   );
 };
+=======
+    return (
+        <div>
+            {campaign && typeof campaignId === 'string' && (
+                <div className="text-black">
+                    <div className="grid grid-cols-5 overflow-hidden">
+                        <LeadsSidebar userId={userId} campaignId={campaignId} />
+                        <div className="col-span-4 overflow-hidden h-screen">
+                            <MessagePanel />
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+    
+}
+>>>>>>> 9d47f26280e8492ababdfcc5f4d120166d396aa2
 
 export default CampaignPage;

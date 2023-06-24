@@ -105,7 +105,7 @@ const LeadsList = () => {
   };
 
   const handleEditClick = (id: string, lead: Lead) => {
-    setEditingLead({ id, ...lead });
+    setEditingLead({ ...lead, id });
     setIsEditing(true);
   };
 
@@ -131,43 +131,46 @@ const LeadsList = () => {
     index: number,
     id: string,
     lead: Lead,
-    event: React.MouseEvent
+    event: React.MouseEvent<HTMLTableRowElement, MouseEvent>
   ) => {
-    let updatedIsSelected = { ...isSelected };
-
-    if (event.shiftKey && lastSelectedIndex !== null) {
-      const start = Math.min(index, lastSelectedIndex);
-      const end = Math.max(index, lastSelectedIndex);
-
-      for (let i = start; i <= end; i++) {
-        const leadId = leads[i].id;
-        updatedIsSelected[leadId] = true;
-        dispatch(addSelectedLead(leads[i]));
-      }
-    } else if (event.ctrlKey) {
-      updatedIsSelected[id] = !isSelected[id];
-      updatedIsSelected[id]
-        ? dispatch(addSelectedLead(lead))
-        : dispatch(removeLead(lead));
-    } else {
-      if (isSelected[id]) {
-        updatedIsSelected[id] = false;
-        dispatch(removeLead(lead));
+    if (!isEditing) {
+      let updatedIsSelected = { ...isSelected };
+  
+      if (event.shiftKey && lastSelectedIndex !== null) {
+        const start = Math.min(index, lastSelectedIndex);
+        const end = Math.max(index, lastSelectedIndex);
+  
+        for (let i = start; i <= end; i++) {
+          const leadId = leads[i].id;
+          updatedIsSelected[leadId] = true;
+          dispatch(addSelectedLead(leads[i]));
+        }
+      } else if (event.ctrlKey) {
+        updatedIsSelected[id] = !isSelected[id];
+        updatedIsSelected[id]
+          ? dispatch(addSelectedLead(lead))
+          : dispatch(removeLead(lead));
       } else {
-        updatedIsSelected[id] = true;
-        dispatch(addSelectedLead(lead));
+        if (isSelected[id]) {
+          updatedIsSelected[id] = false;
+          dispatch(removeLead(lead));
+        } else {
+          updatedIsSelected[id] = true;
+          dispatch(addSelectedLead(lead));
+        }
       }
+  
+      setIsSelected(updatedIsSelected);
+      setLastSelectedIndex(index);
+  
+      const selectedCount = Object.values(updatedIsSelected).filter(
+        value => value
+      ).length;
+      console.log(selectedLeadsCount);
+      setSelectedLeadsCount(selectedCount);
     }
-
-    setIsSelected(updatedIsSelected);
-    setLastSelectedIndex(index);
-
-    const selectedCount = Object.values(updatedIsSelected).filter(
-      value => value
-    ).length;
-    console.log(selectedLeadsCount);
-    setSelectedLeadsCount(selectedCount);
   };
+  
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
@@ -416,10 +419,9 @@ const LeadsList = () => {
           </div>
         </div>
 
-        <div className="">
-          {/* <div className="overflow-y-auto"> */}
-          <div className="flex justify-start ">
-            <div className="space-x-5 my-5">
+        <div className="px-10 overflow-y-auto">
+          <div className="flex justify-start w-full">
+            <div className="space-x-5 my-5 w-full flex">
               <button
                 className="border-[1px] rounded-md px-4 py-3 bg-brand text-white text-white text-xs"
                 onClick={() => setModalOpen(true)}
@@ -445,6 +447,21 @@ const LeadsList = () => {
                   Send selected leads to campaign
                 </button>
               </Link>
+              <button
+                    className={`border-[1px] flex justify-center items-center space-x-2 rounded-md px-4 py-3 bg-red-600 text-white text-white text-xs ${
+                    selectedLeadsCount > 0
+                      ? ""
+                      : "opacity-50 cursor-not-allowed"
+                  }`}
+                  onClick={event => {
+                    event.stopPropagation();
+                    handleDeleteLead();
+                  }}
+                  disabled={selectedLeadsCount === 0}
+                >
+                  <TrashIcon height={15} width={15} />
+                  <h1>Delete lead(s)</h1>
+                </button>
             </div>
           </div>
 
@@ -704,53 +721,63 @@ const LeadsList = () => {
               .map((lead: Lead, index: number) => {
                 const id = lead.id;
 
-                return (
-                  <tr
-                    key={lead.id}
-                    className={`${isSelected[id] ? "bg-gray-100" : ""}`}
-                    onClick={event => handleRowClick(index, id, lead, event)}
-                  >
-                    <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-6">
-                      <div className="flex items-center space-x-3">
-                        {isSelected[id] ? (
-                          <CheckIcon className="h-5 w-5 text-brand" />
-                        ) : (
-                          <div className="h-5 w-5 border-2 rounded-md cursor-pointer"></div>
-                        )}
-                      </div>
-                    </td>
-                    <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-6">
-                      {isEditing && editingLead.id === lead.id ? (
-                        <div className="flex flex-col space-y-2">
-                          <input
-                            className="border-b border-gray-300 px-2 py-1"
-                            placeholder="First name"
-                            value={editingLead.firstName}
-                            onChange={e =>
-                              setEditingLead({
-                                ...editingLead,
-                                firstName: e.target.value,
-                              })
-                            }
-                          />
-                          <input
-                            className="border-b border-gray-300 px-2 py-1"
-                            placeholder="Last name"
-                            value={editingLead.lastName}
-                            onChange={e =>
-                              setEditingLead({
-                                ...editingLead,
-                                lastName: e.target.value,
-                              })
-                            }
-                          />
-                        </div>
-                      ) : (
-                        <div className="font-medium select-none text-gray-900">
-                          {lead.firstName} {lead.lastName}
-                        </div>
-                      )}
-                    </td>
+                                      return (
+                                        <tr
+                                          key={lead.id}
+                                          className={`${
+                                            isSelected[id] ? "bg-gray-100" : ""
+                                          }`}
+                                          onClick={event =>
+                                            handleRowClick(
+                                              index,
+                                              id,
+                                              lead,
+                                              event
+                                            )
+                                          }
+                                        >
+                                          <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-6">
+                                            <div className="flex items-center space-x-3">
+                                              {isSelected[id] ? (
+                                                <CheckIcon className="h-5 w-5 text-brand" />
+                                              ) : (
+                                                <div className="h-5 w-5 border-2 rounded-md cursor-pointer"></div>
+                                              )}
+                                            </div>
+                                          </td>
+                                          <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-6">
+                                            {isEditing &&
+                                            editingLead.id === lead.id ? (
+                                              <div className="flex flex-col space-y-2">
+                                                <input
+                                                  className="border-b border-gray-300 px-2 py-1"
+                                                  placeholder="First name"
+                                                  value={editingLead.firstName}
+                                                  onChange={e =>
+                                                    setEditingLead({
+                                                      ...editingLead,
+                                                      firstName: e.target.value,
+                                                    })
+                                                  }
+                                                />
+                                                <input
+                                                  className="border-b border-gray-300 px-2 py-1"
+                                                  placeholder="Last name"
+                                                  value={editingLead.lastName}
+                                                  onChange={e =>
+                                                    setEditingLead({
+                                                      ...editingLead,
+                                                      lastName: e.target.value,
+                                                    })
+                                                  }
+                                                />
+                                              </div>
+                                            ) : (
+                                              <div className="font-medium select-none text-gray-900">
+                                                {lead.firstName} {lead.lastName}
+                                              </div>
+                                            )}
+                                          </td>
 
                     <td className="whitespace-nowrap select-none px-3 py-4 text-sm">
                       {isEditing && editingLead.id === lead.id ? (
@@ -868,48 +895,210 @@ const LeadsList = () => {
                             <CheckCircleIcon className="h-5 w-5 text-green-600" />
                           </a>
 
-                          <a
-                            href="#"
-                            className="mr-5 select-none hover:text-indigo-900"
-                            onClick={event => {
-                              event.stopPropagation();
-                              setIsEditing(false);
-                            }}
-                          >
-                            <XIcon className="h-5 w-5 text-red-600" />
-                          </a>
+                                                <a
+                                                  href="#"
+                                                  className="mr-5 select-none hover:text-indigo-900"
+                                                  onClick={event => {
+                                                    event.stopPropagation();
+                                                    setIsEditing(false);
+                                                  }}
+                                                >
+                                                  <XIcon className="h-5 w-5 text-red-600" />
+                                                </a>
+                                              </div>
+                                            ) : (
+                                              <a
+                                                href="#"
+                                                className="text-indigo-600 select-none hover:text-indigo-900"
+                                                onClick={event => {
+                                                  event.stopPropagation();
+                                                  handleEditClick(
+                                                    lead.id,
+                                                    lead
+                                                  );
+                                                }}
+                                              >
+                                                {/* Edit */}
+                                                <PencilAltIcon className="h-5 w-5" />
+                                              </a>
+                                            )}
+                                          </td>
+                                          <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
+                                            <TrashIcon
+                                              className="text-red-500 cursor-pointer h-5 w-5"
+                                              onClick={event => {
+                                                event.stopPropagation();
+                                                handleDeleteLead();
+                                              }}
+                                            />
+                                          </td>
+                                        </tr>
+                                      );
+                                    })
+                                )}
+                              </tbody>
+                            </table>
+                          </div>
                         </div>
-                      ) : (
-                        <a
-                          href="#"
-                          className="text-indigo-600 select-none hover:text-indigo-900"
-                          onClick={event => {
-                            event.stopPropagation();
-                            handleEditClick(lead.id, lead);
-                          }}
-                        >
-                          {/* Edit */}
-                          <PencilAltIcon className="h-5 w-5" />
-                        </a>
-                      )}
-                    </td>
-                    <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                      <TrashIcon
-                        className="text-red-500 cursor-pointer h-5 w-5"
-                        onClick={event => {
-                          event.stopPropagation();
-                          handleDeleteLead();
-                        }}
-                      />
-                    </td>
-                  </tr>
-                );
-              })
-          )}
-        </tbody>
-      </table>
-    );
-  }
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+      {modalOpen && (
+        <div className="absolute inset-0 bg-gray-800 bg-opacity-60 z-10 flex justify-center items-center">
+          <div className="bg-white rounded-lg w-2/3 p-8">
+            <h2 className="text-2xl  mb-8">Upload Leads</h2>
+            <div className="flex">
+              <div
+                className={`cursor-pointer rounded-t-md py-2 border px-4 ${
+                  activeTab === "linkedin" ? "bg-gray-100" : ""
+                }`}
+                onClick={() => setActiveTab("linkedin")}
+              >
+                LinkedIn URLs
+              </div>
+              <div
+                className={`cursor-pointer rounded-t-md py-2 border px-4 ${
+                  activeTab === "csv" ? "bg-gray-100" : ""
+                }`}
+                onClick={() => setActiveTab("csv")}
+              >
+                CSV File
+              </div>
+            </div>
+            {activeTab === "linkedin" && (
+              <div>
+                <textarea
+                  className="mt-8 w-full h-48 bg-white  p-2 rounded-md"
+                  placeholder="Paste LinkedIn Usernames here..."
+                  value={linkedinInput}
+                  onChange={e => setLinkedinInput(e.target.value)}
+                />
+              </div>
+            )}
+            {activeTab === "csv" && (
+              <div className="py-5">
+                CSV files must be formatted as{" "}
+                <span className="font-semibold">
+                  firstName,lastName,jobTitle,companyName,email,phone,linkedIn
+                </span>
+                <div className="mt-8 flex flex-col items-center justify-center h-48 bg-white border rounded-md">
+                  <label
+                    htmlFor="upload-button"
+                    className="cursor-pointer flex items-center space-x-2"
+                  >
+                    <FiUpload size={24} />
+                    <span>
+                      {file
+                        ? `Uploaded ${file.name}`
+                        : "Click here to upload a file"}
+                    </span>
+                  </label>
+                  <input
+                    id="upload-button"
+                    type="file"
+                    accept=".csv"
+                    hidden
+                    onChange={handleUpload}
+                    ref={fileInput}
+                  />
+                </div>
+              </div>
+            )}
+            <div className="mt-8 text-right flex justify-end items-center gap-x-6">
+              {activeTab === "linkedin" && (
+                <button
+                  className="bg-brand rounded-md text-white py-2 px-4 rounded-md"
+                  onClick={handleLinkedInInput}
+                >
+                  Import
+                </button>
+              )}
+              <button className="" onClick={() => setModalOpen(false)}>
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {createModalOpen && (
+        <div className="absolute inset-0 bg-gray-800 bg-opacity-60 z-10 flex justify-center items-center">
+          {/* <div className="bg-white rounded-lg w-2/3 p-8">
+            <h2 className="text-2xl  mb-8">Create Lead</h2>
+            <form className="flex flex-col ">
+              <input
+                type="text"
+                name="firstName"
+                placeholder="First Name"
+                value={newLead.firstName}
+                onChange={handleInputChange}
+              />
+              <input
+                type="text"
+                name="lastName"
+                placeholder="Last Name"
+                value={newLead.lastName}
+                onChange={handleInputChange}
+              />
+              <input
+                type="text"
+                name="jobTitle"
+                placeholder="Job Title"
+                value={newLead.jobTitle}
+                onChange={handleInputChange}
+              />
+              <input
+                type="text"
+                name="companyName"
+                placeholder="Company Name"
+                value={newLead.companyName}
+                onChange={handleInputChange}
+              />
+              <input
+                type="text"
+                name="email"
+                placeholder="Email"
+                value={newLead.email}
+                onChange={handleInputChange}
+              />
+              <input
+                type="text"
+                name="phone"
+                placeholder="Phone"
+                value={newLead.phone}
+                onChange={handleInputChange}
+              />
+              <input
+                type="text"
+                name="linkedIn"
+                placeholder="LinkedIn"
+                value={newLead.linkedIn}
+                onChange={handleInputChange}
+              />
+            </form>
+            <div className="mt-2 text-right">
+              <button
+                type="button"
+                className="mt-4 py-2 px-4 rounded-md bg-brand text-white mr-6"
+                onClick={handleCreateLead}
+              >
+                Create
+              </button>
+              <button className="" onClick={() => setCreateModalOpen(false)}>
+                Close
+              </button>
+            </div>
+          </div> */}
+          <LeadProfile />
+        </div>
+      )}
+    </div>
+  );
 
   function LeadProfile() {
     return (

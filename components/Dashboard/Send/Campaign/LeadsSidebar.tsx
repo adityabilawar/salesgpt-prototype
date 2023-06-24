@@ -117,12 +117,12 @@ const LeadsSidebar = ({ campaignId, userId }: LeadsSidebarProps) => {
       <h1 className="px-5 text-3xl mt-5">Leads</h1>
       <div className="flex border-b items-center">
           <button
-            className="px-4 py-2 m-5 border-[1px] rounded-md bg-brand text-white"
+            className="px-2 py-2 m-4 text-sm border-[1px] rounded-md bg-brand text-white"
           >
-            Export as CSV
+            Export CSV
           </button>
           <h1 className="flex cursor-pointer items-center space-x-2 bg-brand px-4 py-2 rounded-md text-white">
-          <FiFastForward /><span>Run all</span>
+          <FiFastForward /><span className="text-sm">Run all</span>
           </h1>
       </div>
       {activeTab === 'leads' && leads.map((lead: Lead) => (
