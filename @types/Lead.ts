@@ -11,6 +11,7 @@ interface Lead extends BaseLead {
     linkedIn: string;
     phone: string;
     refresh?: string;
+    generatedMessages?: { campaignId: string; message: string }[];
     [key: string]: any;
 }
 
