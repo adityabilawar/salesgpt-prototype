@@ -475,7 +475,7 @@ const LeadsList = () => {
             {leads.length === 0 ? (
               <div className="flex items-center justify-center h-48">
                 <p className="text-xl text-gray-500">
-                  Upload leads to send to campaign
+                  Upload or create leads to send to campaign
                 </p>
               </div>
             ) : (
