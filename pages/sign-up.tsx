@@ -198,7 +198,7 @@ const RegisterPage = () => {
               </button>
             </div>
 
-            <div className="relative my-3">
+            <div className="relative">
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-gray-300" />
               </div>
@@ -207,7 +207,9 @@ const RegisterPage = () => {
               </div>
             </div>
 
-            <button
+            
+          </form>
+          <button
               onClick={() => {
                 signInWithRedirect(auth, new GoogleAuthProvider());
               }}
@@ -222,7 +224,6 @@ const RegisterPage = () => {
               </span>
               <span>Continue with Google</span>
             </button>
-          </form>
         </div>
       </div>
     </>
