@@ -251,7 +251,7 @@ const CampaignsList = () => {
                             <div className="group relative flex justify-center">
                               <button
                                 disabled={!campaignsWithLeads[campaign.id]} // Disable the button if the campaign has no leads
-                                className={`group relative flex bg-gray-800 ${
+                                className={`group relative flex bg-brand ${
                                   !campaignsWithLeads[campaign.id] &&
                                   "bg-gray-600"
                                 } text-white items-center rounded-md px-6 py-2 md:text-sm lg:text-md`}

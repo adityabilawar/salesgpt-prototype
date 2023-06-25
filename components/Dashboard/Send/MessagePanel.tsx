@@ -51,11 +51,6 @@ const MessagePanel = () => {
   };
 
   const saveGeneratedMessage = async () => {
-    if (!displayedMessage || displayedMessage.trim() === "") {
-      alert("The message is empty. Please generate a message before saving.");
-      return;
-    }
-
     if (!selectedLead || !userId || !campaignId) console.log("Now you know why I stopped working");
     if (!selectedLead || !userId || !campaignId) return;
 
@@ -103,6 +98,28 @@ const MessagePanel = () => {
       // Display error notification
       setNotification({ message: 'Failed to save message, please try again.', type: 'error' });
       console.error("Error saving message", error);
+    }
+
+    if (!displayedMessage || displayedMessage.trim() === "") {
+      const confirmation = window.confirm("Do you want to delete the message from this lead?");
+      if (confirmation) {
+        const updatedLeadData = {
+          ...leadData,
+          generatedMessages: leadData.generatedMessages.filter(
+            (msg: { campaignId: string; message: string }) => msg.campaignId !== campaignId
+          )
+        };
+        try {
+          await setDoc(leadRef, updatedLeadData);
+          setNotification({ message: 'Message deleted successfully!', type: 'success' });
+          console.log("Message deleted successfully");
+        } catch (error) {
+          // Display error notification
+          setNotification({ message: 'Failed to delete message, please try again.', type: 'error' });
+          console.error("Error deleting message", error);
+        }
+        return;
+      }
     }
 
     console.log("Message saved successfully");
