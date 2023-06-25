@@ -457,9 +457,7 @@ const MessagePanel = () => {
       </div>
       <div className="flex-grow-0 px-10 py-5 flex flex-col justify-start items-start">
         <h1 className="mb-5 font-bold">
-          Generating message for {selectedLead && selectedLead.firstName}{" "}
-          {selectedLead && selectedLead.lastName},{" "}
-          {selectedLead && selectedLead.companyName}
+          {selectedLead && <p>Generating message for {selectedLead && selectedLead.firstName}{" "}{selectedLead && selectedLead.lastName},{" "}{selectedLead && selectedLead.companyName}</p>}
         </h1>
         <div className="relative w-full min-h-60 overflow-y-auto">
         <textarea

@@ -113,9 +113,27 @@ const LeadsSidebar = ({ campaignId, userId }: LeadsSidebarProps) => {
           >
             Export CSV
           </button>
-          <h1 className="flex cursor-pointer items-center space-x-2 bg-brand px-4 py-2 rounded-md text-white">
-          <FiFastForward /><span className="text-sm">Run all</span>
-          </h1>
+          <button
+          className="flex cursor-pointer items-center space-x-2 bg-brand px-4 py-2 rounded-md text-white"
+          // onClick={async () => {
+          //   for (const lead of leads) {
+          //     if (lead.generatedMessages) {
+          //       const existingMessage = lead.generatedMessages.find(
+          //         (msg: { campaignId: string; message: string }) => msg.campaignId === campaignId
+          //       );
+          //       if (!existingMessage) {
+          //         // Lead does not have a message associated with the campaignId, generate a new message
+          //         playLeadHandler(lead);
+          //       }
+          //     } else {
+                
+          //     }
+          //   }
+          // }}
+        >
+          <FiFastForward />
+          <span className="text-sm">Run all</span>
+        </button>
       </div>
       {activeTab === 'leads' && leads.map((lead: Lead) => (
         lead && (
@@ -123,8 +141,6 @@ const LeadsSidebar = ({ campaignId, userId }: LeadsSidebarProps) => {
             key={lead.id}
             className="flex justify-between m-2 p-4 cursor-pointer rounded-md duration-100 hover:bg-gray-100"
             onClick={() => {
-            //   console.log(lead);
-            //   console.log(campaignId)
               if (lead.generatedMessages) {
                 console.log("true")
                 const leadMessage = lead.generatedMessages.find((msg: { campaignId: string, message: string }) => msg.campaignId === campaignId);

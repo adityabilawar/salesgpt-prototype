@@ -113,7 +113,7 @@ const Sidebar = () => {
               >
                 <img
                   className="h-8 w-auto"
-                  src="/templogo.svg"
+                  src="/logo.svg"
                   alt="Pipeline AI"
                 />
                 <span className="ml-3 text-gray-900 text-2xl font-semibold">

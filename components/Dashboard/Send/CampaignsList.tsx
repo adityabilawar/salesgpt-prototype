@@ -195,7 +195,7 @@ const CampaignsList = () => {
               {/* <div className="flex-grow" /> */}
               <h2 className="font-semibold text-sm">CAMPAIGN TITLE</h2>
               <Link href="/dashboard/create-campaign">
-                <button className="border-[1px] px-6 py-3 rounded-md bg-emerald-600 text-white md:text-sm lg:text-md">
+                <button className="border-[1px] px-6 py-3 rounded-md bg-green-600 text-white md:text-sm lg:text-md">
                   <div className="flex justify-center items-center gap-x-1">
                     <PlusIcon className="h-4 w-4"/>
                     <p className="text-sm">Add Campaign</p>

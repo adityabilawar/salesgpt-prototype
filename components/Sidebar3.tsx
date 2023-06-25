@@ -93,11 +93,11 @@ export default function Sidebar3() {
                   <div className="flex-shrink-0 flex items-center px-4">
                     <img
                       className="h-8 w-auto"
-                      src="/templogo.svg"
+                      src="/logo.svg"
                       alt="Pipeline AI"
                     />
-                    <span className="ml-3 text-gray-900 text-2xl font-semibold">
-                  Pipeline AI
+               <span className="ml-2 text-brand text-2xl font-semibold">
+                  Pipeline
                 </span>
                   </div>
                   <nav className="mt-5 px-2 space-y-1">
@@ -159,11 +159,11 @@ export default function Sidebar3() {
               <div className="flex items-center flex-shrink-0 px-4">
                 <img
                   className="h-8 w-auto"
-                  src="/templogo.svg"
+                  src="/logo.svg"
                   alt="Pipeline AI"
                 />
-               <span className="ml-3 text-gray-900 text-2xl font-semibold">
-                  Pipeline AI
+               <span className="ml-2 text-brand text-2xl font-semibold">
+                  Pipeline
                 </span>
               </div>
               <nav className="mt-5 flex-1 px-2 bg-white space-y-1">
