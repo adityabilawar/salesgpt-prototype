@@ -1,7 +1,9 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/router";
-import { createUserWithEmailAndPassword } from "@/lib/firebaseClient";
+import { auth, createUserWithEmailAndPassword } from "@/lib/firebaseClient";
 import Snackbar from "@/components/Snackbar";
+import { GoogleAuthProvider, signInWithRedirect } from "firebase/auth";
+import { User, onAuthStateChanged } from "firebase/auth";
 
 const RegisterPage = () => {
   const router = useRouter();
@@ -12,6 +14,8 @@ const RegisterPage = () => {
 
   const [termsOfService, setTermsOfService] = useState(false);
   const [privacyPolicy, setPrivacyPolicy] = useState(false);
+
+  const [user, setUser] = useState<User | null>(null);
 
   const submitRegistration = async event => {
     event.preventDefault(); // Prevent form submission and page refresh
@@ -27,6 +31,15 @@ const RegisterPage = () => {
       console.error(error);
     }
   };
+
+  useEffect(() => {
+    auth.onAuthStateChanged(async user => {
+      setUser(user);
+    });
+    if (user) {
+      router.push("/dashboard");
+    }
+  }, [user]);
 
   return (
     <>
@@ -136,7 +149,7 @@ const RegisterPage = () => {
 
               <div className="h-5" />
 
-              <div>
+              {/* <div>
                 <div className="flex items-center">
                   <input
                     type="checkbox"
@@ -172,7 +185,7 @@ const RegisterPage = () => {
                     </span>
                   </label>
                 </div>
-              </div>
+              </div> */}
             </div>
 
             <div>
@@ -184,6 +197,31 @@ const RegisterPage = () => {
                 Sign up
               </button>
             </div>
+
+            <div className="relative my-3">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-300" />
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-2 bg-white text-gray-500">Or</span>
+              </div>
+            </div>
+
+            <button
+              onClick={() => {
+                signInWithRedirect(auth, new GoogleAuthProvider());
+              }}
+              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-black bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            >
+              <span className="absolute left-0 inset-y-0 flex items-center pl-3">
+                <img
+                  className="w-9 h-9"
+                  src="/google-icon.svg"
+                  alt="Google Icon"
+                />
+              </span>
+              <span>Continue with Google</span>
+            </button>
           </form>
         </div>
       </div>

@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 import { BadgeCheckIcon } from "@heroicons/react/solid";
 import { onAuthStateChanged } from "firebase/auth";
-import { auth, db, updateUserProfile } from "@/lib/firebaseClient";
+import { auth, db } from "@/lib/firebaseClient";
 import { collection, doc, setDoc, getDoc } from "firebase/firestore";
 
 export default function onboarding() {
@@ -18,32 +18,14 @@ export default function onboarding() {
   const [valueProvide, setValueProvide] = useState("");
   const [problemSolve, setProblemSolve] = useState("");
 
+  const [termsOfService, setTermsOfService] = useState(false);
+  const [privacyPolicy, setPrivacyPolicy] = useState(false);
+
+  
+
   const handleSubmitOnboarding = async event => {
     event.preventDefault(); 
-    if (
-      phoneNumber &&
-      linkedIn &&
-      jobTitle &&
-      companyInformation &&
-      valueProvide &&
-      problemSolve
-    ) {
-      try {
-        await updateUserProfile(
-          phoneNumber,
-          linkedIn,
-          jobTitle,
-          companyInformation,
-          valueProvide,
-          problemSolve
-        );
-        router.push("/login");
-      } catch (error) {
-        console.error(error);
-      }
-    } else {
-      alert("Please fill all the fields before proceeding.");
-    }
+    
   };
 
   useEffect(() => {
@@ -240,6 +222,45 @@ export default function onboarding() {
                   )}
                 </div>
               </div>
+
+              <div>
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="terms-checkbox"
+                    checked={termsOfService}
+                    onChange={() => {
+                      setTermsOfService(!termsOfService);
+                    }}
+                    className="mr-2"
+                  />
+                  <label htmlFor="terms-checkbox" className="text-sm">
+                    I agree to the Pipeline{" "}
+                    <span className="text-blue-500">
+                      <a href="/terms-of-service">Terms of Service</a>
+                    </span>
+                  </label>
+                </div>
+
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="privacy-checkbox"
+                    checked={privacyPolicy}
+                    onChange={() => {
+                      setPrivacyPolicy(!privacyPolicy);
+                    }}
+                    className="mr-2"
+                  />
+                  <label htmlFor="privacy-checkbox" className="text-sm">
+                    I agree to the Pipeline{" "}
+                    <span className="text-blue-500">
+                      <a href="/privacy-policy">Privacy Policy</a>
+                    </span>
+                  </label>
+                </div>
+              </div>
+
               <div className="flex justify-end pt-5">
                 <button
                   onClick={handleSubmitOnboarding}
@@ -249,6 +270,7 @@ export default function onboarding() {
                   Save
                 </button>
               </div>
+              
             </form>
           </div>
         </div>

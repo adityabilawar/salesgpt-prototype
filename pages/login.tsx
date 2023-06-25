@@ -2,7 +2,13 @@ import { useEffect, useRef, useState } from "react";
 import styles from "@/styles/Login.module.css";
 import graphic from "@/public/graphic.png";
 import { useRouter } from "next/router";
-import { onAuthStateChanged, User } from "firebase/auth";
+import {
+  onAuthStateChanged,
+  User,
+  GoogleAuthProvider,
+  signInWithRedirect,
+  signInWithPopup,
+} from "firebase/auth";
 import { signInWithEmailAndPassword, auth } from "@/lib/firebaseClient";
 import { LockClosedIcon } from "@heroicons/react/solid";
 import { FormEvent } from "react";
@@ -49,7 +55,9 @@ const LoginPage = () => {
 
   return (
     <>
-    {showNotif && error && <Snackbar message="Wrong email or password." color="red" />}
+      {showNotif && error && (
+        <Snackbar message="Wrong email or password." color="red" />
+      )}
       <div className="min-h-full flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-md w-full space-y-8 loginContainer p-12">
           <div>
@@ -138,15 +146,39 @@ const LoginPage = () => {
               </div>
             </div>
 
-            {/* {error && <p className="text-red-500">{error}</p>} */}
-            <div>
+            <div className="flex flex-col gap-2">
               <button
                 type="submit"
                 className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-500 hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
               >
-                <span className="absolute left-0 inset-y-0 flex items-center pl-3"></span>
                 Sign in
               </button>
+
+              <div className="relative my-3">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-300" />
+                </div>
+                <div className="relative flex justify-center text-sm">
+                  <span className="px-2 bg-white text-gray-500">Or</span>
+                </div>
+              </div>
+
+              <button
+                onClick={() => {
+                  signInWithRedirect(auth, new GoogleAuthProvider());
+                }}
+                className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-black bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              >
+                <span className="absolute left-0 inset-y-0 flex items-center pl-3">
+                  <img
+                    className="w-9 h-9"
+                    src="/google-icon.svg"
+                    alt="Google Icon"
+                  />
+                </span>
+                <span>Continue with Google</span>
+              </button>
+              
             </div>
           </form>
         </div>

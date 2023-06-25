@@ -47,44 +47,44 @@ export const createUserWithEmailAndPassword = async (email: string, password: st
   }
 };
 
-export const updateUserProfile = async (
-  uid: string,
-  firstName?: string,
-  lastName?: string,
-  phoneNumber?: string,
-  linkedIn?: string,
-  companyInformation?: string,
-  valueYouProvide?: string,
-  problemsYouSolve?: string
-) => {
-  try {
-    const userRef = doc(db, "users", uid);
-    const docSnap = await getDoc(userRef);
+// export const updateUserProfile = async (
+//   uid: string,
+//   firstName?: string,
+//   lastName?: string,
+//   phoneNumber?: string,
+//   linkedIn?: string,
+//   companyInformation?: string,
+//   valueYouProvide?: string,
+//   problemsYouSolve?: string
+// ) => {
+//   try {
+//     const userRef = doc(db, "users", uid);
+//     const docSnap = await getDoc(userRef);
 
-    if (docSnap.exists()) {
-      const updatedData = {
-        firstName: firstName || docSnap.data().firstName,
-        lastName: lastName || docSnap.data().lastName,
-        phoneNumber: phoneNumber || docSnap.data().phoneNumber,
-        linkedIn: linkedIn || docSnap.data().linkedIn,
-        companyInformation:
-          companyInformation || docSnap.data().companyInformation,
-        valueYouProvide: valueYouProvide || docSnap.data().valueYouProvide,
-        problemsYouSolve: problemsYouSolve || docSnap.data().problemsYouSolve,
-      };
+//     if (docSnap.exists()) {
+//       const updatedData = {
+//         firstName: firstName || docSnap.data().firstName,
+//         lastName: lastName || docSnap.data().lastName,
+//         phoneNumber: phoneNumber || docSnap.data().phoneNumber,
+//         linkedIn: linkedIn || docSnap.data().linkedIn,
+//         companyInformation:
+//           companyInformation || docSnap.data().companyInformation,
+//         valueYouProvide: valueYouProvide || docSnap.data().valueYouProvide,
+//         problemsYouSolve: problemsYouSolve || docSnap.data().problemsYouSolve,
+//       };
 
-      await updateDoc(userRef, updatedData);
-      console.log(`User ${uid} updated successfully`);
-      return { uid, error: null };
-    } else {
-      console.log("No such document!");
-      return { uid: null, error: "No such document!" };
-    }
-  } catch (error: any) {
-    console.error("Error updating user: ", error);
-    return { uid: null, error: error.message };
-  }
-};
+//       await updateDoc(userRef, updatedData);
+//       console.log(`User ${uid} updated successfully`);
+//       return { uid, error: null };
+//     } else {
+//       console.log("No such document!");
+//       return { uid: null, error: "No such document!" };
+//     }
+//   } catch (error: any) {
+//     console.error("Error updating user: ", error);
+//     return { uid: null, error: error.message };
+//   }
+// };
 
 
 
