@@ -2,31 +2,23 @@
 import { Fragment, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import {
-  CalendarIcon,
-  ChartBarIcon,
-  FolderIcon,
-  HomeIcon,
-  InboxIcon,
   MenuIcon,
   UserIcon,
-  UsersIcon,
-  XIcon,
+  XIcon
 } from "@heroicons/react/outline";
-import { useRouter } from "next/router";
 import { FiGrid, FiLogOut, FiMail, FiSettings, FiX } from "react-icons/fi";
 import { HiOutlinePaperAirplane } from "react-icons/hi";
 import { signOut } from "firebase/auth";
 import { auth } from "@/lib/firebaseClient";
 
 const navigation = [
-  { name: "Dashboard", href: "/dashboard", icon: FiGrid, current: true },
+  { name: "Dashboard", href: "/dashboard", icon: FiGrid},
   {
     name: "Campaigns",
     href: "/dashboard/send",
     icon: HiOutlinePaperAirplane,
-    current: false,
   },
-  { name: "Profile", href: "/profile", icon: UserIcon, current: false },
+  { name: "Profile", href: "/profile", icon: UserIcon },
 ];
 
 function classNames(...classes) {
@@ -35,6 +27,11 @@ function classNames(...classes) {
 
 export default function Sidebar3() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState("Dashboard");
+
+  const handleTabClick = (name) => {
+    setActiveTab(name);
+  };
 
   return (
     <>
@@ -66,7 +63,7 @@ export default function Sidebar3() {
               leaveTo="-translate-x-full"
             >
               <div className="relative flex-1 flex flex-col max-w-xs w-full bg-white">
-                <Transition.Child
+                {/* <Transition.Child
                   as={Fragment}
                   enter="ease-in-out duration-300"
                   enterFrom="opacity-0"
@@ -88,7 +85,7 @@ export default function Sidebar3() {
                       />
                     </button>
                   </div>
-                </Transition.Child>
+                </Transition.Child> */}
                 <div className="flex-1 h-0 pt-5 pb-4 overflow-y-auto">
                   <div className="flex-shrink-0 flex items-center px-4">
                     <img
@@ -103,10 +100,11 @@ export default function Sidebar3() {
                   <nav className="mt-5 px-2 space-y-1">
                     {navigation.map(item => (
                       <a
+                      onClick={() => handleTabClick(item.name)}
                         key={item.name}
                         href={item.href}
                         className={classNames(
-                          item.current
+                          activeTab === item.name
                             ? "bg-gray-100 text-gray-900"
                             : "text-gray-600 hover:bg-gray-50 hover:text-gray-900",
                           "group flex items-center px-2 py-2 text-base font-medium rounded-md"
@@ -114,7 +112,7 @@ export default function Sidebar3() {
                       >
                         <item.icon
                           className={classNames(
-                            item.current
+                            activeTab === item.name
                               ? "text-gray-500"
                               : "text-gray-400 group-hover:text-gray-500",
                             "mr-4 flex-shrink-0 h-6 w-6"
@@ -169,10 +167,11 @@ export default function Sidebar3() {
               <nav className="mt-5 flex-1 px-2 bg-white space-y-1">
                 {navigation.map(item => (
                   <a
+                  onClick={() => handleTabClick(item.name)}
                     key={item.name}
                     href={item.href}
                     className={classNames(
-                      item.current
+                      activeTab === item.name
                         ? "bg-gray-100 text-gray-900"
                         : "text-gray-600 hover:bg-gray-50 hover:text-gray-900",
                       "group flex items-center px-2 py-2 text-sm font-medium rounded-md"
@@ -180,7 +179,7 @@ export default function Sidebar3() {
                   >
                     <item.icon
                       className={classNames(
-                        item.current
+                        activeTab === item.name
                           ? "text-gray-500"
                           : "text-gray-400 group-hover:text-gray-500",
                         "mr-3 flex-shrink-0 h-6 w-6"
