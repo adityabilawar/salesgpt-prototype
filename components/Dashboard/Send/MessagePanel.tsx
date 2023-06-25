@@ -9,7 +9,7 @@ import { fetchUserData, User } from "@/components/redux/userSlice";
 import { useRouter } from "next/router";
 import { FiRotateCw } from "react-icons/fi";
 import { onAuthStateChanged } from "firebase/auth";
-import autosize from "autosize";
+import Notification from "@/components/Notification";
 
 
 const configuration = new Configuration({
@@ -35,12 +35,20 @@ const MessagePanel = () => {
   const playButtonState = useSelector((state: RootState) => state.playButton);
   const { campaignId } = router.query;
   const [currentMessage, setCurrentMessage] = useState<string | null>(null);
+  const [notification, setNotification] = useState<{ message: string, type: 'success' | 'error' } | null>(null);
   const [displayedMessage, setDisplayedMessage] = useState<string | null>(null);
-  const textareaRef = useRef(null);
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
   if (selectedLead) {
     console.log("Selected lead: " + selectedLead.toString());
   }
+
+  const autosizeTextarea = () => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+    }
+  };
 
   const saveGeneratedMessage = async () => {
     if (!displayedMessage || displayedMessage.trim() === "") {
@@ -48,6 +56,7 @@ const MessagePanel = () => {
       return;
     }
 
+    if (!selectedLead || !userId || !campaignId) console.log("Now you know why I stopped working");
     if (!selectedLead || !userId || !campaignId) return;
 
     const leadRef = doc(db, "users", userId, "leads", selectedLead.id);
@@ -84,14 +93,19 @@ const MessagePanel = () => {
         message: displayedMessage,
       });
     }
+    try {
+      await setDoc(leadRef, updatedLeadData);
 
-    await setDoc(leadRef, updatedLeadData);
+      setNotification({ message: 'Message saved successfully!', type: 'success' });
+
+      console.log("Message saved successfully");
+    } catch (error) {
+      // Display error notification
+      setNotification({ message: 'Failed to save message, please try again.', type: 'error' });
+      console.error("Error saving message", error);
+    }
 
     console.log("Message saved successfully");
-
-    // Set isDeleted to true and clear the displayedMessage
-    setIsDeleted(true);
-    setDisplayedMessage(null);
   };
 
   async function generatePersonalizedMessage(
@@ -146,7 +160,6 @@ const MessagePanel = () => {
       setLoading(false);
     }
   }
-  
 
   const handleRefreshClick = async () => {
     if (!selectedLead || !userId || !campaignId || !user) return;
@@ -221,7 +234,6 @@ const MessagePanel = () => {
     }
     setMessagesGenerated((prevCount) => prevCount + 1);
   };
-  
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -342,21 +354,10 @@ const MessagePanel = () => {
             purpose: campaignData.purpose,
             ...campaignData,
           };
-
-          const message = await generatePersonalizedMessage(
-            JSON.parse(JSON.stringify(selectedLead)),
-            campaign,
-            JSON.parse(JSON.stringify(user))
-          );
-          setDisplayedMessage(message);
-          // if (!currentMessage) {
-            setCurrentMessage(message);
-          // }
-          setMessagesGenerated((prevCount) => prevCount + 1);
         }
       }
 
-      setLoading(true); // Only set loading to true if there's no existing message
+      setLoading(true);
 
       setDisplayedMessage(null);
       setCurrentMessage(null);
@@ -415,16 +416,25 @@ const MessagePanel = () => {
     fetchCampaignAndGenerateMessage();
   }, [playButtonState, user, userId]);
   
-  
+  useEffect(() => {
+    autosizeTextarea();
+  }, [displayedMessage]);
 
   useEffect(() => {
-    if (textareaRef.current) {
-      autosize(textareaRef.current);
+    if (notification) {
+      const timer = setTimeout(() => {
+        setNotification(null);
+      }, 5000);
+  
+      return () => {
+        clearTimeout(timer);
+      };
     }
-  }, [displayedMessage]);
+  }, [notification]);
 
   return (
     <div className="flex-grow overflow-y-auto h-full">
+      {notification && <Notification message={notification.message} type={notification.type} />}
       <div className="relative flex border-b px-10 py-5 text-2xl">
         {campaignTitle ? campaignTitle : "Loading..."}
       </div>
@@ -435,14 +445,15 @@ const MessagePanel = () => {
           {selectedLead && selectedLead.companyName}
         </h1>
         <div className="relative w-full min-h-60 overflow-y-auto">
-          <textarea
-            ref={textareaRef}
-            className={`w-full h-full border text-black rounded-md ${
-              loading ? "opacity-50" : ""
-            }`}
-            value={displayedMessage || ""} // when displayedMessage is null, set the value to an empty string
-            onChange={(e) => setDisplayedMessage(e.target.value)}
-          ></textarea>
+        <textarea
+          ref={textareaRef}
+          className={`w-full h-full border text-black rounded-md ${
+            loading ? "opacity-50" : ""
+          }`}
+          value={displayedMessage || ""} // when displayedMessage is null, set the value to an empty string
+          onChange={(e) => setDisplayedMessage(e.target.value)}
+          style={{overflow: 'hidden'}} // disable the scrollbar
+        ></textarea>
           {loading && (
             <div className="absolute inset-0 bg-gray-200 opacity-50 rounded-md flex justify-center items-center">
               <svg

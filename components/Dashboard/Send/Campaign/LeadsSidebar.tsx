@@ -123,8 +123,8 @@ const LeadsSidebar = ({ campaignId, userId }: LeadsSidebarProps) => {
             key={lead.id}
             className="flex justify-between m-2 p-4 cursor-pointer rounded-md duration-100 hover:bg-gray-100"
             onClick={() => {
-              console.log(lead);
-              console.log(campaignId)
+            //   console.log(lead);
+            //   console.log(campaignId)
               if (lead.generatedMessages) {
                 console.log("true")
                 const leadMessage = lead.generatedMessages.find((msg: { campaignId: string, message: string }) => msg.campaignId === campaignId);
@@ -132,17 +132,21 @@ const LeadsSidebar = ({ campaignId, userId }: LeadsSidebarProps) => {
                   dispatch(setCurrentMessage(leadMessage.message));
                 } else {
                   console.log(`No generated message associated with campaignId ${campaignId} for lead ${lead.id}`);
-                }
+                } 
               } else {
                 console.log(`No generated messages for lead ${lead.id}`);
               }
-              playLeadHandler(lead);
+            //   playLeadHandler(lead);
               dispatch(setSelectedLead(lead));
+            // }}
             }}
           >
             {`${lead.firstName} ${lead.lastName}`}
             <div className="flex space-x-2 text-xl">
-              <BsPlay className="cursor-pointer" onClick={(e) => playLeadHandler(lead)} />
+              <BsPlay className="cursor-pointer" onClick={(e) =>  {
+                e.stopPropagation()
+                playLeadHandler(lead)
+              }} />
               <FiTrash2 className="cursor-pointer" onClick={(e) => {
                 removeLeadHandler(lead);
               }} />
