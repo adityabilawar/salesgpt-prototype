@@ -11,6 +11,7 @@ import { FiRotateCw } from "react-icons/fi";
 import { onAuthStateChanged } from "firebase/auth";
 import autosize from "autosize";
 
+
 const configuration = new Configuration({
   organization: "org-z7m6hqrQHuHbpI0K9pYlJiR0",
   apiKey: process.env.OPEN_AI_KEY,
@@ -30,6 +31,8 @@ const MessagePanel = () => {
   const [campaignTitle, setCampaignTitle] = useState<string | null>(null);
   const router = useRouter();
   const [isDeleted, setIsDeleted] = useState<boolean>(false);
+  const { lead } = useSelector((state: RootState) => state.message);
+  const playButtonState = useSelector((state: RootState) => state.playButton);
   const { campaignId } = router.query;
   const [currentMessage, setCurrentMessage] = useState<string | null>(null);
   const [displayedMessage, setDisplayedMessage] = useState<string | null>(null);
@@ -98,7 +101,7 @@ const MessagePanel = () => {
   ): Promise<string> {
     setLoading(true);
     const aboutInput = `Never forget the recipient's name is ${lead.firstName} ${lead.lastName}. The company values are ${user.companyValues} and we are solving ${user.problem}. Never forget our name is ${user.firstName} ${user.lastName}.`;
-
+  
     try {
       const response = lead.refresh
         ? await axios.post("/api/refresh", {
@@ -111,7 +114,7 @@ const MessagePanel = () => {
       // F(response.data);
       if (response.data && response.data.message) {
         const message = response.data.message;
-
+  
         const leadsCollectionRef = collection(
           db,
           "users",
@@ -121,8 +124,12 @@ const MessagePanel = () => {
           "leads"
         );
         const leadRef = doc(leadsCollectionRef, lead.id as string);
-
+  
         await setDoc(leadRef, { generatedMessage: message }, { merge: true });
+  
+        // Update the displayedMessage state with the new message
+        setDisplayedMessage(message);
+  
         return message;
       } else {
         throw new Error("AI model failed to generate a personalized message");
@@ -139,6 +146,7 @@ const MessagePanel = () => {
       setLoading(false);
     }
   }
+  
 
   const handleRefreshClick = async () => {
     if (!selectedLead || !userId || !campaignId || !user) return;
@@ -364,6 +372,50 @@ const MessagePanel = () => {
       setDisplayedMessage(currentMessage);
     }
   }, [currentMessage]);
+
+  useEffect(() => {
+    async function fetchCampaignAndGenerateMessage() {
+      if (playButtonState.lead && playButtonState.campaignId && user && userId) {
+        const campaignDocRef = doc(
+          db,
+          "users",
+          userId,
+          "campaigns",
+          playButtonState.campaignId
+        );
+        const campaignSnapshot = await getDoc(campaignDocRef);
+  
+        if (!campaignSnapshot.exists()) {
+          console.error("Campaign does not exist");
+          return;
+        }
+  
+        const campaignData = campaignSnapshot.data();
+  
+        if (!campaignData || typeof campaignData.generatedPrompt !== "string") {
+          console.error("Invalid campaign data");
+          return;
+        }
+  
+        const campaign: Campaign = {
+          id: campaignSnapshot.id,
+          generatedPrompt: campaignData.generatedPrompt,
+          callToAction: campaignData.callToAction,
+          campaignTitle: campaignData.campaignTitle,
+          platform: campaignData.platform,
+          toneOfVoice: campaignData.toneOfVoice,
+          purpose: campaignData.purpose,
+          ...campaignData,
+        };
+  
+        generatePersonalizedMessage(playButtonState.lead, campaign, user);
+      }
+    }
+  
+    fetchCampaignAndGenerateMessage();
+  }, [playButtonState, user, userId]);
+  
+  
 
   useEffect(() => {
     if (textareaRef.current) {
