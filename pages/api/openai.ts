@@ -26,7 +26,8 @@ async function scrape(linkedInId: string) {
       params: {
         api_key: '648a5995f781eb467a28ddc1',
         type: 'profile',
-        linkId: linkedInId
+        linkId: linkedInId,
+        private: true
       }
     });
 
