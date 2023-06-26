@@ -24,8 +24,34 @@ export default function onboarding() {
   
 
   const handleSubmitOnboarding = async event => {
-    event.preventDefault(); 
-    
+    event.preventDefault();
+    const unsubscribe = onAuthStateChanged(auth, async user => {
+      if (user) {
+        setUserId(user.uid);
+  
+        const userDoc = doc(collection(db, "users"), user.uid);
+        const userData = await getDoc(userDoc);
+        
+        if (userData.exists()) {
+          const {
+            phoneNumber,
+            linkedInProfile,
+            jobTitle,
+            companyInformation,
+            companyValue,
+            problem,
+          } = userData.data();
+  
+          if (phoneNumber || linkedInProfile || jobTitle || companyInformation || companyValue || problem) {
+            router.push('/dashboard');
+          }
+        }
+      } else {
+        setUserId(null);
+        router.push('/login');
+      }
+      router.push('/dashboard'); //delete later
+    });
   };
 
   useEffect(() => {

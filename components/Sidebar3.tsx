@@ -1,5 +1,5 @@
 /* This example requires Tailwind CSS v2.0+ */
-import { Fragment, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import {
   MenuIcon,
@@ -10,6 +10,7 @@ import { FiGrid, FiLogOut, FiMail, FiSettings, FiX } from "react-icons/fi";
 import { HiOutlinePaperAirplane } from "react-icons/hi";
 import { signOut } from "firebase/auth";
 import { auth } from "@/lib/firebaseClient";
+import { useRouter } from 'next/router';
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: FiGrid},
@@ -28,11 +29,19 @@ function classNames(...classes) {
 export default function Sidebar3() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("Dashboard");
+  const router = useRouter();
 
-  const handleTabClick = (name) => {
-    setActiveTab(name);
-  };
-
+useEffect(() => {
+    const currentPath = router.pathname;
+    if (currentPath.startsWith('/dashboard/generate')) {
+      setActiveTab('Campaigns');
+    } else if (currentPath.startsWith('/dashboard/send')) {
+      setActiveTab('Campaigns');
+    } else {
+      const navItem = navigation.find(item => currentPath.startsWith(item.href));
+      if (navItem) setActiveTab(navItem.name);
+    }
+  }, [router.pathname]);
   return (
     <>
       <div>
@@ -100,7 +109,6 @@ export default function Sidebar3() {
                   <nav className="mt-5 px-2 space-y-1">
                     {navigation.map(item => (
                       <a
-                      onClick={() => handleTabClick(item.name)}
                         key={item.name}
                         href={item.href}
                         className={classNames(
@@ -167,7 +175,6 @@ export default function Sidebar3() {
               <nav className="mt-5 flex-1 px-2 bg-white space-y-1">
                 {navigation.map(item => (
                   <a
-                  onClick={() => handleTabClick(item.name)}
                     key={item.name}
                     href={item.href}
                     className={classNames(
