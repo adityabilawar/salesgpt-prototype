@@ -171,14 +171,6 @@ export default function onboarding() {
                     false
                   )}
                   {textBox(
-                    "Phone number",
-                    "tel",
-                    "phone-number",
-                    "",
-                    setPhoneNumber,
-                    false
-                  )}
-                  {textBox(
                     "LinkedIn username",
                     "text",
                     "linkedin",
