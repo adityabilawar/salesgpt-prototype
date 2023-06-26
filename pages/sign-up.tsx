@@ -37,7 +37,7 @@ const RegisterPage = () => {
       setUser(user);
     });
     if (user) {
-      router.push("/dashboard");
+      router.push("/onboarding");
     }
   }, [user]);
 
